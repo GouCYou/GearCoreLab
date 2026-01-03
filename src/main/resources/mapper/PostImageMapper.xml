@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.gcc.gearcorelab.mapper.PostImageMapper">
+    <select id="findUrlsByPostId" resultType="string">
+        SELECT image_url FROM post_images
+        WHERE post_id=#{postId}
+        ORDER BY sort_order ASC
+    </select>
+    <insert id="insert">
+        INSERT INTO post_images(post_id,image_url,sort_order)
+        VALUES(#{postId},#{imageUrl},#{sortOrder})
+    </insert>
+    <delete id="deleteByPostId">
+        DELETE FROM post_images WHERE post_id=#{postId}
+    </delete>
+</mapper>

@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>注册 | CCTStudio - GearCoreLab</title>
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="stylesheet" th:href="@{/css/main.css}">
+</head>
+<body>
+    <div th:replace="fragments/header :: siteHeader('auth')"></div>
+
+    <div class="auth-card fade-in">
+        <h1>注册</h1>
+        <form th:action="@{/register}" method="post">
+            <input type="text" name="username" placeholder="用户名" required>
+            <input type="email" name="email" placeholder="邮箱" required>
+            <input type="password" name="password" placeholder="密码" required>
+            <input type="password" name="confirm" placeholder="确认密码" required>
+            <button type="submit" class="submit-btn">注册并发送验证邮件</button>
+        </form>
+        <div class="tips">
+            已有账号？ <a th:href="@{/login}">去登录</a>
+        </div>
+    </div>
+</body>
+</html>

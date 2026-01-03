@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>邮箱验证 | CCTStudio - GearCoreLab</title>
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="stylesheet" th:href="@{/css/main.css}">
+</head>
+<body>
+    <div th:replace="fragments/header :: siteHeader('auth')"></div>
+
+    <div class="auth-card fade-in">
+        <h2 style="color: #333; margin-bottom: 20px;">您好，<span th:text="${username}">用户名</span></h2>
+        <p style="color: #666; margin-bottom: 30px;">我们已经把邮件发送到了 <span th:text="${email}" style="color: #007bff;">your@email.com</span></p>
+        
+        <form th:action="@{/verify-email}" method="post" style="margin-bottom: 20px;">
+            <input type="hidden" name="username" th:value="${username}">
+            <input type="hidden" name="email" th:value="${email}">
+            
+            <div style="margin-bottom: 20px;">
+                <input type="text" name="code" placeholder="请输入验证码" required 
+                       style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 16px; box-sizing: border-box;">
+            </div>
+            
+            <button type="submit" 
+                    style="width: 100%; padding: 12px; background-color: #007bff; color: white; border: none; border-radius: 6px; font-size: 16px; cursor: pointer; transition: background-color 0.3s;">
+                验证邮箱
+            </button>
+        </form>
+        
+        <div th:if="${error}" style="color: #dc3545; margin-bottom: 15px; text-align: center;" th:text="${error}"></div>
+        
+        <div class="tips" style="text-align: center;">
+            <a th:href="@{/}" style="color: #6c757d; text-decoration: none;">返回首页</a>
+        </div>
+    </div>
+</body>
+</html>

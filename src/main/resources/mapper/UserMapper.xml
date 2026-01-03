@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="cn.gcc.gearcorelab.mapper.UserMapper">
+
+    <resultMap id="UserWithRolesMap" type="cn.gcc.gearcorelab.model.User">
+        <id property="id" column="id"/>
+        <result property="username" column="username"/>
+        <result property="password" column="password"/>
+        <result property="email" column="email"/>
+        <result property="enabled" column="enabled"/>
+        <result property="emailVerifyCode" column="email_verify_code"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="avatarUrl" column="avatar_url"/>
+        <result property="signature" column="signature"/>
+        <result property="backgroundUrl" column="background_url"/>
+        <result property="banType" column="ban_type"/>
+        <result property="banReason" column="ban_reason"/>
+        <result property="banUntil" column="ban_until"/>
+        <collection property="roles" ofType="string" column="id"
+            select="selectRolesByUserId"/>
+    </resultMap>
+
+    <!-- 根据用户名查，仅查 users 表，角色通过 collection 延迟查询，避免多行 -->
+    <select id="findByUsername" resultMap="UserWithRolesMap">
+        SELECT * FROM users WHERE username = #{username} LIMIT 1
+    </select>
+
+    <select id="selectRolesByUserId" resultType="string">
+        SELECT role_name FROM user_roles WHERE user_id = #{userId}
+    </select>
+
+    <!-- 根据邮箱查 -->
+    <select id="findByEmail" resultType="cn.gcc.gearcorelab.model.User">
+        SELECT * FROM users WHERE email = #{email}
+    </select>
+
+    <!-- 新增：根据 ID 查 -->
+    <select id="findById" resultType="cn.gcc.gearcorelab.model.User">
+        SELECT * FROM users WHERE id = #{id}
+    </select>
+
+    <!-- 新增：更新用户（用于激活、重发验证码等） -->
+    <update id="update" parameterType="cn.gcc.gearcorelab.model.User">
+        UPDATE users
+        SET password = #{password},
+            enabled = #{enabled},
+            email_verify_code = #{emailVerifyCode},
+            avatar_url = #{avatarUrl},
+            signature = #{signature},
+            background_url = #{backgroundUrl}
+        WHERE id = #{id}
+    </update>
+
+    <!-- 新增：插入新用户 -->
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO users(username, password, email, enabled, email_verify_code, created_at)
+        VALUES (#{username}, #{password}, #{email}, #{enabled}, #{emailVerifyCode}, #{createdAt})
+    </insert>
+    
+    <!-- 获取所有用户列表 -->
+    <select id="findAll" resultType="cn.gcc.gearcorelab.model.User">
+        SELECT * FROM users ORDER BY created_at DESC
+    </select>
+    
+    <!-- 搜索用户 -->
+    <select id="searchUsers" resultType="cn.gcc.gearcorelab.model.User">
+        SELECT * FROM users 
+        WHERE username LIKE CONCAT('%', #{query}, '%')
+           OR email LIKE CONCAT('%', #{query}, '%')
+        ORDER BY created_at DESC
+    </select>
+
+    <!-- 封禁用户 -->
+    <update id="banUser">
+        UPDATE users
+        SET 
+            ban_type = #{banType},
+            ban_reason = #{banReason},
+            ban_until = 
+                <choose>
+                    <when test="banDuration != null">
+                        DATE_ADD(NOW(), INTERVAL #{banDuration} SECOND)
+                    </when>
+                    <otherwise>
+                        NULL
+                    </otherwise>
+                </choose>
+        WHERE id = #{userId}
+    </update>
+
+    <!-- 解封用户 -->
+    <update id="unbanUser">
+        UPDATE users
+        SET ban_type = NULL, ban_reason = NULL, ban_until = NULL
+        WHERE id = #{userId}
+    </update>
+
+    <!-- 分页获取用户列表 -->
+    <select id="getAllUsersWithPagination" resultMap="UserWithRolesMap">
+        SELECT * FROM users ORDER BY created_at DESC LIMIT #{size} OFFSET #{offset}
+    </select>
+
+    <!-- 获取用户总数 -->
+    <select id="countAllUsers" resultType="long">
+        SELECT COUNT(*) FROM users
+    </select>
+    
+    <!-- 插入用户角色 -->
+    <insert id="insertUserRole">
+        INSERT INTO user_roles(user_id, role_name) VALUES (#{userId}, #{roleName})
+    </insert>
+</mapper>

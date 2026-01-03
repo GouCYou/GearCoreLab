@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>发帖 | CCTStudio - GearCoreLab</title>
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="stylesheet" th:href="@{/css/main.css}">
+    <style>
+        /* 配置单选择样式 - 优化版 */
+        .config-selection {
+            margin: 0.75rem 0;
+            padding: 0.75rem;
+            background: #f8f9fa;
+            border-radius: 12px;
+            border: 1px solid #dee2e6;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        
+        .config-selection label {
+            display: flex;
+            align-items: center;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: #495057;
+            font-size: 13px;
+        }
+        
+        .config-selection label::before {
+            content: "⚙️";
+            margin-right: 0.5rem;
+            font-size: 14px;
+        }
+        
+        .config-select {
+            width: 100%;
+            padding: 0.5rem 0.75rem;
+            border: 1px solid #ced4da;
+            border-radius: 8px;
+            background: white;
+            font-size: 13px;
+            transition: all 0.2s ease;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        
+        .config-select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        .config-preview {
+            margin-top: 0.75rem;
+            padding: 0.75rem;
+            background: white;
+            border-radius: 8px;
+            border: 1px solid #dee2e6;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+        
+        .config-preview h4 {
+            margin: 0 0 0.5rem 0;
+            color: #495057;
+            font-size: 13px;
+            font-weight: 600;
+        }
+        
+        .config-preview-content {
+            font-size: 13px;
+            color: #6c757d;
+        }
+        
+        /* 表单优化 */
+        .post-form-container {
+            padding: 1.5rem;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        
+        .post-form-container h2 {
+            margin: 0 0 1rem 0;
+            font-size: 1.5rem;
+            color: #333;
+        }
+        
+        .post-form input[type="text"],
+        .post-form textarea {
+            margin-bottom: 0.75rem;
+            border-radius: 8px;
+        }
+        
+        .post-form textarea {
+            min-height: 120px;
+            max-height: 300px;
+            resize: vertical;
+        }
+        
+        .form-actions {
+            margin-top: 1rem;
+            display: flex;
+            gap: 0.75rem;
+        }
+        
+        .back-home-btn {
+            background: #6c757d;
+            color: #fff;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.2s ease;
+        }
+        
+        .back-home-btn:hover {
+            background: #5a6268;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 顶部导航 -->
+    <div th:replace="fragments/header :: siteHeader('community')" ></div>
+
+    <div class="container">
+        <div class="post-form-container">
+            <h2>发布新帖</h2>
+            
+            <form class="post-form" th:action="@{/community/create}" method="post" enctype="multipart/form-data">
+                <input type="text" name="title" placeholder="输入标题" required>
+                <textarea name="content" placeholder="说点什么..." required></textarea>
+                
+                <!-- 配置单选择 -->
+                <div class="config-selection">
+                    <label for="configSelect">引用配置单（可选）：</label>
+                    <select id="configSelect" name="configId" class="config-select">
+                        <option value="">不引用配置单</option>
+                        <!-- 配置单选项将通过JavaScript动态加载 -->
+                    </select>
+                    <div class="config-preview" id="configPreview" style="display: none;">
+                        <h4>配置单预览</h4>
+                        <div class="config-preview-content" id="configPreviewContent"></div>
+                    </div>
+                </div>
+                
+                <div class="image-preview" id="imagePreview"></div>
+
+                <div class="form-actions">
+                    <input type="file" id="postImages" name="images" accept="image/*" multiple style="display:none" onchange="previewImages(this)">
+                    <button type="button" class="back-home-btn" onclick="window.location.href='/'">
+                        返回主页
+                    </button>
+                    <button type="button" class="image-upload-btn" onclick="document.getElementById('postImages').click()">
+                        上传图片
+                    </button>
+                    <button type="submit" class="submit-btn">发布</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // 图片预览
+        function previewImages(input) {
+            const preview = document.getElementById('imagePreview');
+            preview.innerHTML = '';
+
+            if (input.files) {
+                Array.from(input.files).slice(0, 9).forEach(file => {
+                    const reader = new FileReader();
+                    reader.onload = function (e) {
+                        const div = document.createElement('div');
+                        div.className = 'preview-item';
+
+                        const img = document.createElement('img');
+                        img.src = e.target.result;
+
+                        const removeBtn = document.createElement('button');
+                        removeBtn.className = 'remove';
+                        removeBtn.innerHTML = '×';
+                        removeBtn.onclick = function(e) {
+                            e.stopPropagation();
+                            div.remove();
+                            // 清除对应的文件
+                            const dt = new DataTransfer();
+                            const { files } = input;
+                            for (let i = 0; i < files.length; i++) {
+                                if (files[i] !== file) dt.items.add(files[i]);
+                            }
+                            input.files = dt.files;
+                        };
+
+                        div.appendChild(img);
+                        div.appendChild(removeBtn);
+                        preview.appendChild(div);
+                    }
+                    reader.readAsDataURL(file);
+                });
+            }
+        }
+        
+        // 配置选择功能
+        function loadUserConfigs() {
+            const configSelect = document.getElementById('configSelect');
+            fetch('/api/user-configs')
+                .then(res => res.json())
+                .then(data => {
+                    configSelect.innerHTML = '<option value="">不引用配置单</option>';
+                    if (data.success && Array.isArray(data.data)) {
+                        window.userConfigs = data.data;
+                        data.data.forEach(config => {
+                            const option = document.createElement('option');
+                            option.value = config.id;
+                            option.textContent = config.title;
+                            configSelect.appendChild(option);
+                        });
+                    } else {
+                        window.userConfigs = [];
+                    }
+                });
+        }
+        
+        function onConfigSelectChange() {
+            const configSelect = document.getElementById('configSelect');
+            const configPreview = document.getElementById('configPreview');
+            const configPreviewContent = document.getElementById('configPreviewContent');
+            
+            if (configSelect.value) {
+                const selectedConfig = (window.userConfigs || []).find(config => config.id == configSelect.value);
+                
+                if (selectedConfig) {
+                    let previewHtml = '<div class="config-components">';
+                    
+                    if (selectedConfig.cpu) previewHtml += `<div><strong>CPU:</strong> ${selectedConfig.cpu.name}</div>`;
+                    if (selectedConfig.motherboard) previewHtml += `<div><strong>主板:</strong> ${selectedConfig.motherboard.name}</div>`;
+                    if (selectedConfig.memory) previewHtml += `<div><strong>内存:</strong> ${selectedConfig.memory.name}</div>`;
+                    if (selectedConfig.gpu) previewHtml += `<div><strong>显卡:</strong> ${selectedConfig.gpu.name}</div>`;
+                    if (selectedConfig.storage && selectedConfig.storage.length > 0) {
+                        previewHtml += `<div><strong>存储:</strong> ${selectedConfig.storage.map(s => s.name).join(', ')}</div>`;
+                    }
+                    if (selectedConfig.psu) previewHtml += `<div><strong>电源:</strong> ${selectedConfig.psu.name}</div>`;
+                    if (selectedConfig.case) previewHtml += `<div><strong>机箱:</strong> ${selectedConfig.case.name}</div>`;
+                    
+                    previewHtml += '</div>';
+                    
+                    configPreviewContent.innerHTML = previewHtml;
+                    configPreview.style.display = 'block';
+                } else {
+                    configPreview.style.display = 'none';
+                }
+            } else {
+                configPreview.style.display = 'none';
+            }
+        }
+        
+        // 页面加载时初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            loadUserConfigs();
+            document.getElementById('configSelect').addEventListener('change', onConfigSelectChange);
+        });
+    </script>
+</body>
+</html>

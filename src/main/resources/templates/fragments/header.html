@@ -1,0 +1,272 @@
+<header class="gcl-navbar pc-only" xmlns:th="http://www.thymeleaf.org" th:fragment="siteHeader(active)">
+    <!-- Favicon配置 -->
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="apple-touch-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon.ico">
+    <link rel="manifest" href="/favicon.ico">
+    <meta name="msapplication-TileImage" content="/favicon.ico">
+    <meta name="theme-color" content="#667eea">
+    
+    <!-- Font Awesome图标库 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <!-- 导航栏独立样式模块 -->
+    <link rel="stylesheet" th:href="@{/css/navbar.module.css}">
+    
+    <style>
+        /* 搜索历史下拉框样式 */
+        .search-container {
+            position: relative;
+        }
+        
+        .search-history-dropdown {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            display: none;
+            margin-top: 4px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        .search-history-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 16px;
+            border-bottom: 1px solid #f0f0f0;
+            font-size: 14px;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .clear-all-btn {
+            background: none;
+            border: none;
+            color: #666;
+            font-size: 12px;
+            cursor: pointer;
+            padding: 4px 8px;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+        }
+        
+        .clear-all-btn:hover {
+            background: #f5f5f5;
+            color: #333;
+        }
+        
+        .search-history-item {
+            display: flex;
+            align-items: center;
+            padding: 8px 16px;
+            border-bottom: 1px solid #f8f8f8;
+            transition: background-color 0.3s ease;
+        }
+        
+        .search-history-item:last-child {
+            border-bottom: none;
+        }
+        
+        .search-history-item:hover {
+            background: #f8f9fa;
+        }
+        
+        .history-text {
+            flex: 1;
+            cursor: pointer;
+            font-size: 14px;
+            color: #333;
+            padding: 4px 0;
+        }
+        
+        .delete-history-btn {
+            background: none;
+            border: none;
+            color: #999;
+            cursor: pointer;
+            padding: 4px;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+            margin-left: 8px;
+        }
+        
+        .delete-history-btn:hover {
+            background: #f0f0f0;
+            color: #666;
+        }
+        
+        .search-history-empty {
+            text-align: center;
+            padding: 24px 16px;
+            color: #999;
+            font-size: 14px;
+        }
+        
+        .search-history-empty i {
+            font-size: 24px;
+            margin-bottom: 8px;
+            display: block;
+            opacity: 0.5;
+        }
+        
+        .admin-username { color: #e74c3c !important; font-weight: bold; }
+    </style>
+    <div class="gcl-navbar-left">
+        <a th:href="@{/}" class="gcl-logo-link">
+            <img src="/img/logo.png" alt="Logo" class="gcl-logo-img">
+            <span class="gcl-site-name">GearCoreLab</span>
+        </a>
+    </div>
+    
+    <div class="gcl-navbar-center">
+        <nav class="gcl-nav-links">
+            <a th:href="@{/}" th:classappend="${active == 'community'} ? 'active' : ''">数码社区</a>
+            <a th:href="@{/build}" th:classappend="${active == 'build'} ? 'active' : ''">我的配置</a>
+            <a th:href="@{/news}" th:classappend="${active == 'news'} ? 'active' : ''">科技新闻</a>
+        </nav>
+        
+        <!-- 搜索栏 (重新设计) -->
+        <div class="gcl-search-container">
+            <form class="gcl-search-form" action="/search" method="get" onsubmit="return validateSearch()">
+                <input type="text" name="q" class="gcl-search-input" placeholder="搜索内容..." 
+                       onfocus="showSearchHistory()" onblur="hideSearchHistory()">
+                <button type="submit" class="gcl-search-btn">
+                    <svg class="gcl-search-icon" viewBox="0 0 1024 1024" width="18" height="18">
+                        <path d="M909.6 854.5L649.9 594.8C690.2 542.7 712 479 712 412c0-80.2-31.3-155.4-87.9-212.1-56.6-56.7-132-87.9-212.1-87.9s-155.5 31.3-212.1 87.9C143.2 256.5 112 331.8 112 412c0 80.1 31.3 155.5 87.9 212.1C256.5 680.8 331.8 712 412 712c67 0 130.6-21.8 182.7-62l259.7 259.6c3.2 3.2 8.4 3.2 11.6 0l43.6-43.5c3.2-3.2 3.2-8.4 0-11.6zM570.4 570.4C528 612.7 471.8 636 412 636s-116-23.3-158.4-65.6C211.3 528 188 471.8 188 412s23.3-116.1 65.6-158.4C296 211.3 352.2 188 412 188s116.1 23.2 158.4 65.6S636 352.2 636 412s-23.3 116.1-65.6 158.4z" fill="currentColor"></path>
+                    </svg>
+                </button>
+            </form>
+            
+            <!-- 搜索历史下拉框 -->
+            <div class="gcl-search-history-dropdown" id="searchHistoryDropdown">
+                <div class="gcl-search-history-header">
+                    <span>搜索历史</span>
+                    <button class="gcl-clear-all-btn" onclick="clearAllHistory()">清空</button>
+                </div>
+                <div class="gcl-search-history-list" id="searchHistoryList">
+                    <!-- 搜索历史项将通过JavaScript动态添加 -->
+                </div>
+                <div class="gcl-search-history-empty" id="searchHistoryEmpty" style="display: none;">
+                    <i class="fas fa-history"></i>
+                    <span>暂无搜索历史</span>
+                </div>
+            </div>
+        </div>
+        
+        <script>
+            // 搜索历史管理
+            const SEARCH_HISTORY_KEY = 'gearcore_search_history';
+            const MAX_HISTORY_ITEMS = 10;
+            
+            function validateSearch() {
+                const query = document.querySelector('.gcl-search-input').value.trim();
+                if (query.length > 0) {
+                    saveSearchHistory(query);
+                    return true;
+                }
+                return false;
+            }
+            
+            function saveSearchHistory(query) {
+                let history = getSearchHistory();
+                // 移除重复项
+                history = history.filter(item => item !== query);
+                // 添加到开头
+                history.unshift(query);
+                // 限制数量
+                history = history.slice(0, MAX_HISTORY_ITEMS);
+                localStorage.setItem(SEARCH_HISTORY_KEY, JSON.stringify(history));
+            }
+            
+            function getSearchHistory() {
+                const history = localStorage.getItem(SEARCH_HISTORY_KEY);
+                return history ? JSON.parse(history) : [];
+            }
+            
+            function showSearchHistory() {
+                const dropdown = document.getElementById('searchHistoryDropdown');
+                const historyList = document.getElementById('searchHistoryList');
+                const emptyState = document.getElementById('searchHistoryEmpty');
+                const history = getSearchHistory();
+                
+                // 清空列表
+                historyList.innerHTML = '';
+                
+                if (history.length === 0) {
+                    emptyState.style.display = 'block';
+                } else {
+                    emptyState.style.display = 'none';
+                    history.forEach((item, index) => {
+                        const historyItem = document.createElement('div');
+                        historyItem.className = 'gcl-search-history-item';
+                        historyItem.innerHTML = `
+                            <div class="gcl-history-text" onclick="selectHistoryItem('${item.replace(/'/g, "\\'")}')">${item}</div>
+                            <button class="gcl-delete-history-btn" onclick="deleteHistoryItem(${index})">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        `;
+                        historyList.appendChild(historyItem);
+                    });
+                }
+                
+                dropdown.style.display = 'block';
+            }
+            
+            function hideSearchHistory() {
+                setTimeout(() => {
+                    const dropdown = document.getElementById('searchHistoryDropdown');
+                    dropdown.style.display = 'none';
+                }, 200);
+            }
+            
+            function selectHistoryItem(query) {
+                const searchInput = document.querySelector('.gcl-search-input');
+                searchInput.value = query;
+                document.querySelector('.gcl-search-form').submit();
+            }
+            
+            function deleteHistoryItem(index) {
+                let history = getSearchHistory();
+                history.splice(index, 1);
+                localStorage.setItem(SEARCH_HISTORY_KEY, JSON.stringify(history));
+                showSearchHistory(); // 刷新显示
+            }
+            
+            function clearAllHistory() {
+                localStorage.removeItem(SEARCH_HISTORY_KEY);
+                showSearchHistory(); // 刷新显示
+            }
+        </script>
+    </div>
+    
+    <nav class="gcl-navbar-right">
+
+        <!-- 登录后 -->
+        <div th:if="${#authorization.expression('isAuthenticated()')}" class="gcl-user-menu">
+            <img class="gcl-avatar-small" th:src="${session.user != null && session.user.avatarUrl != null && !session.user.avatarUrl.isEmpty() ? session.user.avatarUrl : '/img/default-avatar.svg'}" alt="头像">
+            <span th:class="${session.user != null and session.user.roles != null and session.user.roles.contains('ADMIN')} ? 'gcl-nickname admin-username' : 'gcl-nickname'"
+                  th:text="${session.user != null and session.user.roles != null and session.user.roles.contains('ADMIN')} ? '[ADMIN] ' + ${#authentication.name} : ${#authentication.name}">昵称</span>
+            <div class="gcl-dropdown">
+                <a th:href="@{/admin}" th:if="${session.user != null and session.user.roles != null and session.user.roles.contains('ADMIN')}">进入管理</a>
+                <a th:href="@{/profile}">个人中心</a>
+                <a th:href="@{/notifications}">消息提醒</a>
+                <a th:href="@{/logout}" class="gcl-logout-link">退出登录</a>
+            </div>
+        </div>
+
+        <!-- 未登录 -->
+        <div th:if="${#authorization.expression('isAnonymous()')}" class="gcl-guest-menu">
+            <a th:href="@{/login}">登录</a>
+            <a th:href="@{/register}">注册</a>
+        </div>
+    </nav>
+</header>

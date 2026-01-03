@@ -1,0 +1,682 @@
+/* GearCoreLab 导航栏模块 - 防止CSS污染的独立样式 */
+/* 基于帖子列表页面的导航栏样式，使用唯一前缀 gcl-navbar */
+
+/* 1. 导航栏容器重置和隔离 */
+.gcl-navbar-container {
+    all: initial !important;
+    font-family: "Helvetica Neue", Arial, sans-serif !important;
+    box-sizing: border-box !important;
+    position: relative !important;
+    z-index: 1000 !important;
+}
+
+/* 强制覆盖导航栏内所有元素的字体 */
+.gcl-navbar-container * {
+    font-family: "Helvetica Neue", Arial, sans-serif !important;
+}
+
+.gcl-navbar-container .gcl-nav-links a {
+    font-family: "Helvetica Neue", Arial, sans-serif !important;
+    font-weight: 600 !important;
+}
+
+.gcl-navbar-container .gcl-site-name {
+    font-family: "Helvetica Neue", Arial, sans-serif !important;
+    font-weight: 400 !important;
+    font-style: normal !important;
+    text-decoration: none !important;
+}
+
+/* 管理员用户名红色样式 */
+.gcl-navbar-container .gcl-nickname.admin-username,
+.gcl-user-menu .gcl-nickname.admin-username {
+    color: #e74c3c !important;
+    font-weight: 600 !important;
+}
+
+.gcl-navbar-container *,
+.gcl-navbar-container *::before,
+.gcl-navbar-container *::after {
+    box-sizing: border-box !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+/* 2. 导航栏主体样式 */
+.gcl-navbar {
+    background: #fff !important;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.06) !important;
+    padding: 0.75rem 1.25rem !important;
+    position: sticky !important;
+    top: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    z-index: 999 !important;
+    transition: all 0.3s ease !important;
+    width: 100% !important;
+    height: auto !important;
+    border: none !important;
+    border-radius: 0 !important;
+    margin: 0 !important;
+    font-size: 14px !important;
+    line-height: 1.6 !important;
+    color: #4b5563 !important;
+}
+
+/* 3. 导航栏左侧 - Logo区域 */
+.gcl-navbar-left {
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.5rem !important;
+}
+
+.gcl-navbar .gcl-logo-link {
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.5rem !important;
+    font-weight: 600 !important;
+    transition: transform 0.2s ease !important;
+    text-decoration: none !important;
+    color: inherit !important;
+}
+
+.gcl-navbar .gcl-logo-link:hover {
+    transform: scale(1.05) !important;
+}
+
+.gcl-navbar .gcl-logo-img {
+    width: 40px !important;
+    height: 40px !important;
+    border-radius: 50% !important;
+    object-fit: cover !important;
+    display: block !important;
+    max-width: 100% !important;
+}
+
+.gcl-navbar .gcl-site-name {
+    font-size: 1.125rem !important;
+    color: #374151 !important;
+    font-weight: bold !important;
+}
+
+/* 4. 导航栏中心区域 */
+.gcl-navbar-center {
+    display: flex !important;
+    align-items: center !important;
+    gap: 2rem !important;
+    flex: 1 !important;
+    justify-content: space-between !important;
+}
+
+/* 5. 导航链接 */
+.gcl-nav-links {
+    display: flex !important;
+    gap: 1.5rem !important;
+    align-items: center !important;
+    margin-left: 2rem !important;
+    list-style: none !important;
+}
+
+.gcl-nav-links a {
+    position: relative !important;
+    padding: 0.5rem 1rem !important;
+    border-radius: 6px !important;
+    transition: all 0.3s ease !important;
+    font-weight: 500 !important;
+    text-decoration: none !important;
+    color: #374151 !important;
+    background: transparent !important;
+    border: none !important;
+    cursor: pointer !important;
+    font-size: 14px !important;
+    line-height: 1.6 !important;
+}
+
+.gcl-nav-links a:hover {
+    background: #f3f4f6 !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1) !important;
+}
+
+.gcl-nav-links a.active {
+    background: #2563eb !important;
+    color: white !important;
+    font-weight: bold !important;
+}
+
+.gcl-nav-links a.active:hover {
+    background: #3b82f6 !important;
+}
+
+/* 6. 搜索容器 */
+.gcl-search-container {
+    position: relative !important;
+    margin-left: auto !important;
+}
+
+.gcl-search-form {
+    display: flex !important;
+    align-items: center !important;
+    background: rgba(255, 255, 255, 0.9) !important;
+    border-radius: 25px !important;
+    padding: 0.25rem !important;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    width: 250px !important;
+    overflow: hidden !important;
+    border: 1px solid rgba(0, 0, 0, 0.1) !important;
+    position: relative !important;
+    backdrop-filter: blur(10px) !important;
+}
+
+.gcl-search-form:hover,
+.gcl-search-form:focus-within {
+    width: 320px !important;
+    background: white !important;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1) !important;
+    border-color: rgba(0, 0, 0, 0.2) !important;
+}
+
+.gcl-search-input {
+    border: none !important;
+    background: transparent !important;
+    outline: none !important;
+    flex: 1 !important;
+    padding: 0.6rem 0.5rem 0.6rem 1rem !important;
+    font-size: 14px !important;
+    color: #374151 !important;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    min-width: 0 !important;
+    font-family: inherit !important;
+}
+
+.gcl-search-input::placeholder {
+    color: rgba(0, 0, 0, 0.5) !important;
+}
+
+.gcl-search-btn {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    background: transparent !important;
+    color: rgba(0, 0, 0, 0.6) !important;
+    border: none !important;
+    border-radius: 50% !important;
+    width: 36px !important;
+    height: 36px !important;
+    cursor: pointer !important;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    flex-shrink: 0 !important;
+    position: relative !important;
+    font-family: inherit !important;
+}
+
+.gcl-search-btn:hover {
+    background: rgba(0, 0, 0, 0.05) !important;
+    color: rgba(0, 0, 0, 0.8) !important;
+    transform: scale(1.05) !important;
+}
+
+.gcl-search-btn:active {
+    transform: scale(0.95) !important;
+}
+
+.gcl-search-icon {
+    width: 18px !important;
+    height: 18px !important;
+    transition: transform 0.3s ease !important;
+}
+
+.gcl-search-form:hover .gcl-search-icon {
+    transform: scale(1.1) !important;
+}
+
+/* 7. 导航栏右侧 */
+.gcl-navbar-right {
+    display: flex !important;
+    gap: 1rem !important;
+    align-items: center !important;
+    margin-left: 1rem !important;
+}
+
+.gcl-avatar-small {
+    width: 36px !important;
+    height: 36px !important;
+    border-radius: 50% !important;
+    object-fit: cover !important;
+    display: block !important;
+}
+
+.gcl-avatar {
+    width: 48px !important;
+    height: 48px !important;
+    border-radius: 50% !important;
+    object-fit: cover !important;
+    display: block !important;
+}
+
+/* 8. 用户菜单 */
+.gcl-user-menu {
+    position: relative !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.5rem !important;
+    cursor: pointer !important;
+    padding: 0.5rem !important;
+    border-radius: 6px !important;
+    transition: background 0.2s ease !important;
+    background: transparent !important;
+    border: none !important;
+}
+
+.gcl-user-menu:hover {
+    background: #f3f4f6 !important;
+}
+
+.gcl-user-menu .gcl-nickname {
+    font-weight: bold !important;
+    color: #374151 !important;
+    font-size: 14px !important;
+}
+
+.gcl-user-menu .gcl-dropdown {
+    display: none !important;
+    position: absolute !important;
+    right: 0 !important;
+    top: calc(100% + 0.25rem) !important;
+    background: #fff !important;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15) !important;
+    border-radius: 12px !important;
+    min-width: 180px !important;
+    z-index: 9999 !important;
+    padding: 0.75rem 0 !important;
+    border: 1px solid rgba(0, 0, 0, 0.1) !important;
+    opacity: 0 !important;
+    transform: translateY(-10px) !important;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    list-style: none !important;
+}
+
+.gcl-user-menu:hover .gcl-dropdown {
+    display: block !important;
+    opacity: 1 !important;
+    transform: translateY(0) !important;
+}
+
+.gcl-dropdown:hover {
+    display: block !important;
+    opacity: 1 !important;
+    transform: translateY(0) !important;
+}
+
+.gcl-logout-link,
+.gcl-dropdown a {
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.75rem !important;
+    padding: 0.75rem 1rem !important;
+    white-space: nowrap !important;
+    transition: all 0.2s ease !important;
+    color: #333 !important;
+    text-decoration: none !important;
+    font-size: 14px !important;
+    border-radius: 8px !important;
+    margin: 0 0.5rem !important;
+    background: transparent !important;
+    border: none !important;
+    cursor: pointer !important;
+    font-family: inherit !important;
+}
+
+.gcl-logout-link:hover,
+.gcl-dropdown a:hover {
+    background: #f8f9ff !important;
+    color: #667eea !important;
+    transform: translateX(4px) !important;
+}
+
+/* 9. 搜索历史下拉框 */
+.gcl-search-history-dropdown {
+    position: absolute !important;
+    top: 100% !important;
+    left: 0 !important;
+    right: 0 !important;
+    background: white !important;
+    border: 1px solid #ddd !important;
+    border-top: none !important;
+    border-radius: 0 0 8px 8px !important;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1) !important;
+    z-index: 1000 !important;
+    max-height: 300px !important;
+    overflow-y: auto !important;
+    display: none !important;
+}
+
+.gcl-search-history-header {
+    padding: 10px 15px !important;
+    border-bottom: 1px solid #eee !important;
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    font-weight: bold !important;
+    color: #333 !important;
+}
+
+.gcl-clear-all-btn {
+    background: none !important;
+    border: none !important;
+    color: #007bff !important;
+    cursor: pointer !important;
+    font-size: 12px !important;
+    padding: 0 !important;
+}
+
+.gcl-clear-all-btn:hover {
+    text-decoration: underline !important;
+}
+
+.gcl-search-history-list {
+    max-height: 200px !important;
+    overflow-y: auto !important;
+}
+
+.gcl-search-history-item {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    padding: 8px 15px !important;
+    border-bottom: 1px solid #f5f5f5 !important;
+    cursor: pointer !important;
+}
+
+.gcl-search-history-item:hover {
+    background-color: #f8f9fa !important;
+}
+
+.gcl-history-text {
+    flex: 1 !important;
+    color: #333 !important;
+    font-size: 14px !important;
+}
+
+.gcl-delete-history-btn {
+    background: none !important;
+    border: none !important;
+    color: #999 !important;
+    cursor: pointer !important;
+    padding: 2px 5px !important;
+    font-size: 12px !important;
+}
+
+.gcl-delete-history-btn:hover {
+    color: #dc3545 !important;
+}
+
+.gcl-search-history-empty {
+    padding: 20px !important;
+    text-align: center !important;
+    color: #999 !important;
+    font-size: 14px !important;
+}
+
+/* 用户菜单样式 */
+.gcl-user-menu {
+    position: relative !important;
+    display: flex !important;
+    align-items: center !important;
+    cursor: pointer !important;
+    padding: 8px 12px !important;
+    border-radius: 20px !important;
+    transition: background-color 0.3s ease !important;
+}
+
+.gcl-user-menu:hover {
+    background-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+.gcl-avatar-small {
+    width: 32px !important;
+    height: 32px !important;
+    border-radius: 50% !important;
+    margin-right: 8px !important;
+    object-fit: cover !important;
+}
+
+.gcl-nickname {
+    color: white !important;
+    font-size: 14px !important;
+    font-weight: 500 !important;
+}
+
+.gcl-dropdown {
+    position: absolute !important;
+    top: 100% !important;
+    right: 0 !important;
+    background: white !important;
+    border: 1px solid #e0e0e0 !important;
+    border-radius: 8px !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
+    z-index: 1000 !important;
+    display: none !important;
+    margin-top: 4px !important;
+    min-width: 150px !important;
+}
+
+.gcl-dropdown a {
+    display: block !important;
+    padding: 12px 16px !important;
+    color: #333 !important;
+    text-decoration: none !important;
+    font-size: 14px !important;
+    border-bottom: 1px solid #f5f5f5 !important;
+    transition: background-color 0.2s ease !important;
+}
+
+.gcl-dropdown a:last-child {
+    border-bottom: none !important;
+}
+
+.gcl-dropdown a:hover {
+    background-color: #f8f9fa !important;
+}
+
+.gcl-logout-link {
+    color: #dc3545 !important;
+}
+
+.gcl-logout-link:hover {
+    background-color: #f8f9fa !important;
+    color: #dc3545 !important;
+}
+
+.gcl-guest-menu {
+    display: flex !important;
+    align-items: center !important;
+    gap: 0 !important;
+    border: 1px solid #007bff !important;
+    border-radius: 6px !important;
+    overflow: hidden !important;
+}
+
+.gcl-guest-menu a {
+    color: #007bff !important;
+    text-decoration: none !important;
+    font-size: 14px !important;
+    padding: 8px 16px !important;
+    border: none !important;
+    background: transparent !important;
+    transition: all 0.3s ease !important;
+    font-weight: 500 !important;
+    flex: 1 !important;
+    text-align: center !important;
+}
+
+.gcl-guest-menu a:first-child {
+    border-right: 1px solid #007bff !important;
+}
+
+.gcl-guest-menu a:hover {
+    background: #007bff !important;
+    color: white !important;
+}
+
+.gcl-guest-menu span {
+    color: rgba(255, 255, 255, 0.7) !important;
+    font-size: 14px !important;
+}
+
+.gcl-search-history-header {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    padding: 12px 16px !important;
+    border-bottom: 1px solid #f0f0f0 !important;
+    font-size: 14px !important;
+    font-weight: 600 !important;
+    color: #333 !important;
+}
+
+.gcl-clear-all-btn {
+    background: none !important;
+    border: none !important;
+    color: #666 !important;
+    font-size: 12px !important;
+    cursor: pointer !important;
+    padding: 4px 8px !important;
+    border-radius: 4px !important;
+    transition: all 0.3s ease !important;
+    font-family: inherit !important;
+}
+
+.gcl-clear-all-btn:hover {
+    background: #f5f5f5 !important;
+    color: #333 !important;
+}
+
+.gcl-search-history-item {
+    display: flex !important;
+    align-items: center !important;
+    padding: 8px 16px !important;
+    border-bottom: 1px solid #f8f8f8 !important;
+    transition: background-color 0.3s ease !important;
+}
+
+.gcl-search-history-item:last-child {
+    border-bottom: none !important;
+}
+
+.gcl-search-history-item:hover {
+    background: #f8f9fa !important;
+}
+
+.gcl-history-text {
+    flex: 1 !important;
+    cursor: pointer !important;
+    font-size: 14px !important;
+    color: #333 !important;
+    padding: 4px 0 !important;
+}
+
+.gcl-delete-history-btn {
+    background: none !important;
+    border: none !important;
+    color: #999 !important;
+    cursor: pointer !important;
+    padding: 4px !important;
+    border-radius: 4px !important;
+    transition: all 0.3s ease !important;
+    margin-left: 8px !important;
+    font-family: inherit !important;
+}
+
+.gcl-delete-history-btn:hover {
+    background: #f0f0f0 !important;
+    color: #666 !important;
+}
+
+.gcl-search-history-empty {
+    text-align: center !important;
+    padding: 24px 16px !important;
+    color: #999 !important;
+    font-size: 14px !important;
+}
+
+.gcl-search-history-empty i {
+    font-size: 24px !important;
+    margin-bottom: 8px !important;
+    display: block !important;
+    opacity: 0.5 !important;
+}
+
+/* 10. 响应式设计 */
+@media (max-width: 600px) {
+    .gcl-navbar-right {
+        gap: 0.75rem !important;
+    }
+    
+    .gcl-search-form {
+        width: 200px !important;
+    }
+    
+    .gcl-search-form:hover,
+    .gcl-search-form:focus-within {
+        width: 250px !important;
+    }
+    
+    .gcl-nav-links {
+        gap: 1rem !important;
+        margin-left: 1rem !important;
+    }
+}
+
+/* 11. PC专用样式 */
+.gcl-navbar.pc-only {
+    display: flex !important;
+}
+
+@media (max-width: 768px) {
+    .gcl-navbar.pc-only {
+        display: none !important;
+    }
+}
+
+/* 12. 防止外部样式污染的额外保护 */
+.gcl-navbar-container button {
+    font: inherit !important;
+    cursor: pointer !important;
+}
+
+.gcl-navbar-container ul {
+    list-style: none !important;
+}
+
+.gcl-navbar-container a {
+    text-decoration: none !important;
+    color: inherit !important;
+}
+
+.gcl-navbar-container img {
+    display: block !important;
+    max-width: 100% !important;
+}
+
+/* 13. 确保字体图标正常显示 */
+.gcl-navbar-container .fa,
+.gcl-navbar-container .fas,
+.gcl-navbar-container .far,
+.gcl-navbar-container .fab {
+    font-family: "Font Awesome 6 Free" !important;
+    font-weight: 900 !important;
+}
+
+/* 14. 桥接区域防止下拉菜单消失 */
+.gcl-user-menu::after {
+    content: '' !important;
+    position: absolute !important;
+    top: 100% !important;
+    right: 0 !important;
+    width: 100% !important;
+    height: 0.75rem !important;
+    background: transparent !important;
+    z-index: 999 !important;
+}

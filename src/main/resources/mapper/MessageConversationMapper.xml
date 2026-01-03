@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="cn.gcc.gearcorelab.mapper.MessageConversationMapper">
+
+    <!-- 插入会话记录 -->
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO message_conversations 
+        (user1_id, user2_id, last_message_id, last_message_time, user1_unread_count, user2_unread_count)
+        VALUES (#{user1Id}, #{user2Id}, #{lastMessageId}, #{lastMessageTime}, #{user1UnreadCount}, #{user2UnreadCount})
+    </insert>
+
+    <!-- 更新会话记录 -->
+    <update id="update">
+        UPDATE message_conversations 
+        SET last_message_id = #{lastMessageId},
+            last_message_time = #{lastMessageTime},
+            user1_unread_count = #{user1UnreadCount},
+            user2_unread_count = #{user2UnreadCount}
+        WHERE id = #{id}
+    </update>
+
+    <!-- 根据两个用户ID查询会话 -->
+    <select id="findByUsers" resultType="cn.gcc.gearcorelab.model.MessageConversation">
+        SELECT 
+            mc.id,
+            mc.user1_id AS user1Id,
+            mc.user2_id AS user2Id,
+            mc.last_message_id AS lastMessageId,
+            mc.last_message_time AS lastMessageTime,
+            mc.user1_unread_count AS user1UnreadCount,
+            mc.user2_unread_count AS user2UnreadCount,
+            u1.username AS user1Username,
+            u1.avatar_url AS user1AvatarUrl,
+            u2.username AS user2Username,
+            u2.avatar_url AS user2AvatarUrl,
+            pm.content AS lastMessageContent
+        FROM message_conversations mc
+        LEFT JOIN users u1 ON mc.user1_id = u1.id
+        LEFT JOIN users u2 ON mc.user2_id = u2.id
+        LEFT JOIN private_messages pm ON mc.last_message_id = pm.id
+        WHERE (mc.user1_id = #{user1Id} AND mc.user2_id = #{user2Id})
+           OR (mc.user1_id = #{user2Id} AND mc.user2_id = #{user1Id})
+    </select>
+
+    <!-- 查询用户的所有会话列表 -->
+    <select id="findConversationsByUser" resultType="cn.gcc.gearcorelab.model.MessageConversation">
+        SELECT 
+            mc.id,
+            mc.user1_id AS user1Id,
+            mc.user2_id AS user2Id,
+            mc.last_message_id AS lastMessageId,
+            mc.last_message_time AS lastMessageTime,
+            mc.user1_unread_count AS user1UnreadCount,
+            mc.user2_unread_count AS user2UnreadCount,
+            u1.username AS user1Username,
+            u1.avatar_url AS user1AvatarUrl,
+            u2.username AS user2Username,
+            u2.avatar_url AS user2AvatarUrl,
+            pm.content AS lastMessageContent
+        FROM message_conversations mc
+        LEFT JOIN users u1 ON mc.user1_id = u1.id
+        LEFT JOIN users u2 ON mc.user2_id = u2.id
+        LEFT JOIN private_messages pm ON mc.last_message_id = pm.id
+        WHERE mc.user1_id = #{userId} OR mc.user2_id = #{userId}
+        ORDER BY mc.last_message_time DESC
+        LIMIT #{limit} OFFSET #{offset}
+    </select>
+
+    <!-- 统计用户的会话总数 -->
+    <select id="countConversationsByUser" resultType="int">
+        SELECT COUNT(*)
+        FROM message_conversations
+        WHERE user1_id = #{userId} OR user2_id = #{userId}
+    </select>
+
+    <!-- 更新未读数量 -->
+    <update id="updateUnreadCount">
+        UPDATE message_conversations 
+        SET user1_unread_count = #{user1UnreadCount},
+            user2_unread_count = #{user2UnreadCount}
+        WHERE (user1_id = #{user1Id} AND user2_id = #{user2Id})
+           OR (user1_id = #{user2Id} AND user2_id = #{user1Id})
+    </update>
+
+    <!-- 删除会话 -->
+    <delete id="deleteByUsers">
+        DELETE FROM message_conversations 
+        WHERE (user1_id = #{user1Id} AND user2_id = #{user2Id})
+           OR (user1_id = #{user2Id} AND user2_id = #{user1Id})
+    </delete>
+
+</mapper>

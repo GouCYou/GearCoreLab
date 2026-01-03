@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>编辑新闻 - GearCoreLab</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        .edit-news-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .page-header {
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #e1e5e9;
+        }
+        
+        .page-title {
+            font-size: 28px;
+            font-weight: bold;
+            color: #2c3e50;
+            margin: 0;
+        }
+        
+        .news-form {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #2c3e50;
+        }
+        
+        .form-input, .form-textarea, .form-file {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #dee2e6;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: border-color 0.3s ease;
+        }
+        
+        .form-input:focus, .form-textarea:focus, .form-file:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        .form-textarea {
+            min-height: 300px;
+            resize: vertical;
+            font-family: inherit;
+        }
+        
+        .form-file {
+            padding: 8px 12px;
+        }
+        
+        .form-datetime {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #dee2e6;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+        
+        .current-image {
+            margin-bottom: 15px;
+        }
+        
+        .current-image img {
+            max-width: 300px;
+            max-height: 200px;
+            border-radius: 6px;
+            border: 1px solid #dee2e6;
+        }
+        
+        .current-image-label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 12px;
+            color: #6c757d;
+        }
+        
+        .form-actions {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+        
+        .btn-submit, .btn-cancel {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 500;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-submit {
+            background: #667eea;
+            color: white;
+        }
+        
+        .btn-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn-cancel {
+            background-color: #6c757d;
+            color: white;
+        }
+        
+        .btn-cancel:hover {
+            background-color: #5a6268;
+        }
+        
+        .help-text {
+            font-size: 12px;
+            color: #6c757d;
+            margin-top: 5px;
+        }
+        
+        .markdown-help {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 6px;
+            margin-top: 10px;
+            font-size: 12px;
+            color: #6c757d;
+        }
+        
+        .markdown-help h4 {
+            margin: 0 0 10px 0;
+            color: #495057;
+        }
+        
+        .markdown-help ul {
+            margin: 0;
+            padding-left: 20px;
+        }
+        
+        .markdown-help li {
+            margin-bottom: 5px;
+        }
+        
+        .alert {
+            padding: 12px 16px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+        }
+        
+        .alert-success {
+            background-color: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+        
+        .alert-error {
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+    </style>
+</head>
+<body>
+    <div th:replace="fragments/header :: siteHeader('news')"></div>
+    
+    <div class="edit-news-container">
+        <div class="page-header">
+            <h1 class="page-title">编辑科技新闻</h1>
+        </div>
+        
+        <!-- 成功消息 -->
+        <div th:if="${message}" class="alert alert-success">
+            <span th:text="${message}"></span>
+        </div>
+        
+        <!-- 错误消息 -->
+        <div th:if="${error}" class="alert alert-error">
+            <span th:text="${error}"></span>
+        </div>
+        
+        <form th:action="@{/news/edit/{id}(id=${news.id})}" th:object="${news}" method="post" enctype="multipart/form-data" class="news-form">
+            <div class="form-group">
+                <label for="title" class="form-label">新闻标题 *</label>
+                <input type="text" id="title" th:field="*{title}" class="form-input" required>
+                <div class="help-text">请输入吸引人的新闻标题</div>
+            </div>
+            
+            <div class="form-group">
+                <label for="summary" class="form-label">新闻摘要</label>
+                <textarea id="summary" th:field="*{summary}" class="form-textarea" placeholder="请输入新闻摘要（可选）" style="min-height: 100px;"></textarea>
+                <div class="help-text">简要描述新闻内容</div>
+            </div>
+            
+            <div class="form-group">
+                <label for="author" class="form-label">作者</label>
+                <input type="text" id="author" th:field="*{author}" class="form-input" placeholder="请输入作者姓名">
+                <div class="help-text">新闻作者姓名</div>
+            </div>
+            
+            <div class="form-group">
+                <label for="category" class="form-label">新闻分类</label>
+                <select id="category" th:field="*{category}" class="form-input">
+                    <option value="">请选择分类</option>
+                    <option value="技术资讯">技术资讯</option>
+                    <option value="产品动态">产品动态</option>
+                    <option value="行业动态">行业动态</option>
+                    <option value="公司新闻">公司新闻</option>
+                </select>
+                <div class="help-text">选择新闻所属分类</div>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">当前图片</label>
+                <div th:if="${news.imageUrl}" class="current-image">
+                    <span class="current-image-label">当前新闻图片：</span>
+                    <img th:src="${news.imageUrl}" th:alt="${news.title}">
+                </div>
+                <div th:unless="${news.imageUrl}" class="current-image">
+                    <span class="current-image-label">当前没有图片</span>
+                </div>
+                
+                <label for="image" class="form-label">更换图片</label>
+                <input type="file" id="image" name="image" class="form-file" accept="image/*">
+                <div class="help-text">支持 JPG、PNG、GIF 格式，建议尺寸 1200x600 像素。留空则保持当前图片不变</div>
+            </div>
+            
+            <div class="form-group">
+                <label for="publishTime" class="form-label">发布时间</label>
+                <input type="datetime-local" id="publishTime" name="publishTimeStr" class="form-datetime" 
+                       th:value="${#temporals.format(news.publishTime, 'yyyy-MM-dd\'T\'HH:mm')}">
+                <div class="help-text">修改新闻的发布时间</div>
+            </div>
+            
+            <div class="form-group">
+                <label for="content" class="form-label">新闻内容 *</label>
+                <textarea id="content" th:field="*{content}" class="form-textarea" required placeholder="请输入新闻内容..."></textarea>
+                
+                <div class="markdown-help">
+                    <h4>支持的格式：</h4>
+                    <ul>
+                        <li><strong>粗体文本</strong>：**粗体文本**</li>
+                        <li><em>斜体文本</em>：*斜体文本*</li>
+                        <li><code>代码</code>：`代码`</li>
+                        <li>标题：# 一级标题，## 二级标题，### 三级标题</li>
+                        <li>链接：[链接文本](链接地址)</li>
+                        <li>段落：用空行分隔段落</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="form-actions">
+                <button type="submit" class="btn-submit">
+                    <i class="fas fa-save"></i> 保存修改
+                </button>
+                <a th:href="@{/news/{id}(id=${news.id})}" class="btn-cancel">
+                    <i class="fas fa-times"></i> 取消
+                </a>
+            </div>
+        </form>
+    </div>
+    
+    
+    
+    <script>
+        // 表单验证
+        document.querySelector('.news-form').addEventListener('submit', function(e) {
+            const title = document.getElementById('title').value.trim();
+            const content = document.getElementById('content').value.trim();
+            
+            if (!title) {
+                alert('请输入新闻标题');
+                e.preventDefault();
+                return;
+            }
+            
+            if (!content) {
+                alert('请输入新闻内容');
+                e.preventDefault();
+                return;
+            }
+            
+            if (title.length > 200) {
+                alert('新闻标题不能超过200个字符');
+                e.preventDefault();
+                return;
+            }
+            
+            // 表单提交成功后通知其他标签页刷新
+            setTimeout(() => {
+                localStorage.setItem('newsListUpdate', Date.now());
+                localStorage.removeItem('newsListUpdate');
+            }, 500);
+        });
+    </script>
+</body>
+</html>

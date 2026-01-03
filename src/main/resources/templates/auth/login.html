@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>登录 | CCTStudio - GearCoreLab</title>
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="stylesheet" th:href="@{/css/main.css}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div th:replace="fragments/header :: siteHeader('auth')"></div>
+
+    <div class="auth-card fade-in">
+        <h1>登录</h1>
+        
+        <!-- 错误信息显示区域 -->
+        <div th:if="${param.error}" class="error-message" id="errorMessage">
+            <i class="fas fa-exclamation-triangle"></i>
+            <span th:text="${session.loginError}" th:remove="tag">登录失败</span>
+        </div>
+        
+        <form th:action="@{/login}" method="post">
+            <input type="text" name="username" placeholder="用户名/邮箱" required>
+            <input type="password" name="password" placeholder="密码" required>
+            <button type="submit" class="submit-btn">登录</button>
+        </form>
+        <div class="tips">
+            还没有账号？ <a th:href="@{/register}">去注册</a>
+            <p><a href="/forgot-password" class="forgot-password-link">忘记密码？</a></p>
+        </div>
+        <script>
+            // 确保忘记密码链接能正常工作
+            document.addEventListener('DOMContentLoaded', function() {
+                const forgotLink = document.querySelector('.forgot-password-link');
+                if (forgotLink) {
+                    forgotLink.addEventListener('click', function(e) {
+                        console.log('忘记密码链接被点击');
+                        // 不阻止默认行为，让链接正常跳转
+                    });
+                }
+                
+                // 如果显示了错误信息，添加自动隐藏功能
+                const errorMessage = document.getElementById('errorMessage');
+                if (errorMessage) {
+                    // 5秒后自动隐藏错误信息
+                    setTimeout(function() {
+                        errorMessage.style.opacity = '0';
+                        setTimeout(function() {
+                            errorMessage.style.display = 'none';
+                        }, 300);
+                    }, 5000);
+                    
+                    // 添加点击关闭功能
+                    errorMessage.style.cursor = 'pointer';
+                    errorMessage.addEventListener('click', function() {
+                        errorMessage.style.opacity = '0';
+                        setTimeout(function() {
+                            errorMessage.style.display = 'none';
+                        }, 300);
+                    });
+                }
+            });
+        </script>
+    </div>
+</body>
+</html>

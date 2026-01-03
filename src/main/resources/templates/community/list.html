@@ -1,0 +1,1918 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>数码社区 | CCTStudio - GearCoreLab</title>
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="stylesheet" th:href="@{/css/main.css}">
+    <style>
+        /* 配置单选择样式 - 紧凑版 */
+        .config-selection {
+            margin: 0.4rem 0 0.4rem 0;
+            padding: 0.4rem;
+            background: #f8f9fa;
+            border-radius: 6px;
+            border: 1px solid #dee2e6;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        }
+        
+        .config-selection label {
+            display: flex;
+            align-items: center;
+            margin-bottom: 0.25rem;
+            font-weight: 600;
+            color: #495057;
+            font-size: 14px;
+        }
+        
+        .config-selection label::before {
+            content: "⚙️";
+            margin-right: 0.25rem;
+            font-size: 14px;
+        }
+        
+        .config-select {
+            width: 100%;
+            padding: 0.3rem 0.4rem;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+            background: white;
+            font-size: 14px;
+            transition: all 0.2s ease;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+        }
+        
+        .config-select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.1);
+        }
+        
+        .config-preview {
+            margin-top: 0.4rem;
+            padding: 0.4rem;
+            background: white;
+            border-radius: 4px;
+            border: 1px solid #dee2e6;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        }
+        
+        .config-preview h4 {
+            margin: 0 0 0.25rem 0;
+            color: #495057;
+            font-size: 14px;
+            font-weight: 600;
+        }
+        
+        .config-preview-content {
+            font-size: 14px;
+            color: #6c757d;
+        }
+        
+        /* 快速发帖表单优化 - 更紧凑设计 */
+        .post-form-container {
+            padding: 0.5rem;
+            margin-bottom: 0.6rem;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+        }
+        
+        .post-form-container h2 {
+            margin: 0 0 0.3rem 0.5rem;
+            font-size: 1.5rem;
+            color: #333;
+            font-weight: 600;
+        }
+        
+        .post-form input[type="text"],
+        .post-form textarea {
+            margin-bottom: 0.3rem;
+            border-radius: 6px;
+            padding: 0.4rem;
+            font-size: 1rem;
+        }
+        
+        .post-form textarea {
+            min-height: 45px;
+            max-height: 90px;
+        }
+        
+        /* 配置单悬浮窗样式 */
+        .config-tooltip {
+            position: fixed;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 0.75rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.12);
+            z-index: 1000;
+            min-width: 250px;
+            max-width: 320px;
+            display: none;
+            pointer-events: none;
+            font-size: 0.9rem;
+        }
+        
+        .config-tooltip-header {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.75rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .config-tooltip-title {
+            font-weight: 600;
+            color: #333;
+            font-size: 1rem;
+        }
+        
+        .config-tooltip-components {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        
+        .config-tooltip-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.4rem 0;
+            border-bottom: 1px solid #f8f9fa;
+        }
+        
+        .config-tooltip-item:last-child {
+            border-bottom: none;
+        }
+        
+        .config-tooltip-component {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .config-tooltip-component-icon {
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #667eea;
+            font-size: 0.9rem;
+        }
+        
+        .config-tooltip-component-name {
+            font-size: 0.85rem;
+            color: #333;
+            font-weight: 500;
+        }
+        
+        .config-tooltip-component-model {
+            font-size: 0.8rem;
+            color: #666;
+            margin-top: 0.1rem;
+        }
+        
+        .config-tooltip-price {
+            font-size: 0.85rem;
+            color: #28a745;
+            font-weight: 600;
+        }
+        
+        .config-tooltip-footer {
+            margin-top: 0.75rem;
+            padding-top: 0.75rem;
+            border-top: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .config-tooltip-total {
+            font-weight: 700;
+            color: #333;
+            font-size: 1rem;
+        }
+        
+        .config-tooltip-power {
+            font-size: 0.85rem;
+            color: #666;
+            resize: vertical;
+        }
+        
+        /* 配置单信息条样式 - 胶囊型设计 */
+        .config-info-bar {
+            margin: 1rem 0;
+            padding: 0.6rem 1.2rem;
+            background: #667eea;
+            border: none;
+            border-radius: 25px; /* 胶囊型圆角 */
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 3px 12px rgba(102, 126, 234, 0.3);
+            display: inline-block;
+            max-width: fit-content;
+        }
+        
+        .config-info-bar:hover {
+            background: #5a67d8;
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+            transform: translateY(-2px);
+        }
+        
+        .config-info-content {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            color: white;
+        }
+        
+        .config-icon {
+            width: 32px;
+            height: 32px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1rem;
+        }
+        
+        .config-details {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+        
+        .config-name {
+            font-weight: 600;
+            color: white;
+            font-size: 1rem;
+        }
+        
+        .config-type {
+            font-size: 0.85rem;
+            color: rgba(255, 255, 255, 0.8);
+            background: rgba(255, 255, 255, 0.1);
+            padding: 0.2rem 0.6rem;
+            border-radius: 12px;
+        }
+        
+        .config-price {
+            font-weight: 600;
+            color: white;
+            font-size: 1rem;
+        }
+        
+        .form-actions {
+            margin-top: 0.2rem;
+            display: flex;
+            gap: 0.3rem;
+        }
+        
+        /* 悬浮新建帖子按钮 */
+        .floating-new-post-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: #74b9ff;
+            color: white;
+            border: none;
+            border-radius: 50px;
+            padding: 15px 25px;
+            cursor: pointer;
+            box-shadow: 0 4px 20px rgba(116, 185, 255, 0.4);
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            z-index: 1000;
+            text-decoration: none;
+        }
+        
+        .floating-new-post-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 25px rgba(116, 185, 255, 0.6);
+            background: #0984e3;
+        }
+        
+        .floating-new-post-btn i {
+            font-size: 16px;
+        }
+        
+        @media (max-width: 768px) {
+            .floating-new-post-btn {
+                bottom: 20px;
+                right: 20px;
+                padding: 12px 20px;
+            }
+            
+            .floating-new-post-btn span {
+                display: none;
+            }
+        }
+
+        /* 分页样式 */
+        .pagination-container {
+            margin-top: 30px;
+            padding: 20px 0;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+
+        .pagination-btn {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 16px;
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            color: #4a5568;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        .pagination-btn:hover {
+            background: #f7fafc;
+            border-color: #cbd5e0;
+            color: #2d3748;
+            transform: translateY(-1px);
+        }
+
+        .pagination-numbers {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .pagination-number {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 36px;
+            height: 36px;
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            color: #4a5568;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        .pagination-number:hover {
+            background: #f7fafc;
+            border-color: #cbd5e0;
+            color: #2d3748;
+        }
+
+        .pagination-number.active {
+            background: #667eea;
+            border-color: #667eea;
+            color: #ffffff;
+            font-weight: 600;
+        }
+
+        .pagination-number.active:hover {
+            background: #5a67d8;
+            transform: translateY(-1px);
+        }
+
+        .pagination-ellipsis {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 36px;
+            height: 36px;
+            color: #a0aec0;
+            font-size: 14px;
+        }
+
+        .pagination-info {
+            text-align: center;
+            color: #718096;
+            font-size: 13px;
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .pagination {
+                flex-wrap: wrap;
+                gap: 6px;
+            }
+
+            .pagination-btn {
+                padding: 6px 12px;
+                font-size: 13px;
+            }
+
+            .pagination-number {
+                width: 32px;
+                height: 32px;
+                font-size: 13px;
+            }
+
+            .pagination-info {
+                font-size: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 顶部导航 -->
+    <div th:replace="fragments/header :: siteHeader('community')"></div>
+
+    <div class="main-content-wrapper">
+        <!-- 快捷发帖表单（仅登录用户可见） -->
+        <div class="content-container" th:if="${#authentication != null}">
+            <div class="post-form-container">
+                <h2>快速发帖</h2>
+                <form class="post-form" th:action="@{/community/create}" method="post" enctype="multipart/form-data">
+                    <input type="text" name="title" placeholder="输入标题" required>
+                    <textarea name="content" placeholder="说点什么..." required></textarea>
+                    
+                    <!-- 配置单选择 -->
+                    <div class="config-selection">
+                        <label for="configSelect">引用配置单（可选）：</label>
+                        <select id="configSelect" name="configId" class="config-select">
+                            <option value="">不引用配置单</option>
+                            <!-- 配置单选项将通过JavaScript动态加载 -->
+                        </select>
+                    </div>
+                    
+                    <div class="image-preview" id="quickImagePreview"></div>
+
+                    <div class="form-actions">
+                        <input type="file" id="quickPostImages" name="images" accept="image/*" multiple style="display:none" onchange="previewQuickImages(this)">
+                        <button type="button" class="image-upload-btn" onclick="document.getElementById('quickPostImages').click()">
+                            上传图片
+                        </button>
+                        <button type="submit" class="submit-btn">发布</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+            <!-- 帖子列表容器 -->
+            <div class="post-list-container">
+                <!-- 空列表提示 -->
+                <div th:if="${#lists.isEmpty(posts)}" class="empty-post-list">
+                    <div class="empty-state">
+                        <div class="empty-icon">📝</div>
+                        <h3>还没有帖子</h3>
+                        <p>成为第一个发帖的人吧！分享你的想法、问题或创意。</p>
+                        <button class="primary-btn" th:if="${#authentication != null}" onclick="document.querySelector('.post-form textarea').focus()">立即发帖</button>
+                        <button class="primary-btn" th:unless="${#authentication != null}" onclick="redirectToLogin()">登录发帖</button>
+                    </div>
+                </div>
+                
+                <div th:each="post : ${posts}" class="post-card" th:onclick="'showPostDetail(' + ${post.id} + ')'">
+                    <div class="post-header">
+                        <div class="author">
+                            <img th:src="${post.authorAvatarUrl != null && !post.authorAvatarUrl.isEmpty() ? post.authorAvatarUrl : '/img/default-avatar.svg'}" alt="头像" class="avatar">
+                            <a class="username" th:href="@{'/user/profile/' + ${post.authorUsername}}" th:text="${post.authorUsername}" onclick="event.stopPropagation()">
+                            </a>
+                        </div>
+                        <div class="post-header-actions" th:if="${#authentication != null && (#authentication.name == post.authorUsername || #authorization.expression('hasRole(''ADMIN'')'))}">
+                            <button class="delete-btn-small" th:onclick="'event.stopPropagation(); showDeleteConfirm(' + ${post.id} + ')'">
+                                删除
+                            </button>
+                        </div>
+                    </div>
+                    <h3 class="title" th:text="${post.title}"></h3>
+                    <p class="content" th:text="${post.content}"></p>
+                    <div class="post-images" th:if="${not #lists.isEmpty(post.imageUrls)}">
+                        <img th:each="imgUrl : ${post.imageUrls}"
+                             th:src="@{${imgUrl}}"
+                             alt="图片"
+                             class="post-image post-preview-img">
+                    </div>
+                    <div class="post-actions">
+                        <button class="like-btn post-like" th:classappend="${post.liked} ? 'liked' : ''" th:onclick="'togglePostLike(' + ${post.id} + ')'">
+                            <span th:text="${post.likeCount}">0</span>
+                            <i class="like-icon">❤</i>
+                        </button>
+                        <button class="comment-btn" th:onclick="'showPostDetail(' + ${post.id} + ')'">
+                            <span>评论</span>
+                            <span th:text="${post.commentCount != null ? post.commentCount : 0}">0</span>
+                        </button>
+                    </div>
+                    <div class="post-meta">
+                        <span class="date" th:text="${#temporals.format(post.createdAt, 'yyyy-MM-dd HH:mm')}"></span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 分页控件 -->
+            <div class="pagination-container" th:if="${totalPages > 1}">
+                <div class="pagination">
+                    <!-- 上一页 -->
+                    <a th:if="${currentPage > 1}" 
+                       th:href="@{/community(page=${currentPage - 1})}" 
+                       class="pagination-btn prev-btn">
+                        <i class="fas fa-chevron-left"></i>
+                        上一页
+                    </a>
+                    
+                    <!-- 页码 -->
+                    <div class="pagination-numbers">
+                        <!-- 第一页 -->
+                        <a th:if="${currentPage > 3}" 
+                           th:href="@{/community(page=1)}" 
+                           class="pagination-number">1</a>
+                        
+                        <!-- 省略号 -->
+                        <span th:if="${currentPage > 4}" class="pagination-ellipsis">...</span>
+                        
+                        <!-- 当前页前后的页码 -->
+                        <th:block th:each="page : ${#numbers.sequence(T(java.lang.Math).max(1, currentPage - 2), T(java.lang.Math).min(totalPages, currentPage + 2))}">
+                            <a th:href="@{/community(page=${page})}" 
+                               th:class="${page == currentPage} ? 'pagination-number active' : 'pagination-number'"
+                               th:text="${page}"></a>
+                        </th:block>
+                        
+                        <!-- 省略号 -->
+                        <span th:if="${currentPage < totalPages - 3}" class="pagination-ellipsis">...</span>
+                        
+                        <!-- 最后一页 -->
+                        <a th:if="${currentPage < totalPages - 2}" 
+                           th:href="@{/community(page=${totalPages})}" 
+                           class="pagination-number" 
+                           th:text="${totalPages}"></a>
+                    </div>
+                    
+                    <!-- 下一页 -->
+                    <a th:if="${currentPage < totalPages}" 
+                       th:href="@{/community(page=${currentPage + 1})}" 
+                       class="pagination-btn next-btn">
+                        下一页
+                        <i class="fas fa-chevron-right"></i>
+                    </a>
+                </div>
+                
+                <!-- 分页信息 -->
+                <div class="pagination-info">
+                    <span>第 [[${currentPage}]] 页，共 [[${totalPages}]] 页 | 总计 [[${totalPosts}]] 个帖子</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 帖子详情侧边栏 -->
+        <div class="sidebar" id="sidebar">
+            <div class="sidebar-content" id="sidebarContent">
+                <div class="loading">加载中...</div>
+            </div>
+        </div>
+
+    <!-- 自定义删除确认弹窗 -->
+    <div class="delete-confirm-overlay" id="deleteConfirmOverlay" style="display:none;">
+        <div class="delete-confirm-modal">
+            <h3>确认删除</h3>
+            <p>确定要删除这篇帖子吗？此操作无法撤销。</p>
+            <div class="modal-actions">
+                <button class="cancel-btn" onclick="hideDeleteConfirm()">取消</button>
+                <button class="confirm-btn" onclick="confirmDelete()">删除</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 评论删除确认弹窗 -->
+    <div class="delete-confirm-overlay" id="commentDeleteConfirmOverlay" style="display:none;">
+        <div class="delete-confirm-modal">
+            <h3>确认删除</h3>
+            <p>确定要删除这条评论吗？此操作无法撤销。</p>
+            <div class="modal-actions">
+                <button class="cancel-btn" onclick="hideCommentDeleteConfirm()">取消</button>
+                <button class="confirm-btn" onclick="confirmCommentDelete()">删除</button>
+            </div>
+        </div>
+    </div>
+    </div>
+
+    <!-- 添加登录状态标记 -->
+    <meta name="isAuthenticated" th:if="${#authentication != null && #authentication.name != 'anonymousUser'}" />
+
+    <!-- 配置单悬浮窗 -->
+    <div class="config-tooltip" id="configTooltip"></div>
+    
+    <!-- 图片预览模态框 -->
+    <div id="imageModal" class="image-modal" onclick="closeImageModal()" style="display:none;">
+        <div class="image-modal-content">
+            <span class="image-modal-close" onclick="closeImageModal(event)">&times;</span>
+            <img id="modalImage" src="" alt="预览图片">
+        </div>
+    </div>
+
+    <script>
+        // 检查用户是否登录
+        function checkLogin() {
+            return document.querySelector('meta[name="isAuthenticated"]') !== null;
+        }
+
+        // 跳转到登录页面
+        function redirectToLogin() {
+            window.location.href = '/login';
+        }
+        
+        // 加载用户配置单列表
+        function loadUserConfigs() {
+            const configSelect = document.getElementById('configSelect');
+            fetch('/api/user-configs')
+                .then(res => {
+                    if (!res.ok) {
+                        throw new Error('网络请求失败: ' + res.status);
+                    }
+                    return res.json();
+                })
+                .then(data => {
+                    console.log('配置单数据:', data); // 调试信息
+                    configSelect.innerHTML = '<option value="">不引用配置单</option>';
+                    if (data.success && Array.isArray(data.data)) {
+                        window.userConfigs = data.data;
+                        data.data.forEach(config => {
+                            const option = document.createElement('option');
+                            option.value = config.id;
+                            option.textContent = config.title;
+                            configSelect.appendChild(option);
+                        });
+                        console.log('成功加载', data.data.length, '个配置单'); // 调试信息
+                    } else {
+                        window.userConfigs = [];
+                        console.log('配置单数据格式错误或为空:', data); // 调试信息
+                    }
+                })
+                .catch(error => {
+                    console.error('加载配置单失败:', error);
+                    window.userConfigs = [];
+                });
+        }
+        
+        // 配置单选择变化事件（已移除预览功能）
+        function onConfigSelectChange() {
+            // 配置单选择变化时不再显示预览，但保留选择功能
+            // 选择的配置单ID会通过表单提交到后端
+        }
+        
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            if (checkLogin()) {
+                loadUserConfigs();
+                document.getElementById('configSelect').addEventListener('change', onConfigSelectChange);
+            }
+        });
+
+        // 快捷发帖图片预览
+        function previewQuickImages(input) {
+            const preview = document.getElementById('quickImagePreview');
+            preview.innerHTML = '';
+
+            if (input.files) {
+                Array.from(input.files).slice(0, 9).forEach(file => {
+                    const reader = new FileReader();
+                    reader.onload = function (e) {
+                        const div = document.createElement('div');
+                        div.className = 'preview-item';
+
+                        const img = document.createElement('img');
+                        img.src = e.target.result;
+
+                        const removeBtn = document.createElement('button');
+                        removeBtn.className = 'remove';
+                        removeBtn.innerHTML = '×';
+                        removeBtn.onclick = function(e) {
+                            e.stopPropagation();
+                            div.remove();
+                            // 清除对应的文件
+                            const dt = new DataTransfer();
+                            const { files } = input;
+                            for (let i = 0; i < files.length; i++) {
+                                if (files[i] !== file) dt.items.add(files[i]);
+                            }
+                            input.files = dt.files;
+                        };
+
+                        div.appendChild(img);
+                        div.appendChild(removeBtn);
+                        preview.appendChild(div);
+                    }
+                    reader.readAsDataURL(file);
+                });
+            }
+        }
+
+        // 显示帖子详情
+        function showPostDetail(postId) {
+            const sidebar = document.getElementById('sidebar');
+            const sidebarContent = document.getElementById('sidebarContent');
+            const mainWrapper = document.querySelector('.main-content-wrapper');
+            
+            // 显示侧边栏
+            sidebar.classList.add('active');
+            if (mainWrapper) {
+                mainWrapper.classList.add('has-sidebar');
+            }
+            
+            // 加载帖子详情内容
+            sidebarContent.innerHTML = '<div class="loading">加载中...</div>';
+            
+            fetch(`/community/${postId}`, {
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => response.text())
+            .then(html => {
+                // 提取帖子详情内容
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(html, 'text/html');
+                const postDetail = doc.querySelector('.post-detail');
+                if (postDetail) {
+                    // 在帖子详情前添加关闭按钮
+                    const closeButton = '<div class="sidebar-close-section"><button class="close-btn" onclick="hidePostDetail()">关闭</button></div>';
+                    sidebarContent.innerHTML = closeButton + postDetail.outerHTML;
+                    // 重新绑定事件（修正：绑定图片预览）
+                    bindDetailEventsWithPreview();
+                    // 自动高亮点赞按钮
+                    const likeBtn = sidebarContent.querySelector('.post-detail .like-btn.post-like');
+                    if (likeBtn) {
+                        if (likeBtn.className.includes('liked')) {
+                            likeBtn.classList.add('liked');
+                        } else {
+                            likeBtn.classList.remove('liked');
+                        }
+                    }
+                }
+            })
+            .catch(error => {
+                sidebarContent.innerHTML = '<div class="error">加载失败，请重试</div>';
+            });
+        }
+
+        // 隐藏帖子详情
+        function hidePostDetail() {
+            const sidebar = document.getElementById('sidebar');
+            const mainWrapper = document.querySelector('.main-content-wrapper');
+            
+            sidebar.classList.remove('active');
+            if (mainWrapper) {
+                mainWrapper.classList.remove('has-sidebar');
+            }
+        }
+        
+        // 兼容旧函数名
+        function openPostDetail(postId) {
+            showPostDetail(postId);
+        }
+        
+        function closePostDetail() {
+            hidePostDetail();
+        }
+
+        // 绑定详情页面的事件
+        function bindDetailEvents() {
+            // 重新绑定点赞等事件
+            const likeButtons = document.querySelectorAll('#sidebarContent .like-btn');
+            likeButtons.forEach(btn => {
+                btn.onclick = function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    // 从按钮的data-post-id属性或URL中获取postId
+                    let postId = this.getAttribute('data-post-id');
+                    // 如果没有data-post-id属性，尝试从onclick属性中提取
+                    if (!postId) {
+                        const onclickAttr = this.getAttribute('onclick');
+                        if (onclickAttr && onclickAttr.includes('togglePostLike')) {
+                            const match = onclickAttr.match(/togglePostLike\((\d+)\)/);
+                            if (match) {
+                                postId = match[1];
+                            }
+                        }
+                    }
+                    // 如果仍然没有找到postId，尝试从URL中获取
+                    if (!postId) {
+                        const currentUrl = window.location.pathname;
+                        const urlMatch = currentUrl.match(/\/community\/(\d+)/);
+                        if (urlMatch) {
+                            postId = urlMatch[1];
+                        }
+                    }
+                    if (postId) {
+                        togglePostLike(postId);
+                    }
+                };
+            });
+            // 重新绑定删除按钮事件
+            const deleteButtons = document.querySelectorAll('#sidebarContent .delete-btn, #sidebarContent .delete-btn-small');
+            deleteButtons.forEach(btn => {
+                btn.onclick = function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    // 从按钮的data-post-id属性或onclick属性中提取postId
+                    let postId = this.getAttribute('data-post-id');
+                    if (!postId) {
+                        const onclickAttr = this.getAttribute('onclick');
+                        if (onclickAttr) {
+                            const match = onclickAttr.match(/(?:deletePost|showDeleteConfirm)\((\d+)\)/);
+                            if (match) {
+                                postId = match[1];
+                            }
+                        }
+                    }
+                    if (!postId) {
+                        const currentUrl = window.location.pathname;
+                        const urlMatch = currentUrl.match(/\/community\/(\d+)/);
+                        if (urlMatch) {
+                            postId = urlMatch[1];
+                        }
+                    }
+                    if (postId) {
+                        showDeleteConfirm(postId);
+                    }
+                };
+            });
+            // 重新绑定图片上传和评论表单事件
+            const commentForm = document.querySelector('#sidebarContent #commentForm');
+            if (commentForm) {
+                commentForm.onsubmit = submitComment;
+                const imageInput = commentForm.querySelector('#commentImages');
+                if (imageInput) {
+                    imageInput.onchange = function() {
+                        previewImages(this);
+                    };
+                }
+            }
+            // 绑定评论删除按钮
+            bindCommentEvents();
+            // 绑定帖子点赞按钮事件（先解绑再绑定，防止多次绑定或被覆盖）
+            const postLikeBtn = document.querySelector('#sidebarContent .post-detail .like-btn');
+            if (postLikeBtn) {
+                postLikeBtn.onclick = null;
+                postLikeBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    let postId = this.getAttribute('data-post-id');
+                    if (!postId) {
+                        const onclickAttr = this.getAttribute('onclick');
+                        if (onclickAttr && onclickAttr.includes('togglePostLike')) {
+                            const match = onclickAttr.match(/togglePostLike\((\d+)\)/);
+                            if (match) {
+                                postId = match[1];
+                            }
+                        }
+                    }
+                    if (postId) {
+                        togglePostLike(postId);
+                    }
+                });
+                
+                // 检查并设置点赞按钮的初始状态
+                const onclickAttr = postLikeBtn.getAttribute('onclick');
+                if (onclickAttr && onclickAttr.includes('togglePostLike')) {
+                    const match = onclickAttr.match(/togglePostLike\((\d+)\)/);
+                    if (match) {
+                        const postId = match[1];
+                        // 从主列表中获取对应帖子的点赞状态
+                        const mainPostCard = document.querySelector(`.post-card .like-btn[onclick*="${postId}"]`);
+                        if (mainPostCard && mainPostCard.classList.contains('liked')) {
+                            postLikeBtn.classList.add('liked');
+                        }
+                    }
+                }
+            }
+            // 绑定评论点赞按钮事件（先解绑再绑定，防止多次绑定或被覆盖）
+            const commentLikeButtons = document.querySelectorAll('#sidebarContent .comment .like-btn');
+            commentLikeButtons.forEach(btn => {
+                btn.onclick = null;
+                btn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    let commentId = null;
+                    const onclickAttr = this.getAttribute('onclick');
+                    if (onclickAttr && onclickAttr.includes('toggleCommentLike')) {
+                        const match = onclickAttr.match(/toggleCommentLike\((\d+),/);
+                        if (match) {
+                            commentId = match[1];
+                        }
+                    }
+                    if (!commentId) {
+                        commentId = this.getAttribute('data-comment-id');
+                    }
+                    if (commentId) {
+                        toggleCommentLike(commentId, this);
+                    }
+                });
+            });
+        }
+
+        // ========== 评论相关函数（从 detail.html 复制） ==========
+        function previewImages(input) {
+            const preview = document.getElementById('imagePreview');
+            if (preview) preview.innerHTML = '';
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const div = document.createElement('div');
+                    div.className = 'preview-item';
+                    const img = document.createElement('img');
+                    img.src = e.target.result;
+                    const removeBtn = document.createElement('button');
+                    removeBtn.className = 'remove';
+                    removeBtn.innerHTML = '×';
+                    removeBtn.onclick = function(e) {
+                        e.stopPropagation();
+                        div.remove();
+                        input.value = '';
+                    };
+                    div.appendChild(img);
+                    div.appendChild(removeBtn);
+                    if (preview) preview.appendChild(div);
+                }
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+        function submitComment(event) {
+            event.preventDefault();
+            event.stopPropagation();
+            if (!checkLogin()) {
+                redirectToLogin();
+                return;
+            }
+            const postIdInput = document.querySelector('#sidebarContent #commentPostId');
+            const contentInput = document.querySelector('#sidebarContent #commentContent');
+            const imageInput = document.querySelector('#sidebarContent #commentImages');
+            if (!contentInput || !postIdInput) return;
+            const postId = postIdInput.value;
+            const content = contentInput.value;
+            if (!content.trim()) {
+                showCustomAlert('评论内容不能为空', 'warning');
+                return;
+            }
+            const formData = new FormData();
+            formData.append('postId', postId);
+            formData.append('content', content);
+            if (imageInput && imageInput.files.length > 0) {
+                formData.append('image', imageInput.files[0]);
+            }
+            const submitBtn = document.querySelector('#sidebarContent .submit-btn');
+            const originalText = submitBtn ? submitBtn.textContent : '';
+            if (submitBtn) {
+                submitBtn.textContent = '提交中...';
+                submitBtn.disabled = true;
+            }
+            fetch('/comment/add', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.text())
+            .then(html => {
+                if (contentInput) contentInput.value = '';
+                const preview = document.getElementById('imagePreview');
+                if (preview) preview.innerHTML = '';
+                if (imageInput) imageInput.value = '';
+                refreshComments(postId);
+                if (submitBtn) {
+                    submitBtn.textContent = originalText;
+                    submitBtn.disabled = false;
+                }
+            })
+            .catch(error => {
+                console.error('提交评论失败:', error);
+                if (submitBtn) {
+                    submitBtn.textContent = originalText;
+                    submitBtn.disabled = false;
+                }
+                showCustomAlert('提交评论失败，请重试', 'error');
+            });
+        }
+        function refreshComments(postId) {
+            fetch(`/community/${postId}`, {
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => response.text())
+            .then(html => {
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(html, 'text/html');
+                const commentsSection = doc.querySelector('.comments');
+                if (commentsSection) {
+                    const currentComments = document.querySelector('#sidebarContent .comments');
+                    const commentForm = currentComments ? currentComments.querySelector('.post-form-container') : null;
+                    const newComments = document.createElement('div');
+                    newComments.className = 'comments';
+                    newComments.id = 'comments';
+                    const title = document.createElement('h3');
+                    title.textContent = '评论区';
+                    newComments.appendChild(title);
+                    if (commentForm) {
+                        newComments.appendChild(commentForm.cloneNode(true));
+                    }
+                    const commentItems = commentsSection.querySelectorAll('.comment');
+                        commentItems.forEach(item => {
+                            // 更新评论结构以匹配新的布局
+                            const clonedItem = item.cloneNode(true);
+                            newComments.appendChild(clonedItem);
+                        });
+                    if (currentComments) currentComments.replaceWith(newComments);
+                    bindCommentEvents();
+                }
+            })
+            .catch(error => {
+                console.error('刷新评论失败:', error);
+            });
+        }
+        function bindCommentEvents() {
+            const deleteButtons = document.querySelectorAll('#sidebarContent .comment-delete-btn');
+            deleteButtons.forEach(btn => {
+                btn.onclick = function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    const commentId = this.getAttribute('data-comment-id');
+                    showCommentDeleteConfirm(commentId);
+                };
+            });
+        }
+        function deleteComment(commentId) {
+            fetch(`/comment/delete/${commentId}`, {
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => {
+                if (response.ok) {
+                    const postIdInput = document.querySelector('#sidebarContent #commentPostId');
+                    const postId = postIdInput ? postIdInput.value : null;
+                    if (postId) refreshComments(postId);
+                } else {
+                    showCustomAlert('删除评论失败，请重试', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('删除评论失败:', error);
+                showCustomAlert('删除评论失败，请重试', 'error');
+            });
+        }
+
+        // 帖子点赞
+        function togglePostLike(postId) {
+            if (!checkLogin()) {
+                redirectToLogin();
+                return;
+            }
+
+            // 添加点击动效
+            const clickedBtn = event.target.closest('.like-btn');
+            if (clickedBtn) {
+                clickedBtn.style.animation = 'likeAnimation 0.3s ease';
+                setTimeout(() => {
+                    clickedBtn.style.animation = '';
+                }, 300);
+            }
+
+            fetch(`/community/${postId}/like`, {
+                method: 'POST',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => {
+                if (response.status === 401) {
+                    redirectToLogin();
+                    return;
+                }
+                return response.text();
+            })
+            .then(data => {
+                // 解析响应数据
+                const isLiked = data === 'liked';
+                const isUnliked = data === 'unliked';
+                
+                if (isLiked || isUnliked) {
+                    // 获取当前点赞数
+                    fetch(`/community/${postId}`, {
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest'
+                        }
+                    })
+                    .then(response => response.text())
+                    .then(html => {
+                        const parser = new DOMParser();
+                        const doc = parser.parseFromString(html, 'text/html');
+                        const likeCountElement = doc.querySelector('#postLikeCount');
+                        const likeCount = likeCountElement ? likeCountElement.textContent : '0';
+                        
+                        // 更新主列表中的点赞按钮
+                        const mainLikeBtn = document.querySelector(`.post-card .like-btn[onclick*="${postId}"]`);
+                        if (mainLikeBtn) {
+                            const mainCountSpan = mainLikeBtn.querySelector('span');
+                            if (mainCountSpan) {
+                                mainCountSpan.textContent = likeCount;
+                            }
+                            if (isLiked) {
+                                mainLikeBtn.classList.add('liked');
+                                // 添加点赞成功动效
+                                mainLikeBtn.style.animation = 'likeAnimation 0.3s ease';
+                                setTimeout(() => {
+                                    mainLikeBtn.style.animation = '';
+                                }, 300);
+                            } else {
+                                mainLikeBtn.classList.remove('liked');
+                            }
+                        }
+                        
+                        // 更新侧边栏中的点赞按钮
+                        const sidebarLikeBtn = document.querySelector('#sidebarContent .like-btn');
+                        if (sidebarLikeBtn) {
+                            const sidebarCountSpan = sidebarLikeBtn.querySelector('span');
+                            if (sidebarCountSpan) {
+                                sidebarCountSpan.textContent = likeCount;
+                            }
+                            if (isLiked) {
+                                sidebarLikeBtn.classList.add('liked');
+                                // 添加点赞成功动效
+                                sidebarLikeBtn.style.animation = 'likeAnimation 0.3s ease';
+                                setTimeout(() => {
+                                    sidebarLikeBtn.style.animation = '';
+                                }, 300);
+                            } else {
+                                sidebarLikeBtn.classList.remove('liked');
+                            }
+                        }
+                    });
+                }
+            })
+            .catch(error => {
+                console.error('点赞操作失败:', error);
+            });
+        }
+        
+        // 图片预览功能
+        function previewImage(src, alt = '') {
+            const overlay = document.createElement('div');
+            overlay.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: rgba(0, 0, 0, 0.9);
+                z-index: 10000;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                opacity: 0;
+                transition: opacity 0.3s ease;
+                backdrop-filter: blur(4px);
+            `;
+            const container = document.createElement('div');
+            container.style.cssText = `
+                position: relative;
+                max-width: 90vw;
+                max-height: 90vh;
+                transform: scale(0.8);
+                transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            `;
+            const img = document.createElement('img');
+            img.src = src;
+            img.alt = alt;
+            img.style.cssText = `
+                width: auto;
+                height: auto;
+                max-width: 80vw;
+                max-height: 80vh;
+                object-fit: contain;
+                border-radius: 8px;
+                box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+                transition: transform 0.3s ease;
+            `;
+            const closeBtn = document.createElement('button');
+            closeBtn.innerHTML = '×';
+            closeBtn.style.cssText = `
+                position: fixed;
+                top: 30px;
+                right: 30px;
+                width: 50px;
+                height: 50px;
+                border: none;
+                border-radius: 50%;
+                background: rgba(0, 0, 0, 0.7);
+                color: white;
+                font-size: 24px;
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                transition: all 0.2s ease;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+                z-index: 10001;
+                font-weight: bold;
+            `;
+            closeBtn.addEventListener('mouseenter', () => {
+                closeBtn.style.background = 'rgba(255, 255, 255, 0.9)';
+                closeBtn.style.color = '#333';
+                closeBtn.style.transform = 'scale(1.1)';
+            });
+            closeBtn.addEventListener('mouseleave', () => {
+                closeBtn.style.background = 'rgba(0, 0, 0, 0.7)';
+                closeBtn.style.color = 'white';
+                closeBtn.style.transform = 'scale(1)';
+            });
+            let scale = 1;
+            // 鼠标滚轮缩放
+            container.addEventListener('wheel', (e) => {
+                e.preventDefault();
+                const delta = e.deltaY > 0 ? -0.1 : 0.1;
+                scale = Math.max(0.5, Math.min(3, scale + delta));
+                img.style.transform = `scale(${scale})`;
+            });
+            // 关闭预览
+            const closePreview = () => {
+                overlay.style.opacity = '0';
+                container.style.transform = 'scale(0.8)';
+                setTimeout(() => {
+                    document.body.removeChild(overlay);
+                }, 300);
+            };
+            closeBtn.addEventListener('click', closePreview);
+            overlay.addEventListener('click', (e) => {
+                if (e.target === overlay) closePreview();
+            });
+            // ESC键关闭
+            const handleKeydown = (e) => {
+                if (e.key === 'Escape') {
+                    closePreview();
+                    document.removeEventListener('keydown', handleKeydown);
+                }
+            };
+            document.addEventListener('keydown', handleKeydown);
+            container.appendChild(img);
+            overlay.appendChild(container);
+            overlay.appendChild(closeBtn);
+            document.body.appendChild(overlay);
+            // 显示动画
+            setTimeout(() => {
+                overlay.style.opacity = '1';
+                container.style.transform = 'scale(1)';
+            }, 10);
+        }
+        function closeImageModal(event) {
+            if (event) event.stopPropagation();
+            const modal = document.getElementById('imageModal');
+            const modalImg = document.getElementById('modalImage');
+            modal.style.display = 'none';
+            modalImg.src = '';
+            document.body.style.overflow = 'auto';
+        }
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                closeImageModal();
+            }
+        });
+        
+        // 搜索功能
+        function handleSearch(event) {
+            if (event) {
+                event.preventDefault();
+            }
+            
+            const searchInput = document.querySelector('.search-input');
+            const query = searchInput ? searchInput.value.trim() : '';
+            
+            if (query) {
+                window.location.href = `/search?q=${encodeURIComponent(query)}`;
+            }
+        }
+        
+        // 初始化搜索功能
+        document.addEventListener('DOMContentLoaded', function() {
+            // 搜索按钮点击事件
+            const searchBtn = document.querySelector('.search-btn');
+            if (searchBtn) {
+                searchBtn.addEventListener('click', handleSearch);
+            }
+            
+            // 搜索输入框回车事件
+            const searchInput = document.querySelector('.search-input');
+            if (searchInput) {
+                searchInput.addEventListener('keypress', function(event) {
+                    if (event.key === 'Enter') {
+                        handleSearch(event);
+                    }
+                });
+            }
+            
+            // 搜索框展开时自动聚焦
+            const searchBox = document.querySelector('.search-box');
+            if (searchBox) {
+                searchBox.addEventListener('mouseenter', function() {
+                    setTimeout(() => {
+                        const input = this.querySelector('.search-input');
+                        if (input) {
+                            input.focus();
+                        }
+                    }, 300);
+                });
+            }
+            
+            // ESC键关闭帖子详情
+            document.addEventListener('keydown', function(event) {
+                if (event.key === 'Escape') {
+                    const sidebar = document.getElementById('sidebar');
+                    if (sidebar && sidebar.classList.contains('active')) {
+                        hidePostDetail();
+                    }
+                }
+            });
+        });
+
+        window.toggleCommentLike = function(commentId, el) {
+            if (!checkLogin()) {
+                redirectToLogin();
+                return;
+            }
+            
+            // 添加点击动画效果
+            el.style.transform = 'scale(0.95)';
+            setTimeout(() => {
+                el.style.transform = '';
+            }, 150);
+            
+            fetch(`/comment/like/${commentId}`, {
+                method: 'POST',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => {
+                if (response.status === 401) {
+                    redirectToLogin();
+                    return null;
+                }
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.text();
+            })
+            .then(res => {
+                if (!res) return;
+                
+                if (res === 'login') {
+                    redirectToLogin();
+                    return;
+                }
+                
+                const span = el.querySelector('span');
+                let c = parseInt(span.innerText) || 0;
+                
+                if (res === 'liked') {
+                    el.classList.add('liked');
+                    span.innerText = c + 1;
+                    // 添加点赞成功的视觉反馈
+                    el.style.animation = 'likeAnimation 0.3s ease';
+                } else if (res === 'unliked') {
+                    el.classList.remove('liked');
+                    span.innerText = Math.max(0, c - 1);
+                }
+                
+                // 清除动画
+                setTimeout(() => {
+                    el.style.animation = '';
+                }, 300);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                // 恢复按钮状态
+                el.style.transform = '';
+            });
+        }
+
+        window.showDeleteConfirm = function(postId) {
+            // 记录要删除的帖子ID
+            window.deletePostId = postId;
+            const overlay = document.getElementById('deleteConfirmOverlay');
+            overlay.style.display = 'flex';
+            overlay.style.justifyContent = 'center';
+            overlay.style.alignItems = 'center';
+        }
+        window.hideDeleteConfirm = function() {
+            window.deletePostId = null;
+            document.getElementById('deleteConfirmOverlay').style.display = 'none';
+        }
+        window.confirmDelete = function() {
+            if (window.deletePostId) {
+                window.location.href = '/community/' + window.deletePostId + '/delete';
+            }
+            window.hideDeleteConfirm();
+        }
+
+        let deleteCommentId = null;
+        function showCommentDeleteConfirm(commentId) {
+            deleteCommentId = commentId;
+            const overlay = document.getElementById('commentDeleteConfirmOverlay');
+            overlay.style.display = 'flex';
+            overlay.style.justifyContent = 'center';
+            overlay.style.alignItems = 'center';
+        }
+        function hideCommentDeleteConfirm() {
+            deleteCommentId = null;
+            document.getElementById('commentDeleteConfirmOverlay').style.display = 'none';
+        }
+        function confirmCommentDelete() {
+            if (deleteCommentId) {
+                deleteComment(deleteCommentId);
+            }
+            hideCommentDeleteConfirm();
+        }
+        
+        // 自定义弹窗函数
+        function showCustomAlert(message, type = 'info', title = '', showCancel = false) {
+            return new Promise((resolve) => {
+                // 创建遮罩层
+                const overlay = document.createElement('div');
+                overlay.className = 'custom-alert-overlay';
+                overlay.style.cssText = `
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    right: 0;
+                    bottom: 0;
+                    background: rgba(0, 0, 0, 0.5);
+                    z-index: 10000;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    opacity: 0;
+                    transition: opacity 0.3s ease;
+                `;
+                
+                // 创建弹窗
+                const alert = document.createElement('div');
+                alert.className = 'custom-alert';
+                alert.style.cssText = `
+                    background: white;
+                    border-radius: 12px;
+                    padding: 0;
+                    max-width: 400px;
+                    width: 90%;
+                    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+                    transform: scale(0.8);
+                    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                    overflow: hidden;
+                `;
+                
+                // 设置图标
+                const icons = {
+                    success: 'fas fa-check',
+                    error: 'fas fa-times',
+                    warning: 'fas fa-exclamation-triangle',
+                    info: 'fas fa-info'
+                };
+                
+                const iconColors = {
+                    success: '#4CAF50',
+                    error: '#f44336',
+                    warning: '#ff9800',
+                    info: '#2196F3'
+                };
+                
+                // 设置标题
+                const titles = {
+                    success: title || '成功',
+                    error: title || '错误',
+                    warning: title || '警告',
+                    info: title || '提示'
+                };
+                
+                alert.innerHTML = `
+                    <div style="padding: 24px; display: flex; align-items: flex-start; gap: 16px;">
+                        <div style="width: 40px; height: 40px; border-radius: 50%; background: ${iconColors[type]}; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                            <i class="${icons[type]}" style="color: white; font-size: 18px;"></i>
+                        </div>
+                        <div style="flex: 1;">
+                            <div style="font-size: 18px; font-weight: 600; color: #333; margin-bottom: 8px;">${titles[type]}</div>
+                            <div style="color: #666; line-height: 1.5;">${message}</div>
+                        </div>
+                    </div>
+                    <div style="padding: 16px 24px; background: #f8f9fa; display: flex; gap: 12px; justify-content: flex-end;">
+                        ${showCancel ? '<button class="custom-alert-btn secondary" style="padding: 8px 16px; border: 1px solid #ddd; background: white; color: #666; border-radius: 6px; cursor: pointer; font-size: 14px;" onclick="closeCustomAlert(false)">取消</button>' : ''}
+                        <button class="custom-alert-btn primary" style="padding: 8px 16px; border: none; background: #007bff; color: white; border-radius: 6px; cursor: pointer; font-size: 14px;" onclick="closeCustomAlert(true)">确定</button>
+                    </div>
+                `;
+                
+                // 添加到页面
+                overlay.appendChild(alert);
+                document.body.appendChild(overlay);
+                
+                // 显示动画
+                setTimeout(() => {
+                    overlay.style.opacity = '1';
+                    alert.style.transform = 'scale(1)';
+                }, 10);
+                
+                // 关闭函数
+                window.closeCustomAlert = function(result) {
+                    overlay.style.opacity = '0';
+                    alert.style.transform = 'scale(0.8)';
+                    
+                    setTimeout(() => {
+                        document.body.removeChild(overlay);
+                        delete window.closeCustomAlert;
+                        resolve(result);
+                    }, 300);
+                };
+                
+                // 点击遮罩层关闭
+                overlay.addEventListener('click', () => window.closeCustomAlert(false));
+            });
+        }
+        
+        // 帖子列表图片预览事件绑定
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('.post-preview-img').forEach(function(img) {
+                img.style.cursor = 'zoom-in';
+                img.onclick = function(e) {
+                    e.stopPropagation();
+                    previewImage(this.src, this.alt);
+                };
+            });
+        });
+        // 右侧详情弹出后也要绑定
+        function bindDetailEventsWithPreview() {
+            bindDetailEvents && bindDetailEvents();
+            document.querySelectorAll('#sidebarContent img').forEach(function(img) {
+                img.style.cursor = 'zoom-in';
+                img.onclick = function(e) {
+                    e.stopPropagation();
+                    previewImage(this.src, this.alt);
+                };
+            });
+        }
+        // 替换原有bindDetailEvents调用
+        const oldShowPostDetail = showPostDetail;
+        showPostDetail = function(postId) {
+            oldShowPostDetail(postId);
+            setTimeout(bindDetailEventsWithPreview, 350);
+        };
+        
+        // ========== 配置相关函数 ==========
+        
+        // 配置缓存
+        window.configCache = {};
+        
+        // 加载配置详情
+        function loadConfigDetails(configId) {
+            if (!configId) return;
+            
+            // 如果已经缓存，直接返回
+            if (window.configCache[configId]) {
+                return;
+            }
+            
+            fetch(`/api/user-configs/${configId}`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success && data.data) {
+                    const config = data.data;
+                    const configData = JSON.parse(config.configData || '{}');
+                    
+                    // 缓存配置数据
+                    window.configCache[configId] = {
+                        id: config.id,
+                        title: config.title,
+                        components: configData.components || {},
+                        specs: configData.specs || {}
+                    };
+                    
+                    // 更新页面显示
+                    updateConfigDisplay(configId, window.configCache[configId]);
+                }
+            })
+            .catch(error => {
+                console.error('Error loading config details:', error);
+            });
+        }
+        
+        // 更新配置显示
+        function updateConfigDisplay(configId, config) {
+            const configBars = document.querySelectorAll(`[data-config-id="${configId}"]`);
+            configBars.forEach(bar => {
+                const titleElement = bar.querySelector('.config-name');
+                const typeElement = bar.querySelector('.config-type');
+                const priceElement = bar.querySelector('.config-price');
+                
+                if (titleElement) titleElement.textContent = config.title || '未命名配置';
+                if (typeElement) typeElement.textContent = getConfigType(config.components);
+                if (priceElement) priceElement.textContent = '¥' + calculateTotalPrice(config.components).toLocaleString();
+            });
+        }
+        
+        // 获取配置类型
+        function getConfigType(components) {
+            const cpu = components.cpu;
+            const gpu = components.gpu;
+            
+            let type = '';
+            if (cpu && cpu.name) {
+                if (cpu.name.toLowerCase().includes('intel')) {
+                    type += 'Intel';
+                } else if (cpu.name.toLowerCase().includes('amd')) {
+                    type += 'AMD';
+                }
+            }
+            
+            if (gpu && gpu.name) {
+                if (type) type += ' + ';
+                if (gpu.name.toLowerCase().includes('nvidia') || gpu.name.toLowerCase().includes('rtx') || gpu.name.toLowerCase().includes('gtx')) {
+                    type += 'NVIDIA';
+                } else if (gpu.name.toLowerCase().includes('amd') || gpu.name.toLowerCase().includes('radeon')) {
+                    type += 'AMD';
+                }
+            }
+            
+            return type || '通用配置';
+        }
+        
+        // 从specs中解析功耗信息
+        function getPowerFromSpecs(specs) {
+            if (!specs) return 0;
+            
+            try {
+                const specsObj = typeof specs === 'string' ? JSON.parse(specs) : specs;
+                
+                // 查找功耗相关字段
+                for (const [key, value] of Object.entries(specsObj)) {
+                    const keyLower = key.toLowerCase();
+                    if (keyLower.includes('power') || keyLower.includes('功耗') || keyLower.includes('tdp')) {
+                        const powerMatch = String(value).match(/(\d+)\s*w/i);
+                        if (powerMatch) {
+                            return parseInt(powerMatch[1]);
+                        }
+                    }
+                }
+            } catch (e) {
+                console.warn('解析specs失败:', e);
+            }
+            
+            return 0;
+        }
+        
+        // 计算总价格
+        function calculateTotalPrice(components) {
+            let total = 0;
+            
+            if (components.cpu && components.cpu.price) total += Number(components.cpu.price);
+            if (components.motherboard && components.motherboard.price) total += Number(components.motherboard.price);
+            if (components.ram && components.ram.price) total += Number(components.ram.price);
+            if (components.gpu && components.gpu.price) total += Number(components.gpu.price);
+            if (components.psu && components.psu.price) total += Number(components.psu.price);
+            if (components.case && components.case.price) total += Number(components.case.price);
+            
+            if (components.storage && Array.isArray(components.storage)) {
+                components.storage.forEach(storage => {
+                    if (storage.price) total += Number(storage.price);
+                });
+            }
+            
+            return total;
+        }
+        
+        // 计算总功耗
+        function calculateTotalPower(components) {
+            let total = 0;
+            
+            if (components.cpu) {
+                total += components.cpu.power || getPowerFromSpecs(components.cpu.specs);
+            }
+            if (components.motherboard) {
+                total += components.motherboard.power || getPowerFromSpecs(components.motherboard.specs);
+            }
+            if (components.ram) {
+                total += components.ram.power || getPowerFromSpecs(components.ram.specs);
+            }
+            if (components.gpu) {
+                total += components.gpu.power || getPowerFromSpecs(components.gpu.specs);
+            }
+            if (components.case) {
+                total += components.case.power || getPowerFromSpecs(components.case.specs);
+            }
+            
+            if (components.storage && Array.isArray(components.storage)) {
+                components.storage.forEach(storage => {
+                    total += storage.power || getPowerFromSpecs(storage.specs);
+                });
+            }
+            
+            return total;
+        }
+        
+        // 显示配置单悬浮窗
+        function showConfigTooltip(element) {
+            const configId = element.getAttribute('data-config-id');
+            
+            // 从缓存中获取配置数据
+            const config = window.configCache && window.configCache[configId];
+            
+            if (!config) {
+                // 如果缓存中没有，尝试重新加载
+                loadConfigDetails(configId);
+                return;
+            }
+            
+            const tooltip = document.getElementById('configTooltip');
+            const components = config.components;
+            
+            // 组件图标映射
+            const componentIcons = {
+                cpu: 'fas fa-microchip',
+                motherboard: 'fas fa-memory',
+                ram: 'fas fa-memory',
+                gpu: 'fas fa-tv',
+                psu: 'fas fa-bolt',
+                case: 'fas fa-cube'
+            };
+            
+            // 组件名称映射
+            const componentNames = {
+                cpu: 'CPU',
+                motherboard: '主板',
+                ram: '内存',
+                gpu: '显卡',
+                psu: '电源',
+                case: '机箱'
+            };
+            
+            let tooltipContent = `
+                <div class="config-tooltip-header">
+                    <i class="fas fa-cog" style="color: #667eea;"></i>
+                    <span class="config-tooltip-title">${config.title || '未命名配置'}</span>
+                </div>
+                <div class="config-tooltip-components">
+            `;
+            
+            // 添加主要组件
+            Object.keys(componentNames).forEach(key => {
+                const component = components[key];
+                if (component && component.name) {
+                    tooltipContent += `
+                        <div class="config-tooltip-item">
+                            <div class="config-tooltip-component">
+                                <div class="config-tooltip-component-icon">
+                                    <i class="${componentIcons[key]}"></i>
+                                </div>
+                                <div>
+                                    <div class="config-tooltip-component-name">${componentNames[key]}</div>
+                                    <div class="config-tooltip-component-model">${component.name || '未选择'}</div>
+                                </div>
+                            </div>
+                            <div class="config-tooltip-price">¥${(component.price || 0).toLocaleString()}</div>
+                        </div>
+                    `;
+                }
+            });
+            
+            // 添加存储组件
+            if (components.storage && Array.isArray(components.storage)) {
+                components.storage.forEach((storage, index) => {
+                    if (storage && storage.name) {
+                        tooltipContent += `
+                            <div class="config-tooltip-item">
+                                <div class="config-tooltip-component">
+                                    <div class="config-tooltip-component-icon">
+                                        <i class="fas fa-hdd"></i>
+                                    </div>
+                                    <div>
+                                        <div class="config-tooltip-component-name">存储 ${index + 1}</div>
+                                        <div class="config-tooltip-component-model">${storage.name || '未选择'}</div>
+                                    </div>
+                                </div>
+                                <div class="config-tooltip-price">¥${(storage.price || 0).toLocaleString()}</div>
+                            </div>
+                        `;
+                    }
+                });
+            }
+            
+            // 计算总价和功耗
+            const totalPrice = calculateTotalPrice(components);
+            const totalPower = calculateTotalPower(components);
+            
+            tooltipContent += `
+                </div>
+                <div class="config-tooltip-footer">
+                    <div class="config-tooltip-total">总计: ¥${totalPrice.toLocaleString()}</div>
+                    <div class="config-tooltip-power">功耗: ${totalPower}W</div>
+                </div>
+            `;
+            
+            tooltip.innerHTML = tooltipContent;
+            
+            // 定位悬浮窗 - 显示在下方
+            const rect = element.getBoundingClientRect();
+            tooltip.style.left = rect.left + 'px';
+            tooltip.style.top = (rect.bottom + 10) + 'px';
+            tooltip.style.display = 'block';
+            
+            // 检查是否超出屏幕边界
+            setTimeout(() => {
+                const tooltipRect = tooltip.getBoundingClientRect();
+                if (tooltipRect.right > window.innerWidth) {
+                    tooltip.style.left = (window.innerWidth - tooltipRect.width - 10) + 'px';
+                }
+                if (tooltipRect.bottom > window.innerHeight) {
+                    tooltip.style.top = (rect.top - tooltipRect.height - 10) + 'px';
+                }
+            }, 10);
+        }
+        
+        // 隐藏配置单悬浮窗
+        function hideConfigTooltip() {
+            const tooltip = document.getElementById('configTooltip');
+            tooltip.style.display = 'none';
+        }
+        
+        // 为配置信息栏添加事件监听器
+        function addConfigEvents() {
+            document.querySelectorAll('[data-config-id]').forEach(element => {
+                const configId = element.getAttribute('data-config-id');
+                if (configId) {
+                    // 加载配置详情
+                    loadConfigDetails(configId);
+                    
+                    // 添加鼠标事件
+                    element.addEventListener('mouseenter', function() {
+                        showConfigTooltip(this);
+                    });
+                    
+                    element.addEventListener('mouseleave', function() {
+                        hideConfigTooltip();
+                    });
+                }
+            });
+        }
+        
+        // 页面加载完成后，为所有配置信息栏加载数据
+        document.addEventListener('DOMContentLoaded', function() {
+            addConfigEvents();
+        });
+        
+        // 修改showPostDetail函数，在侧边栏加载后重新绑定配置事件
+        const originalShowPostDetail = showPostDetail;
+        showPostDetail = function(postId) {
+            originalShowPostDetail(postId);
+            setTimeout(() => {
+                addConfigEvents(); // 重新绑定配置事件
+            }, 350);
+        };
+        
+        // 用户信息悬浮窗功能
+        // 跟踪鼠标位置
+    let currentMouseX = 0;
+    let currentMouseY = 0;
+    
+    document.addEventListener('mousemove', function(e) {
+        currentMouseX = e.clientX;
+        currentMouseY = e.clientY;
+    });
+    
+
+
+        // 配置单保存成功后刷新配置单列表
+        function onConfigSaveSuccess() {
+            loadUserConfigs();
+        }
+    </script>
+
+    <!-- 悬浮新建帖子按钮 -->
+    <div class="floating-new-post-btn" onclick="window.location.href='/community/create'">
+        <i class="fas fa-plus"></i>
+        <span>新建帖子</span>
+    </div>
+
+</body>
+</html>

@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="cn.gcc.gearcorelab.mapper.CommentMapper">
+
+    <!-- 根据帖子 ID 列出该帖所有评论 -->
+    <select id="findByPostId" resultType="cn.gcc.gearcorelab.model.Comment">
+        SELECT
+            c.id,
+            c.post_id         AS postId,
+            c.user_id         AS userId,
+            c.content,
+            c.image_url       AS imageUrl,
+            c.created_at      AS createdAt,
+            u.username        AS authorUsername,
+            u.avatar_url      AS authorAvatarUrl
+        FROM comments c
+        LEFT JOIN users u ON c.user_id = u.id
+        WHERE c.post_id = #{postId}
+        ORDER BY c.created_at ASC
+    </select>
+
+    <!-- 根据评论 ID 查询单条评论 -->
+    <select id="findById" resultType="cn.gcc.gearcorelab.model.Comment">
+        SELECT
+            c.id,
+            c.post_id         AS postId,
+            c.user_id         AS userId,
+            c.content,
+            c.image_url       AS imageUrl,
+            c.created_at      AS createdAt,
+            u.username        AS authorUsername,
+            u.avatar_url      AS authorAvatarUrl
+        FROM comments c
+        LEFT JOIN users u ON c.user_id = u.id
+        WHERE c.id = #{id}
+    </select>
+
+    <!-- 插入新评论 -->
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO comments
+            (post_id, user_id, content, image_url, created_at)
+        VALUES
+            (#{postId}, #{userId}, #{content}, #{imageUrl}, #{createdAt})
+    </insert>
+
+    <!-- 删除评论 -->
+    <delete id="delete">
+        DELETE FROM comments WHERE id = #{id}
+    </delete>
+
+    <delete id="deleteByPostId">
+        DELETE FROM comments WHERE post_id = #{postId}
+    </delete>
+    
+    <!-- 根据用户名查询评论 -->
+    <select id="findByUsername" resultType="cn.gcc.gearcorelab.model.Comment">
+        SELECT
+            c.id,
+            c.post_id         AS postId,
+            c.user_id         AS userId,
+            c.content,
+            c.image_url       AS imageUrl,
+            c.created_at      AS createdAt,
+            u.username        AS authorUsername,
+            u.avatar_url      AS authorAvatarUrl,
+            p.title           AS postTitle
+        FROM comments c
+        LEFT JOIN users u ON c.user_id = u.id
+        LEFT JOIN posts p ON c.post_id = p.id
+        WHERE u.username = #{username}
+        ORDER BY c.created_at DESC
+    </select>
+    
+    <!-- 获取评论总数 -->
+    <select id="countAllComments" resultType="long">
+        SELECT COUNT(*) FROM comments
+    </select>
+
+</mapper>

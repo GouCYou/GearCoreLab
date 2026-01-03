@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.gcc.gearcorelab.mapper.CommentLikeMapper">
+    <select id="countByCommentId" resultType="int">
+        SELECT COUNT(*) FROM comment_likes WHERE comment_id = #{commentId}
+    </select>
+
+    <select id="existsByCommentIdAndUserId" resultType="boolean">
+        SELECT CASE WHEN COUNT(*)>0 THEN TRUE ELSE FALSE END
+        FROM comment_likes
+        WHERE comment_id = #{commentId}
+          AND user_id = #{userId}
+    </select>
+
+    <insert id="insert">
+        INSERT INTO comment_likes(comment_id,user_id,created_at)
+        VALUES(#{commentId},#{userId},NOW())
+    </insert>
+
+    <delete id="delete">
+        DELETE FROM comment_likes
+        WHERE comment_id = #{commentId}
+          AND user_id = #{userId}
+    </delete>
+
+    <delete id="deleteByCommentId">
+        DELETE FROM comment_likes WHERE comment_id = #{commentId}
+    </delete>
+</mapper>

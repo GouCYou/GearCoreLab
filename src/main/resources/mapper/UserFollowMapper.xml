@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.gcc.gearcorelab.mapper.UserFollowMapper">
+
+    <!-- 插入关注关系 -->
+    <insert id="insert" parameterType="cn.gcc.gearcorelab.model.UserFollow">
+        INSERT INTO user_follows (follower_id, following_id, created_at)
+        VALUES (#{followerId}, #{followingId}, #{createdAt})
+    </insert>
+
+    <!-- 删除关注关系 -->
+    <delete id="delete">
+        DELETE FROM user_follows 
+        WHERE follower_id = #{followerId} AND following_id = #{followingId}
+    </delete>
+
+    <!-- 查找关注关系 -->
+    <select id="findByFollowerAndFollowing" resultType="cn.gcc.gearcorelab.model.UserFollow">
+        SELECT * FROM user_follows 
+        WHERE follower_id = #{followerId} AND following_id = #{followingId}
+    </select>
+
+    <!-- 获取用户关注的人列表 -->
+    <select id="findFollowingsByUserId" resultType="cn.gcc.gearcorelab.model.User">
+        SELECT u.* FROM users u
+        INNER JOIN user_follows uf ON u.id = uf.following_id
+        WHERE uf.follower_id = #{userId}
+        ORDER BY uf.created_at DESC
+    </select>
+
+    <!-- 获取用户的粉丝列表 -->
+    <select id="findFollowersByUserId" resultType="cn.gcc.gearcorelab.model.User">
+        SELECT u.* FROM users u
+        INNER JOIN user_follows uf ON u.id = uf.follower_id
+        WHERE uf.following_id = #{userId}
+        ORDER BY uf.created_at DESC
+    </select>
+
+    <!-- 获取用户关注数量 -->
+    <select id="countFollowingsByUserId" resultType="int">
+        SELECT COUNT(*) FROM user_follows WHERE follower_id = #{userId}
+    </select>
+
+    <!-- 获取用户粉丝数量 -->
+    <select id="countFollowersByUserId" resultType="int">
+        SELECT COUNT(*) FROM user_follows WHERE following_id = #{userId}
+    </select>
+
+    <!-- 检查是否互相关注 -->
+    <select id="isMutualFollow" resultType="boolean">
+        SELECT COUNT(*) = 2 FROM (
+            SELECT 1 FROM user_follows WHERE follower_id = #{userId1} AND following_id = #{userId2}
+            UNION ALL
+            SELECT 1 FROM user_follows WHERE follower_id = #{userId2} AND following_id = #{userId1}
+        ) AS mutual_check
+    </select>
+
+</mapper>

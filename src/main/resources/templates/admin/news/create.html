@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>创建新闻 | 管理员后台</title>
+    <link rel="stylesheet" th:href="@{/css/main.css}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: white;
+            min-height: 100vh;
+        }
+
+        .admin-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* 侧边栏样式 */
+        .sidebar {
+            width: 280px;
+            background: #f8f9fa;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+            padding: 0;
+            overflow-y: auto;
+            flex-shrink: 0;
+            position: fixed;
+            left: 0;
+            top: 0;
+            height: 100vh;
+            z-index: 1000;
+        }
+
+        .sidebar-header {
+            padding: 30px 25px;
+            border-bottom: 1px solid #e9ecef;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .logo {
+            width: 60px;
+            height: 60px;
+            margin-bottom: 15px;
+            border-radius: 12px;
+        }
+
+        .sidebar-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 8px;
+        }
+
+        .sidebar-subtitle {
+            color: #6c757d;
+            font-size: 14px;
+        }
+
+        .sidebar-nav {
+            padding: 20px 0;
+        }
+
+        .nav-item {
+            margin: 0;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 15px 25px;
+            color: #495057;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border-left: 4px solid transparent;
+        }
+
+        .nav-link:hover {
+            background: #e9ecef;
+            color: #1890ff;
+            border-left-color: #1890ff;
+        }
+
+        .nav-link.active {
+            background: #e6f7ff;
+            color: #1890ff;
+            border-left-color: #1890ff;
+            font-weight: 600;
+        }
+
+        .nav-icon {
+            width: 20px;
+            margin-right: 12px;
+            text-align: center;
+        }
+
+        /* 主内容区 */
+        .main-content {
+            flex: 1;
+            padding: 30px;
+            overflow-y: auto;
+            margin-left: 280px;
+        }
+
+        .content-header {
+            background: white;
+            border-radius: 8px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .page-title {
+            font-size: 32px;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 8px;
+        }
+
+        .page-subtitle {
+            color: #6c757d;
+            font-size: 16px;
+        }
+
+        .breadcrumb {
+            margin: 10px 0 0 0;
+            color: #7f8c8d;
+        }
+        
+        .news-management {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e9ecef;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: border-color 0.3s ease;
+            box-sizing: border-box;
+        }
+        
+        .form-control:focus {
+            outline: none;
+            border-color: #3498db;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+        }
+        
+        .file-input-wrapper {
+            position: relative;
+        }
+        
+        .file-input-wrapper input[type="file"] {
+            position: absolute;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+        }
+        
+        .file-input-display {
+            display: block;
+            padding: 12px;
+            border: 2px dashed #e9ecef;
+            border-radius: 6px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .file-input-display:hover {
+            border-color: #3498db;
+            background: #f8f9fa;
+        }
+        
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-block;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-right: 10px;
+        }
+        
+        .btn-primary {
+            background: #3498db;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #2980b9;
+        }
+        
+        .btn-secondary {
+            background: #95a5a6;
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background: #7f8c8d;
+        }
+        
+        .form-actions {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #e9ecef;
+            justify-content: flex-end;
+        }
+
+        /* 固定悬浮按钮样式 */
+        .floating-actions {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            z-index: 1000;
+        }
+
+        .floating-btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 50px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            min-width: 120px;
+            justify-content: center;
+        }
+
+        .floating-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .floating-btn-primary {
+            background: #1890ff;
+            color: white;
+        }
+
+        .floating-btn-primary:hover {
+            background: #40a9ff;
+            color: white;
+        }
+
+        .floating-btn-secondary {
+            background: white;
+            color: #595959;
+            border: 1px solid #d9d9d9;
+        }
+
+        .floating-btn-secondary:hover {
+            background: #f0f0f0;
+            border-color: #1890ff;
+            color: #1890ff;
+        }
+        
+        .alert {
+            padding: 12px 16px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+        }
+        
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .alert-danger {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .form-text {
+            font-size: 12px;
+            color: #6c757d;
+            margin-top: 5px;
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .admin-container {
+                flex-direction: column;
+            }
+            
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: relative;
+                left: auto;
+                top: auto;
+            }
+            
+            .main-content {
+                padding: 20px;
+                margin-left: 0;
+            }
+        }
+
+
+    </style>
+</head>
+<body>
+    <div class="admin-container">
+        <!-- 侧边栏 -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <img src="/img/logo.png" alt="GearCoreLab" class="logo">
+                <h1 class="sidebar-title">管理后台</h1>
+                <p class="sidebar-subtitle">GearCoreLab Admin</p>
+            </div>
+            <nav class="sidebar-nav">
+                <div class="nav-item">
+                    <a href="/admin" class="nav-link">
+                        <i class="fas fa-tachometer-alt nav-icon"></i>
+                        仪表盘
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="/admin/users" class="nav-link">
+                        <i class="fas fa-users nav-icon"></i>
+                        用户管理
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="/admin/posts" class="nav-link">
+                        <i class="fas fa-comments nav-icon"></i>
+                        帖子管理
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="/admin/news" class="nav-link active">
+                        <i class="fas fa-newspaper nav-icon"></i>
+                        新闻管理
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="/admin/hardware" class="nav-link">
+                        <i class="fas fa-microchip nav-icon"></i>
+                        配件管理
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="/admin/notifications" class="nav-link">
+                        <i class="fas fa-bell nav-icon"></i>
+                        通知管理
+                    </a>
+                </div>
+
+            </nav>
+        </div>
+
+        <!-- 主内容区 -->
+        <div class="main-content">
+            <!-- 页面标题 -->
+            <div class="content-header">
+                <h1 class="page-title">创建新闻</h1>
+                <p class="page-subtitle">发布新的新闻内容到网站</p>
+                <div class="breadcrumb">
+                    <a th:href="@{/admin}">首页</a> > 
+                    <a th:href="@{/admin/news}">新闻管理</a> > 
+                    创建新闻
+                </div>
+            </div>
+            
+            <div th:if="${success}" class="alert alert-success">
+                <i class="fas fa-check-circle"></i> <span th:text="${success}"></span>
+            </div>
+            
+            <div th:if="${error}" class="alert alert-danger">
+                <i class="fas fa-exclamation-circle"></i> <span th:text="${error}"></span>
+            </div>
+            
+            <div class="news-management">
+                <form id="createNewsForm" th:action="@{/admin/news/create}" method="post" enctype="multipart/form-data" th:object="${news}">
+                    <div class="form-group">
+                        <label for="title">新闻标题 *</label>
+                        <input type="text" id="title" name="title" class="form-control" 
+                               th:field="*{title}" placeholder="请输入新闻标题" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="summary">新闻摘要</label>
+                        <textarea id="summary" name="summary" class="form-control" 
+                                  th:field="*{summary}" placeholder="请输入新闻摘要（可选）" 
+                                  style="min-height: 100px;"></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="content">新闻内容 *</label>
+                        <textarea id="content" name="content" class="form-control" 
+                                  th:field="*{content}" placeholder="请输入新闻内容" 
+                                  style="min-height: 200px;" required></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="image">新闻图片</label>
+                        <div class="file-input-wrapper">
+                            <input type="file" id="image" name="image" accept="image/*">
+                            <label for="image" class="file-input-display">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                                <span>点击选择图片文件</span>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="publishTime">发布时间</label>
+                        <input type="datetime-local" id="publishTime" name="publishTimeStr" class="form-control">
+                        <small class="form-text">留空则立即发布</small>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="author">作者</label>
+                        <input type="text" id="author" name="author" class="form-control" 
+                               th:field="*{author}" placeholder="请输入作者姓名" value="管理员">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="category">新闻分类</label>
+                        <select id="category" name="category" class="form-control" th:field="*{category}">
+                            <option value="">请选择分类</option>
+                            <option value="技术资讯">技术资讯</option>
+                            <option value="产品动态">产品动态</option>
+                            <option value="行业动态">行业动态</option>
+                            <option value="公司新闻">公司新闻</option>
+                        </select>
+                    </div>
+                    
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- 悬浮操作按钮 -->
+    <div class="floating-actions">
+        <button type="submit" form="createNewsForm" class="floating-btn floating-btn-primary">
+            <i class="fas fa-save"></i> 发布新闻
+        </button>
+        <a th:href="@{/admin/news}" class="floating-btn floating-btn-secondary">
+            <i class="fas fa-times"></i> 取消
+        </a>
+    </div>
+    
+    <script>
+        // 文件选择显示
+        document.getElementById('image').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            const display = document.querySelector('.file-input-display span');
+            if (file) {
+                display.textContent = file.name;
+            } else {
+                display.textContent = '点击选择图片文件';
+            }
+        });
+        
+        // 设置默认发布时间为当前时间
+        document.addEventListener('DOMContentLoaded', function() {
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const day = String(now.getDate()).padStart(2, '0');
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            
+            const dateTimeString = `${year}-${month}-${day}T${hours}:${minutes}`;
+            document.getElementById('publishTime').value = dateTimeString;
+        });
+    </script>
+</body>
+</html>

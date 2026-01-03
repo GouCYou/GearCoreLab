@@ -1,0 +1,1023 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>个人中心 | CCTStudio - GearCoreLab</title>
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="stylesheet" th:href="@{/css/main.css}">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .profile-container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            overflow: hidden;
+        }
+        
+        .profile-header {
+            background: #667eea;
+            color: white;
+            padding: 3rem 0;
+            margin: 0 -2rem 2rem -2rem;
+            min-height: 300px;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            position: relative;
+            transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            overflow: hidden;
+        }
+        
+        .profile-header.height-changing {
+            min-height: 300px;
+            background-size: cover;
+            background-position: center;
+        }
+        
+        .profile-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.3);
+            z-index: 1;
+        }
+        
+        .profile-header-content {
+            position: relative;
+            z-index: 2;
+        }
+        
+        .background-upload-btn {
+            position: absolute;
+            bottom: 1rem;
+            right: 1rem;
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            z-index: 3;
+        }
+        
+        .background-upload-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+        
+        .profile-header-content {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+        
+        .profile-avatar-section {
+            position: relative;
+        }
+        
+        .profile-avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            border: 4px solid white;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            object-fit: cover;
+            transition: all 0.3s ease;
+        }
+        
+        .avatar-upload-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 120px;
+            height: 120px;
+            background: rgba(0, 0, 0, 0.6);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            color: white;
+            font-size: 14px;
+            text-align: center;
+            cursor: pointer;
+        }
+        
+        .profile-avatar-section:hover .avatar-upload-overlay {
+            opacity: 1;
+        }
+        
+        .profile-info h1 {
+            margin: 0 0 1rem 0;
+            font-size: 2.5rem;
+            font-weight: 600;
+        }
+        
+        .profile-meta {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+        
+        .profile-meta-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .signature-section {
+            margin-top: 1rem;
+        }
+        
+        .signature-display {
+            background: rgba(255,255,255,0.1);
+            padding: 1rem;
+            border-radius: 8px;
+            font-style: italic;
+            margin-top: 0.5rem;
+            transition: all 0.3s ease;
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .signature-display.editing {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+        
+        .signature-edit {
+            display: none;
+            margin-top: 0.5rem;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: all 0.3s ease;
+        }
+        
+        .signature-edit.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .content-tabs {
+            margin-top: 2rem;
+        }
+        
+        .tab-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            border-bottom: 2px solid #f0f0f0;
+        }
+        
+        .tab-btn {
+            background: none;
+            border: none;
+            padding: 1rem 1.5rem;
+            cursor: pointer;
+            font-size: 1rem;
+            color: #666;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .tab-btn:hover {
+            color: #667eea;
+            background: rgba(102, 126, 234, 0.05);
+        }
+        
+        .tab-btn.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+            font-weight: 600;
+        }
+        
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .content-card {
+            background: #fff;
+            border: 1px solid #e0e0e0;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .content-card:hover {
+            border-color: #667eea;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.1);
+            transform: translateY(-2px);
+        }
+        
+        .post-meta, .comment-meta {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+            color: #666;
+            flex-wrap: wrap;
+        }
+        
+        .post-title {
+            margin: 0 0 1rem 0;
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+        
+        .post-title a {
+            color: #333;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+        
+        .post-title a:hover {
+            color: #667eea;
+        }
+        
+        .post-content, .comment-content {
+            color: #555;
+            line-height: 1.6;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 3rem 2rem;
+            color: #999;
+        }
+        
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            color: #ddd;
+        }
+        
+        .empty-state h5 {
+            margin: 1rem 0 0.5rem 0;
+            color: #666;
+        }
+        
+        .empty-state p {
+            margin: 0;
+            font-size: 0.9rem;
+        }
+        
+        .signature-input {
+            width: 100%;
+            height: 4rem;
+            padding: 1rem;
+            border: 1px solid transparent;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            font-size: 14px;
+            font-style: italic;
+            resize: none;
+            font-family: inherit;
+            line-height: 1.5;
+            transition: all 0.3s ease;
+            overflow: hidden;
+            color: white;
+        }
+        
+        .signature-input::placeholder {
+            color: rgba(255, 255, 255, 0.7);
+        }
+        
+        .signature-input:focus {
+            outline: none;
+            border-color: rgba(102, 126, 234, 0.2);
+            background: rgba(255, 255, 255, 0.08);
+            box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.05);
+        }
+        
+        .signature-actions {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+        
+        .btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+        
+        .btn-secondary {
+            background: rgba(255,255,255,0.2);
+            color: white;
+        }
+        
+        .btn:hover {
+            transform: translateY(-1px);
+        }
+        
+        .profile-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+        
+        .stat-card {
+            background: #f8f9ff;
+            padding: 1.5rem;
+            border-radius: 12px;
+            text-align: center;
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+        }
+        
+        .stat-card:hover {
+            border-color: #667eea;
+            transform: translateY(-2px);
+        }
+        
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 0.5rem;
+        }
+        
+        .stat-label {
+            color: #666;
+            font-size: 1rem;
+        }
+        
+        /* 自定义弹窗样式 */
+        .custom-alert {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.8);
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+            z-index: 10000;
+            min-width: 300px;
+            max-width: 500px;
+            opacity: 0;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+        }
+        
+        .custom-alert.show {
+            opacity: 1;
+            transform: translate(-50%, -50%) scale(1);
+        }
+        
+        .custom-alert-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 9999;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            backdrop-filter: blur(4px);
+        }
+        
+        .custom-alert-overlay.show {
+            opacity: 1;
+        }
+        
+        .custom-alert-header {
+            padding: 1.5rem 1.5rem 1rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .custom-alert-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            flex-shrink: 0;
+        }
+        
+        .custom-alert-icon.success {
+            background: #e8f5e8;
+            color: #4caf50;
+        }
+        
+        .custom-alert-icon.error {
+            background: #ffeaea;
+            color: #f44336;
+        }
+        
+        .custom-alert-icon.warning {
+            background: #fff3e0;
+            color: #ff9800;
+        }
+        
+        .custom-alert-icon.info {
+            background: #e3f2fd;
+            color: #2196f3;
+        }
+        
+        .custom-alert-content {
+            flex: 1;
+        }
+        
+        .custom-alert-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 0.5rem;
+        }
+        
+        .custom-alert-message {
+            color: #666;
+            line-height: 1.5;
+            font-size: 14px;
+        }
+        
+        .custom-alert-footer {
+            padding: 1rem 1.5rem 1.5rem;
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.75rem;
+        }
+        
+        .custom-alert-btn {
+            padding: 0.5rem 1.5rem;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            min-width: 80px;
+        }
+        
+        .custom-alert-btn.primary {
+            background: #667eea;
+            color: white;
+        }
+        
+        .custom-alert-btn.primary:hover {
+            background: #5a6fd8;
+        }
+        
+        .custom-alert-btn.secondary {
+            background: #f5f5f5;
+            color: #666;
+        }
+        
+        .custom-alert-btn.secondary:hover {
+            background: #e0e0e0;
+        }
+    </style>
+</head>
+<body>
+    <div th:replace="fragments/header :: siteHeader('profile')"></div>
+
+    <div class="profile-container">
+        <!-- 个人资料头部 -->
+        <div class="profile-header" th:style="${user.backgroundUrl != null ? 'background-image: url(' + user.backgroundUrl + ');' : ''}">
+            <div class="profile-header-content">
+                <div class="profile-avatar-section">
+                    <img class="profile-avatar" th:src="${user.avatarUrl != null && !user.avatarUrl.isEmpty() ? user.avatarUrl : '/img/default-avatar.svg'}" alt="头像" id="avatarImg">
+                    <div class="avatar-upload-overlay" onclick="document.getElementById('avatarInput').click()">
+                        <span><i class="fas fa-camera"></i><br>更换头像</span>
+                    </div>
+                    <input type="file" id="avatarInput" accept="image/*" style="display:none" onchange="uploadAvatar(this)">
+                </div>
+                <div class="profile-info">
+                    <h1 th:text="${user.username}">用户名</h1>
+                    <div class="profile-meta">
+                        <div class="profile-meta-item">
+                            <i class="fas fa-envelope"></i>
+                            <span th:text="${user.email}">邮箱</span>
+                        </div>
+                        <div class="profile-meta-item">
+                            <i class="fas fa-calendar"></i>
+                            <span>加入时间：<span th:text="${#temporals.format(user.createdAt, 'yyyy年MM月dd日')}">加入时间</span></span>
+                        </div>
+                    </div>
+                    
+                    <!-- 个性签名区域 -->
+                    <div class="signature-section">
+                        <div class="profile-meta-item">
+                            <i class="fas fa-quote-left"></i>
+                            <span>个性签名</span>
+                            <button class="btn btn-secondary" onclick="editSignature()" style="margin-left: auto; padding: 0.3rem 0.8rem; font-size: 0.8rem;">
+                                <i class="fas fa-edit"></i> 编辑
+                            </button>
+                        </div>
+                        <div class="signature-display" id="signatureDisplay">
+                            <span th:text="${user.signature != null && !user.signature.isEmpty() ? user.signature : '这个人很懒，什么都没有留下...'}">个性签名</span>
+                        </div>
+                        <div class="signature-edit" id="signatureEdit">
+                            <textarea class="signature-input" id="signatureInput" placeholder="写下你的个性签名..." th:text="${user.signature}"></textarea>
+                            <div class="signature-actions">
+                                <button class="btn btn-primary" onclick="saveSignature()">保存</button>
+                                <button class="btn btn-secondary" onclick="cancelEditSignature()">取消</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- 背景上传按钮 -->
+            <button class="background-upload-btn" onclick="document.getElementById('backgroundInput').click()">
+                <i class="fas fa-camera"></i> 更换背景
+            </button>
+            <input type="file" id="backgroundInput" accept="image/*" style="display:none" onchange="uploadBackground(this)">
+        </div>
+        
+        <!-- 统计信息 -->
+        <div class="profile-stats">
+            <div class="stat-card">
+                <div class="stat-number" th:text="${userPosts != null ? userPosts.size() : 0}">0</div>
+                <div class="stat-label">发布帖子</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" th:text="${userComments != null ? userComments.size() : 0}">0</div>
+                <div class="stat-label">发表评论</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">0</div>
+                <div class="stat-label">获得点赞</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" th:text="${days}">0</div>
+                <div class="stat-label">登录天数</div>
+            </div>
+        </div>
+        
+        <!-- 内容标签页 -->
+        <div class="content-tabs">
+            <div class="tab-buttons">
+                <button class="tab-btn active" onclick="showTab('posts')">
+                    <i class="fas fa-newspaper"></i> 发布的帖子
+                </button>
+                <button class="tab-btn" onclick="showTab('comments')">
+                    <i class="fas fa-comments"></i> 发表的评论
+                </button>
+            </div>
+
+            <!-- 帖子列表 -->
+            <div class="tab-content active" id="posts">
+                <div th:if="${userPosts == null || userPosts.empty}">
+                    <div class="empty-state">
+                        <i class="fas fa-newspaper"></i>
+                        <h5>还没有发布任何帖子</h5>
+                        <p>快去发布第一个帖子吧！</p>
+                    </div>
+                </div>
+                <div class="content-card" th:each="post : ${userPosts}">
+                    <div class="post-meta">
+                        <span><i class="fas fa-clock"></i> <span th:text="${#temporals.format(post.createdAt, 'yyyy-MM-dd HH:mm')}">发布时间</span></span>
+                        <span><i class="fas fa-heart"></i> <span th:text="${post.likeCount}">0</span> 点赞</span>
+                        <span><i class="fas fa-comment"></i> <span th:text="${post.commentCount}">0</span> 评论</span>
+                    </div>
+                    <h5 class="post-title">
+                        <a th:href="@{'/community/' + ${post.id}}" th:text="${post.title}">帖子标题</a>
+                    </h5>
+                    <div class="post-content" th:text="${#strings.abbreviate(post.content, 200)}">帖子内容预览...</div>
+                </div>
+            </div>
+
+            <!-- 评论列表 -->
+            <div class="tab-content" id="comments">
+                <div th:if="${userComments == null || userComments.empty}">
+                    <div class="empty-state">
+                        <i class="fas fa-comments"></i>
+                        <h5>还没有发表任何评论</h5>
+                        <p>快去参与讨论吧！</p>
+                    </div>
+                </div>
+                <div class="content-card" th:each="comment : ${userComments}">
+                    <div class="comment-meta">
+                        <span><i class="fas fa-clock"></i> <span th:text="${#temporals.format(comment.createdAt, 'yyyy-MM-dd HH:mm')}">评论时间</span></span>
+                        <span>评论了帖子：<a th:href="@{'/community/' + ${comment.postId}}" th:text="${comment.postTitle}">帖子标题</a></span>
+                    </div>
+                    <div class="comment-content" th:text="${comment.content}">评论内容</div>
+                    <div th:if="${comment.imageUrl}" style="margin-top: 1rem;">
+                        <img th:src="${comment.imageUrl}" style="max-width: 200px; border-radius: 8px;" alt="评论图片">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function uploadAvatar(input) {
+            if (input.files && input.files[0]) {
+                const file = input.files[0];
+                
+                // 验证文件类型
+                if (!file.type.startsWith('image/')) {
+                    showCustomAlert('请选择图片文件', 'warning');
+                    return;
+                }
+                
+                // 验证文件大小 (5MB)
+                if (file.size > 5 * 1024 * 1024) {
+                    showCustomAlert('图片大小不能超过5MB', 'warning');
+                    return;
+                }
+                
+                const formData = new FormData();
+                formData.append('avatar', file);
+                
+                // 显示上传进度
+                const overlay = document.querySelector('.avatar-upload-overlay');
+                overlay.innerHTML = '<span><i class="fas fa-spinner fa-spin"></i><br>上传中...</span>';
+                
+                fetch('/profile/upload-avatar', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // 更新头像显示
+                        document.getElementById('avatarImg').src = data.avatarUrl;
+                        overlay.innerHTML = '<span><i class="fas fa-camera"></i><br>更换头像</span>';
+                        
+                        // 更新导航栏头像
+                        const navAvatar = document.querySelector('.avatar-small');
+                        if (navAvatar) {
+                            navAvatar.src = data.avatarUrl;
+                        }
+                    } else {
+                        showCustomAlert('上传失败：' + data.message, 'error');
+                        overlay.innerHTML = '<span><i class="fas fa-camera"></i><br>更换头像</span>';
+                    }
+                })
+                .catch(error => {
+                    console.error('上传错误:', error);
+                    showCustomAlert('上传失败，请重试', 'error');
+                    overlay.innerHTML = '<span><i class="fas fa-camera"></i><br>更换头像</span>';
+                });
+            }
+        }
+        
+        function editSignature() {
+            const displayElement = document.getElementById('signatureDisplay');
+            const editElement = document.getElementById('signatureEdit');
+            
+            displayElement.classList.add('editing');
+            
+            setTimeout(() => {
+                displayElement.style.display = 'none';
+                editElement.style.display = 'block';
+                
+                setTimeout(() => {
+                    editElement.classList.add('active');
+                }, 10);
+            }, 300);
+        }
+        
+        function cancelEditSignature() {
+            const displayElement = document.getElementById('signatureDisplay');
+            const editElement = document.getElementById('signatureEdit');
+            
+            editElement.classList.remove('active');
+            
+            setTimeout(() => {
+                editElement.style.display = 'none';
+                displayElement.style.display = 'block';
+                displayElement.classList.remove('editing');
+            }, 300);
+        }
+        
+        function saveSignature() {
+            const signature = document.getElementById('signatureInput').value;
+            const formData = new URLSearchParams();
+            formData.append('signature', signature);
+            fetch('/profile/update-signature', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: formData.toString()
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // 更新显示的签名
+                    const displayText = signature || '这个人很懒，什么都没有留下...';
+                    document.querySelector('#signatureDisplay span').textContent = displayText;
+                    cancelEditSignature();
+                } else {
+                    showCustomAlert('保存失败：' + data.message, 'error');
+                }
+            })
+            .catch(error => {
+                console.error('保存错误:', error);
+                showCustomAlert('保存失败，请重试', 'error');
+            });
+        }
+        
+        function uploadBackground(input) {
+            if (input.files && input.files[0]) {
+                const file = input.files[0];
+                
+                // 验证文件类型
+                if (!file.type.startsWith('image/')) {
+                    showCustomAlert('请选择图片文件', 'warning');
+                    return;
+                }
+                
+                // 验证文件大小 (5MB)
+                if (file.size > 5 * 1024 * 1024) {
+                    showCustomAlert('图片大小不能超过5MB', 'warning');
+                    return;
+                }
+                
+                const formData = new FormData();
+                formData.append('background', file);
+                
+                const uploadBtn = document.querySelector('.background-upload-btn');
+                uploadBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 上传中...';
+                uploadBtn.disabled = true;
+                
+                fetch('/profile/upload-background', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // 更新背景图片
+                        const headerElement = document.querySelector('.profile-header');
+                        
+                        // 创建新图片对象来预加载
+                        const img = new Image();
+                        img.onload = function() {
+                            // 图片加载完成后应用背景，保持固定高度
+                            headerElement.style.backgroundImage = `url(${data.backgroundUrl})`;
+                            headerElement.style.minHeight = '300px';
+                            headerElement.style.backgroundSize = 'cover';
+                            headerElement.style.backgroundPosition = 'center';
+                        };
+                        img.src = data.backgroundUrl;
+                        
+                        uploadBtn.innerHTML = '<i class="fas fa-camera"></i> 更换背景';
+                        uploadBtn.disabled = false;
+                        
+                        // 使用自定义弹窗替代alert
+                        showCustomAlert('背景更换成功！', 'success');
+                    } else {
+                        showCustomAlert('上传失败：' + data.message, 'error');
+                        uploadBtn.innerHTML = '<i class="fas fa-camera"></i> 更换背景';
+                        uploadBtn.disabled = false;
+                    }
+                })
+                .catch(error => {
+                    console.error('上传错误:', error);
+                    showCustomAlert('上传失败，请重试', 'error');
+                    uploadBtn.innerHTML = '<i class="fas fa-camera"></i> 更换背景';
+                    uploadBtn.disabled = false;
+                });
+            }
+         }
+         
+         // 自定义弹窗函数
+         function showCustomAlert(message, type = 'info', title = '', showCancel = false) {
+             return new Promise((resolve) => {
+                 // 创建遮罩层
+                 const overlay = document.createElement('div');
+                 overlay.className = 'custom-alert-overlay';
+                 
+                 // 创建弹窗
+                 const alert = document.createElement('div');
+                 alert.className = 'custom-alert';
+                 
+                 // 设置图标
+                 const icons = {
+                     success: 'fas fa-check',
+                     error: 'fas fa-times',
+                     warning: 'fas fa-exclamation-triangle',
+                     info: 'fas fa-info'
+                 };
+                 
+                 // 设置标题
+                 const titles = {
+                     success: title || '成功',
+                     error: title || '错误',
+                     warning: title || '警告',
+                     info: title || '提示'
+                 };
+                 
+                 alert.innerHTML = `
+                     <div class="custom-alert-header">
+                         <div class="custom-alert-icon ${type}">
+                             <i class="${icons[type]}"></i>
+                         </div>
+                         <div class="custom-alert-content">
+                             <div class="custom-alert-title">${titles[type]}</div>
+                             <div class="custom-alert-message">${message}</div>
+                         </div>
+                     </div>
+                     <div class="custom-alert-footer">
+                         ${showCancel ? '<button class="custom-alert-btn secondary" onclick="closeCustomAlert(false)">取消</button>' : ''}
+                         <button class="custom-alert-btn primary" onclick="closeCustomAlert(true)">确定</button>
+                     </div>
+                 `;
+                 
+                 // 添加到页面
+                 document.body.appendChild(overlay);
+                 document.body.appendChild(alert);
+                 
+                 // 显示动画
+                 setTimeout(() => {
+                     overlay.classList.add('show');
+                     alert.classList.add('show');
+                 }, 10);
+                 
+                 // 关闭函数
+                 window.closeCustomAlert = function(result) {
+                     overlay.classList.remove('show');
+                     alert.classList.remove('show');
+                     
+                     setTimeout(() => {
+                         document.body.removeChild(overlay);
+                         document.body.removeChild(alert);
+                         delete window.closeCustomAlert;
+                         resolve(result);
+                     }, 300);
+                 };
+                 
+                 // 点击遮罩层关闭
+                 overlay.addEventListener('click', () => window.closeCustomAlert(false));
+             });
+         }
+         
+         // 图片预览功能
+         function previewImage(src, alt = '') {
+             const overlay = document.createElement('div');
+             overlay.style.cssText = `
+                 position: fixed;
+                 top: 0;
+                 left: 0;
+                 right: 0;
+                 bottom: 0;
+                 background: rgba(0, 0, 0, 0.9);
+                 z-index: 10000;
+                 display: flex;
+                 align-items: center;
+                 justify-content: center;
+                 opacity: 0;
+                 transition: opacity 0.3s ease;
+                 backdrop-filter: blur(4px);
+             `;
+             
+             const container = document.createElement('div');
+             container.style.cssText = `
+                 position: relative;
+                 max-width: 90vw;
+                 max-height: 90vh;
+                 transform: scale(0.8);
+                 transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+             `;
+             
+             const img = document.createElement('img');
+             img.src = src;
+             img.alt = alt;
+             img.style.cssText = `
+                 max-width: 100%;
+                 max-height: 100%;
+                 object-fit: contain;
+                 border-radius: 8px;
+                 box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+                 transition: transform 0.3s ease;
+             `;
+             
+             const closeBtn = document.createElement('button');
+             closeBtn.innerHTML = '<i class="fas fa-times"></i>';
+             closeBtn.style.cssText = `
+                 position: absolute;
+                 top: -15px;
+                 right: -15px;
+                 width: 40px;
+                 height: 40px;
+                 border: none;
+                 border-radius: 50%;
+                 background: rgba(255, 255, 255, 0.9);
+                 color: #333;
+                 font-size: 16px;
+                 cursor: pointer;
+                 display: flex;
+                 align-items: center;
+                 justify-content: center;
+                 transition: all 0.2s ease;
+                 box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+             `;
+             
+             closeBtn.addEventListener('mouseenter', () => {
+                 closeBtn.style.background = '#f44336';
+                 closeBtn.style.color = 'white';
+                 closeBtn.style.transform = 'scale(1.1)';
+             });
+             
+             closeBtn.addEventListener('mouseleave', () => {
+                 closeBtn.style.background = 'rgba(255, 255, 255, 0.9)';
+                 closeBtn.style.color = '#333';
+                 closeBtn.style.transform = 'scale(1)';
+             });
+             
+             let scale = 1;
+             
+             // 鼠标滚轮缩放
+             container.addEventListener('wheel', (e) => {
+                 e.preventDefault();
+                 const delta = e.deltaY > 0 ? -0.1 : 0.1;
+                 scale = Math.max(0.5, Math.min(3, scale + delta));
+                 img.style.transform = `scale(${scale})`;
+             });
+             
+             // 关闭预览
+             const closePreview = () => {
+                 overlay.style.opacity = '0';
+                 container.style.transform = 'scale(0.8)';
+                 setTimeout(() => {
+                     document.body.removeChild(overlay);
+                 }, 300);
+             };
+             
+             closeBtn.addEventListener('click', closePreview);
+             overlay.addEventListener('click', (e) => {
+                 if (e.target === overlay) closePreview();
+             });
+             
+             // ESC键关闭
+             const handleKeydown = (e) => {
+                 if (e.key === 'Escape') {
+                     closePreview();
+                     document.removeEventListener('keydown', handleKeydown);
+                 }
+             };
+             document.addEventListener('keydown', handleKeydown);
+             
+             container.appendChild(img);
+             container.appendChild(closeBtn);
+             overlay.appendChild(container);
+             document.body.appendChild(overlay);
+             
+             // 显示动画
+             setTimeout(() => {
+                 overlay.style.opacity = '1';
+                 container.style.transform = 'scale(1)';
+             }, 10);
+         }
+         
+         function showTab(tabName) {
+             // 移除所有按钮的active类
+             document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+             // 移除所有内容的active类
+             document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+             
+             // 添加当前按钮的active类
+             event.target.classList.add('active');
+             // 显示对应的内容
+             document.getElementById(tabName).classList.add('active');
+         }
+    </script>
+</body>
+</html>

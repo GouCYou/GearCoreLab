@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>管理后台 | GearCoreLab</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #ffffff;
+            min-height: 100vh;
+        }
+
+        .admin-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* 侧边栏 */
+        .sidebar {
+            width: 280px;
+            background: #ffffff;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+            padding: 0;
+            overflow-y: auto;
+            border-right: 1px solid #e8e8e8;
+        }
+
+        .sidebar-header {
+            padding: 30px 25px;
+            border-bottom: 1px solid #e9ecef;
+            text-align: center;
+        }
+
+        .sidebar-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 8px;
+        }
+
+        .sidebar-subtitle {
+            color: #6c757d;
+            font-size: 14px;
+        }
+
+        .sidebar-nav {
+            padding: 20px 0;
+        }
+
+        .nav-item {
+            margin: 0;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 15px 25px;
+            color: #495057;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border-left: 4px solid transparent;
+        }
+
+        .nav-link:hover {
+            background: #f8f9fa;
+            color: #1890ff;
+            border-left-color: #1890ff;
+        }
+
+        .nav-link.active {
+            background: #f0f8ff;
+            color: #1890ff;
+            border-left-color: #1890ff;
+            font-weight: 600;
+        }
+
+        .nav-icon {
+            width: 20px;
+            margin-right: 12px;
+            text-align: center;
+        }
+
+        /* 主内容区 */
+        .main-content {
+            flex: 1;
+            padding: 30px;
+            overflow-y: auto;
+        }
+
+        .content-header {
+            background: #ffffff;
+            border-radius: 16px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .page-title {
+            font-size: 32px;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 8px;
+        }
+
+        .page-subtitle {
+            color: #6c757d;
+            font-size: 16px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: #ffffff;
+            border-radius: 8px;
+            padding: 25px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+            border: 1px solid #e8e8e8;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .stat-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            font-size: 20px;
+            color: white;
+        }
+
+        .stat-icon.users { background: #1890ff; }
+        .stat-icon.posts { background: #52c41a; }
+        .stat-icon.comments { background: #faad14; }
+        .stat-icon.news { background: #f5222d; }
+
+        .stat-title {
+            font-size: 16px;
+            color: #6c757d;
+            margin: 0;
+        }
+
+        .stat-value {
+            font-size: 32px;
+            font-weight: 700;
+            color: #2c3e50;
+            margin: 10px 0;
+        }
+
+        .stat-change {
+            font-size: 14px;
+            color: #28a745;
+        }
+
+        .quick-actions {
+            background: #ffffff;
+            border-radius: 8px;
+            padding: 30px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            border: 1px solid #e8e8e8;
+        }
+
+        .actions-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 20px;
+        }
+
+        .actions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .action-btn {
+            display: flex;
+            align-items: center;
+            padding: 12px 20px;
+            background: #1890ff;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            border: none;
+        }
+
+        .action-btn:hover {
+            background: #40a9ff;
+            color: white;
+            text-decoration: none;
+        }
+
+        .action-icon {
+            margin-right: 10px;
+            width: 20px;
+            text-align: center;
+        }
+
+        .back-btn {
+            position: fixed;
+            top: 30px;
+            right: 30px;
+            background: #1890ff;
+            border: none;
+            border-radius: 4px;
+            padding: 12px 20px;
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+        }
+
+        .back-btn:hover {
+            background: #40a9ff;
+            color: white;
+            text-decoration: none;
+        }
+
+        .admin-username {
+            position: fixed;
+            top: 30px;
+            right: 160px;
+            font-size: 18px;
+            font-weight: 600;
+            color: #2c3e50;
+            z-index: 1001;
+        }
+        .admin-username.admin {
+            color: #e74c3c;
+        }
+
+        @media (max-width: 768px) {
+            .admin-container {
+                flex-direction: column;
+            }
+            
+            .sidebar {
+                width: 100%;
+                height: auto;
+            }
+            
+            .main-content {
+                padding: 20px;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-container">
+        <!-- 侧边栏 -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <img src="/img/logo.png" alt="GearCoreLab" class="logo" style="width: 60px; height: 60px; margin-bottom: 15px; border-radius: 12px;">
+                <h1 class="sidebar-title">管理后台</h1>
+                <p class="sidebar-subtitle">GearCoreLab Admin</p>
+            </div>
+            <nav class="sidebar-nav">
+                <div class="nav-item">
+                    <a href="/admin" class="nav-link active">
+                        <i class="fas fa-tachometer-alt nav-icon"></i>
+                        仪表盘
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="/admin/users" class="nav-link">
+                        <i class="fas fa-users nav-icon"></i>
+                        用户管理
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="/admin/posts" class="nav-link">
+                        <i class="fas fa-comments nav-icon"></i>
+                        帖子管理
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="/admin/news" class="nav-link">
+                        <i class="fas fa-newspaper nav-icon"></i>
+                        新闻管理
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="/admin/hardware" class="nav-link">
+                        <i class="fas fa-microchip nav-icon"></i>
+                        配件管理
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="/admin/notifications" class="nav-link">
+                        <i class="fas fa-bell nav-icon"></i>
+                        通知管理
+                    </a>
+                </div>
+
+            </nav>
+        </div>
+
+        <!-- 主内容区 -->
+        <div class="main-content">
+            <div class="content-header">
+                <h1 class="page-title">仪表盘</h1>
+                <p class="page-subtitle">欢迎来到 GearCoreLab 管理后台</p>
+            </div>
+
+            <!-- 统计卡片 -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-icon users">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div>
+                            <h3 class="stat-title">总用户数</h3>
+                        </div>
+                    </div>
+                    <div class="stat-value" id="userCount">-</div>
+                    <div class="stat-change">+12% 本月</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-icon posts">
+                            <i class="fas fa-comments"></i>
+                        </div>
+                        <div>
+                            <h3 class="stat-title">总帖子数</h3>
+                        </div>
+                    </div>
+                    <div class="stat-value" id="postCount">-</div>
+                    <div class="stat-change">+8% 本月</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-icon comments">
+                            <i class="fas fa-comment-dots"></i>
+                        </div>
+                        <div>
+                            <h3 class="stat-title">总评论数</h3>
+                        </div>
+                    </div>
+                    <div class="stat-value" id="commentCount">-</div>
+                    <div class="stat-change">+15% 本月</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-icon news">
+                            <i class="fas fa-newspaper"></i>
+                        </div>
+                        <div>
+                            <h3 class="stat-title">总新闻数</h3>
+                        </div>
+                    </div>
+                    <div class="stat-value" id="newsCount">-</div>
+                    <div class="stat-change">+5% 本月</div>
+                </div>
+            </div>
+
+            <!-- 快捷操作 -->
+            <div class="quick-actions">
+                <h2 class="actions-title">快捷操作</h2>
+                <div class="actions-grid">
+                    <a href="/admin/users" class="action-btn">
+                        <i class="fas fa-user-plus action-icon"></i>
+                        用户管理
+                    </a>
+                    <a href="/admin/news/create" class="action-btn">
+                        <i class="fas fa-plus action-icon"></i>
+                        发布新闻
+                    </a>
+                    <a href="/admin/notifications" class="action-btn">
+                        <i class="fas fa-bullhorn action-icon"></i>
+                        发送通知
+                    </a>
+                    <a href="/admin/hardware" class="action-btn">
+                        <i class="fas fa-microchip action-icon"></i>
+                        配件管理
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 返回主站按钮 -->
+    <a href="/" class="back-btn">
+        <i class="fas fa-home"></i> 返回主站
+    </a>
+
+    <script>
+        // 加载统计数据
+        async function loadStats() {
+            try {
+                const response = await fetch('/admin/api/stats');
+                if (response.ok) {
+                    const stats = await response.json();
+                    document.getElementById('userCount').textContent = stats.userCount || '0';
+                    document.getElementById('postCount').textContent = stats.postCount || '0';
+                    document.getElementById('commentCount').textContent = stats.commentCount || '0';
+                    document.getElementById('newsCount').textContent = stats.newsCount || '0';
+                }
+            } catch (error) {
+                console.error('加载统计数据失败:', error);
+            }
+        }
+
+        // 页面加载时获取统计数据
+        document.addEventListener('DOMContentLoaded', loadStats);
+    </script>
+</body>
+</html>

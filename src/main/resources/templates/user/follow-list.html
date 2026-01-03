@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${pageTitle} + ' - GearCoreLab'">关注列表 - GearCoreLab</title>
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #667eea;
+            min-height: 100vh;
+            padding: 2rem 0;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+        
+        .follow-list-header {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        
+        .follow-list-header h1 {
+            color: #333;
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .follow-list-header p {
+            color: #666;
+            font-size: 1.1rem;
+        }
+        
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 500;
+            margin-bottom: 1rem;
+            transition: color 0.3s ease;
+        }
+        
+        .back-link:hover {
+            color: #764ba2;
+        }
+        
+        .follow-list {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+        
+        .user-item {
+            display: flex;
+            align-items: center;
+            padding: 1.5rem;
+            border-bottom: 1px solid #eee;
+            transition: background-color 0.3s ease;
+        }
+        
+        .user-item:last-child {
+            border-bottom: none;
+        }
+        
+        .user-item:hover {
+            background-color: #f8f9fa;
+        }
+        
+        .user-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-right: 1rem;
+            border: 3px solid #e9ecef;
+        }
+        
+        .user-info {
+            flex: 1;
+        }
+        
+        .user-name {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 0.25rem;
+        }
+        
+        .user-email {
+            color: #666;
+            font-size: 0.9rem;
+            margin-bottom: 0.25rem;
+        }
+        
+        .user-signature {
+            color: #888;
+            font-size: 0.85rem;
+            font-style: italic;
+        }
+        
+        .user-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+        
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn-outline {
+            background: white;
+            color: #667eea;
+            border: 2px solid #667eea;
+        }
+        
+        .btn-outline:hover {
+            background: #667eea;
+            color: white;
+        }
+        
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background: #c82333;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(220, 53, 69, 0.4);
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: #666;
+        }
+        
+        .empty-state i {
+            font-size: 4rem;
+            color: #ddd;
+            margin-bottom: 1rem;
+        }
+        
+        .empty-state h3 {
+            margin-bottom: 0.5rem;
+            color: #999;
+        }
+        
+        .follow-stats {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-bottom: 1rem;
+        }
+        
+        .stat-item {
+            text-align: center;
+        }
+        
+        .stat-number {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #667eea;
+        }
+        
+        .stat-label {
+            font-size: 0.9rem;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <!-- 导航栏 -->
+    <div th:replace="fragments/header :: siteHeader"></div>
+    
+    <div class="container">
+        <!-- 返回链接 -->
+        <a th:href="@{'/user/' + ${targetUser.id}}" class="back-link">
+            <i class="fas fa-arrow-left"></i>
+            返回用户资料
+        </a>
+        
+        <!-- 页面标题 -->
+        <div class="follow-list-header">
+            <h1 th:text="${pageTitle}">关注列表</h1>
+            <p th:text="${targetUser.username} + '的' + ${listType}">用户的关注列表</p>
+            
+            <!-- 统计信息 -->
+            <div class="follow-stats">
+                <div class="stat-item">
+                    <div class="stat-number" th:text="${followingCount}">0</div>
+                    <div class="stat-label">关注</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number" th:text="${followerCount}">0</div>
+                    <div class="stat-label">粉丝</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 用户列表 -->
+        <div class="follow-list">
+            <div th:if="${users.empty}" class="empty-state">
+                <i class="fas fa-users"></i>
+                <h3 th:text="'暂无' + ${listType}">暂无关注</h3>
+                <p>这里还没有任何用户</p>
+            </div>
+            
+            <div th:each="user : ${users}" class="user-item">
+                <img th:src="${user.avatarUrl != null ? user.avatarUrl : '/img/default-avatar.svg'}" 
+                     th:alt="${user.username}" class="user-avatar">
+                
+                <div class="user-info">
+                    <div class="user-name" th:text="${user.username}">用户名</div>
+                    <div class="user-email" th:text="${user.email}">用户邮箱</div>
+                    <div class="user-signature" 
+                         th:text="${user.signature != null && !user.signature.isEmpty() ? user.signature : '这个人很懒，什么都没有留下...'}">个性签名</div>
+                </div>
+                
+                <div class="user-actions" sec:authorize="isAuthenticated()">
+                    <a th:href="@{'/user/' + ${user.id}}" class="btn btn-outline">
+                        <i class="fas fa-user"></i>
+                        查看资料
+                    </a>
+                    
+                    <!-- 关注/取消关注按钮 -->
+                    <button th:if="${!#authentication.name.equals(user.username)}" 
+                            class="btn btn-primary follow-btn" 
+                            th:data-user-id="${user.id}" 
+                            onclick="toggleFollowInList(this)">
+                        <i class="fas fa-user-plus"></i>
+                        <span class="follow-text">关注</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 页脚 -->
+    <div th:replace="fragments/footer :: siteFooter"></div>
+    
+    <script>
+        // 页面加载时检查所有用户的关注状态
+        document.addEventListener('DOMContentLoaded', function() {
+            const followBtns = document.querySelectorAll('.follow-btn');
+            followBtns.forEach(btn => {
+                const userId = btn.getAttribute('data-user-id');
+                checkFollowStatus(userId, btn);
+            });
+        });
+        
+        // 检查关注状态
+        function checkFollowStatus(userId, btn) {
+            fetch(`/api/follow/status/${userId}`)
+                .then(response => response.json())
+                .then(data => {
+                    const icon = btn.querySelector('i');
+                    const text = btn.querySelector('.follow-text');
+                    
+                    if (data.isFollowing) {
+                        btn.classList.remove('btn-primary');
+                        btn.classList.add('btn-danger');
+                        icon.className = 'fas fa-user-minus';
+                        text.textContent = '取消关注';
+                    } else {
+                        btn.classList.remove('btn-danger');
+                        btn.classList.add('btn-primary');
+                        icon.className = 'fas fa-user-plus';
+                        text.textContent = '关注';
+                    }
+                })
+                .catch(error => console.error('检查关注状态失败:', error));
+        }
+        
+        // 切换关注状态
+        function toggleFollowInList(btn) {
+            const userId = btn.getAttribute('data-user-id');
+            const isFollowing = btn.classList.contains('btn-danger');
+            
+            const url = isFollowing ? `/api/follow/unfollow/${userId}` : `/api/follow/follow/${userId}`;
+            
+            fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // 更新按钮状态
+                    checkFollowStatus(userId, btn);
+                    
+                    // 显示提示消息
+                    const message = isFollowing ? '取消关注成功' : '关注成功';
+                    showToast(message);
+                } else {
+                    showToast(data.message || '操作失败', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('关注操作失败:', error);
+                showToast('网络错误，请稍后重试', 'error');
+            });
+        }
+        
+        // 显示提示消息
+        function showToast(message, type = 'success') {
+            const toast = document.createElement('div');
+            toast.className = `toast toast-${type}`;
+            toast.textContent = message;
+            
+            toast.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                padding: 12px 20px;
+                border-radius: 6px;
+                color: white;
+                font-weight: 500;
+                z-index: 10000;
+                opacity: 0;
+                transform: translateX(100%);
+                transition: all 0.3s ease;
+            `;
+            
+            switch(type) {
+                case 'success':
+                    toast.style.background = '#28a745';
+                    break;
+                case 'error':
+                    toast.style.background = '#dc3545';
+                    break;
+                case 'info':
+                    toast.style.background = '#17a2b8';
+                    break;
+                default:
+                    toast.style.background = '#6c757d';
+            }
+            
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.style.opacity = '1';
+                toast.style.transform = 'translateX(0)';
+            }, 100);
+            
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateX(100%)';
+                setTimeout(() => {
+                    document.body.removeChild(toast);
+                }, 300);
+            }, 3000);
+        }
+    </script>
+</body>
+</html>

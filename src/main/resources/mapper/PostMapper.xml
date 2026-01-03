@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.gcc.gearcorelab.mapper.PostMapper">
+    <select id="findAllOrderByRecentActivity" resultType="cn.gcc.gearcorelab.model.Post">
+        SELECT p.*,
+               u.username AS author_username,
+               u.avatar_url AS author_avatar_url,
+               FROM_UNIXTIME(
+                   GREATEST(
+                       UNIX_TIMESTAMP(p.created_at),
+                       IFNULL(MAX(UNIX_TIMESTAMP(c.created_at)),0)
+                   )
+               ) AS last_activity,
+               (SELECT COUNT(*) FROM post_likes pl WHERE pl.post_id = p.id) AS like_count,
+               (SELECT COUNT(*) FROM comments c2 WHERE c2.post_id = p.id) AS comment_count
+        FROM posts p
+        LEFT JOIN users u ON p.user_id = u.id
+        LEFT JOIN comments c ON c.post_id = p.id
+        GROUP BY p.id
+        ORDER BY (like_count + comment_count) DESC, p.created_at DESC
+    </select>
+
+    <!-- 分页查询帖子，按最新活跃度排序 -->
+    <select id="findAllOrderByRecentActivityWithPagination" resultType="cn.gcc.gearcorelab.model.Post">
+        SELECT p.*,
+               u.username AS author_username,
+               u.avatar_url AS author_avatar_url,
+               FROM_UNIXTIME(
+                   GREATEST(
+                       UNIX_TIMESTAMP(p.created_at),
+                       IFNULL(MAX(UNIX_TIMESTAMP(c.created_at)),0)
+                   )
+               ) AS last_activity,
+               (SELECT COUNT(*) FROM post_likes pl WHERE pl.post_id = p.id) AS like_count,
+               (SELECT COUNT(*) FROM comments c2 WHERE c2.post_id = p.id) AS comment_count
+        FROM posts p
+        LEFT JOIN users u ON p.user_id = u.id
+        LEFT JOIN comments c ON c.post_id = p.id
+        GROUP BY p.id
+        ORDER BY (like_count + comment_count) DESC, p.created_at DESC
+        LIMIT #{limit} OFFSET #{offset}
+    </select>
+
+    <!-- 统计帖子总数 -->
+    <select id="countAllPosts" resultType="int">
+        SELECT COUNT(*) FROM posts
+    </select>
+
+    <select id="findById" resultType="cn.gcc.gearcorelab.model.Post">
+        SELECT p.*,
+               u.username AS author_username,
+               u.avatar_url AS author_avatar_url,
+               (SELECT COUNT(*) FROM post_likes pl WHERE pl.post_id = p.id) AS like_count,
+               (SELECT COUNT(*) FROM comments c2 WHERE c2.post_id = p.id) AS comment_count
+        FROM posts p
+        LEFT JOIN users u ON p.user_id = u.id
+        WHERE p.id = #{id}
+    </select>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO posts(user_id, title, content, created_at, config_id)
+        VALUES(#{userId}, #{title}, #{content}, #{createdAt}, #{configId})
+    </insert>
+
+    <insert id="insertImage">
+        INSERT INTO post_images(post_id, image_url)
+        VALUES(#{postId}, #{url})
+    </insert>
+
+    <delete id="delete">
+        DELETE FROM posts WHERE id = #{id}
+    </delete>
+
+    <delete id="deleteImagesByPostId">
+        DELETE FROM post_images
+        WHERE post_id = #{postId}
+    </delete>
+    
+    <select id="findByUsername" resultType="cn.gcc.gearcorelab.model.Post">
+        SELECT p.*,
+               u.username AS author_username,
+               u.avatar_url AS author_avatar_url,
+               (SELECT COUNT(*) FROM post_likes pl WHERE pl.post_id = p.id) AS like_count,
+               (SELECT COUNT(*) FROM comments c2 WHERE c2.post_id = p.id) AS comment_count
+        FROM posts p
+        LEFT JOIN users u ON p.user_id = u.id
+        WHERE u.username = #{username}
+        ORDER BY p.created_at DESC
+    </select>
+    
+    <!-- 搜索帖子 -->
+    <select id="searchPosts" resultType="cn.gcc.gearcorelab.model.Post">
+        SELECT p.id,
+               p.title,
+               p.content,
+               p.created_at,
+               p.user_id,
+               u.username AS authorUsername,
+               u.avatar_url AS author_avatar_url,
+               COALESCE(like_counts.like_count, 0) AS likeCount,
+               COALESCE(comment_counts.comment_count, 0) AS commentCount
+        FROM posts p
+        LEFT JOIN users u ON p.user_id = u.id
+        LEFT JOIN (
+            SELECT post_id, COUNT(*) AS like_count
+            FROM post_likes
+            GROUP BY post_id
+        ) like_counts ON p.id = like_counts.post_id
+        LEFT JOIN (
+            SELECT post_id, COUNT(*) AS comment_count
+            FROM comments
+            GROUP BY post_id
+        ) comment_counts ON p.id = comment_counts.post_id
+        WHERE p.title LIKE CONCAT('%', #{query}, '%')
+           OR p.content LIKE CONCAT('%', #{query}, '%')
+           OR u.username LIKE CONCAT('%', #{query}, '%')
+        ORDER BY p.created_at DESC
+    </select>
+</mapper>

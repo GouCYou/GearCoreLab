@@ -1,0 +1,779 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>搜索结果 | CCTStudio - GearCoreLab</title>
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="stylesheet" th:href="@{/css/main.css}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        /* 搜索页面导航栏间距 */
+        
+        .main-search-page {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .main-search-page .search-header {
+            background: #667eea;
+            color: white;
+            padding: 40px 20px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        
+        .main-search-page .search-box {
+            display: flex;
+            max-width: 400px;
+            margin: 20px auto 2rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 25px;
+            overflow: visible;
+            background: #fff;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            height: 50px;
+            position: relative;
+        }
+        
+        .main-search-page .search-input-container {
+            flex: 1;
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+        
+        .main-search-page .search-box:hover,
+        .main-search-page .search-box:focus-within {
+            max-width: 600px;
+            background: white;
+            box-shadow: 0 8px 30px rgba(102, 126, 234, 0.15);
+            border-color: #667eea;
+            transform: scale(1.02);
+        }
+        
+        .main-search-page .search-input {
+            flex: 1;
+            border: none;
+            padding: 0 20px;
+            font-size: 16px;
+            outline: none;
+            background: transparent;
+            height: 46px;
+            line-height: 46px;
+        }
+        
+        .main-search-page .search-input::placeholder {
+            color: rgba(0, 0, 0, 0.5);
+        }
+        
+        .main-search-page .search-btn {
+            background: transparent;
+            color: #667eea;
+            border: none;
+            padding: 0 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 46px;
+            min-width: 60px;
+        }
+        
+        .main-search-page .search-btn:hover {
+            background: rgba(102, 126, 234, 0.1);
+            color: #5a6fd8;
+            transform: scale(1.05);
+        }
+        
+        .main-search-page .search-btn:active {
+            transform: scale(0.95);
+        }
+        
+        .main-search-page .search-btn i {
+            font-size: 18px;
+            transition: transform 0.3s ease;
+        }
+        
+        .main-search-page .search-box:hover .search-btn i {
+            transform: scale(1.1);
+        }
+        
+        .main-search-page .search-results {
+            display: grid;
+            grid-template-columns: 1fr 300px;
+            gap: 30px;
+            margin-top: 30px;
+        }
+        
+        .main-search-page .results-main {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .main-search-page .results-sidebar {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            height: fit-content;
+        }
+        
+        .main-search-page .results-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+        
+        .main-search-page .results-count {
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .main-search-page .filter-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .main-search-page .filter-tab {
+            padding: 8px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 20px;
+            background: white;
+            color: #666;
+            text-decoration: none;
+            transition: all 0.3s;
+            font-size: 14px;
+        }
+        
+        .main-search-page .filter-tab.active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+        
+        .main-search-page .filter-tab:hover {
+            border-color: #667eea;
+            color: #667eea;
+        }
+        
+        .main-search-page .post-item {
+            border: 1px solid #e0e0e0;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 15px;
+            transition: all 0.3s;
+            background: #fafafa;
+        }
+        
+        .main-search-page .post-item:hover {
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            transform: translateY(-2px);
+        }
+        
+        .main-search-page .post-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .main-search-page .post-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin-right: 12px;
+            object-fit: cover;
+        }
+        
+        .main-search-page .post-meta {
+            flex: 1;
+        }
+        
+        .main-search-page .post-author {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 2px;
+        }
+        
+        .main-search-page .post-time {
+            font-size: 12px;
+            color: #999;
+        }
+        
+        .main-search-page .post-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+            line-height: 1.4;
+        }
+        
+        .main-search-page .post-title a {
+            color: inherit;
+            text-decoration: none;
+        }
+        
+        .main-search-page .post-title a:hover {
+            color: #667eea;
+        }
+        
+        .main-search-page .post-content {
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 12px;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        
+        .main-search-page .post-stats {
+            display: flex;
+            gap: 20px;
+            font-size: 14px;
+            color: #999;
+        }
+        
+        .main-search-page .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .main-search-page .user-item {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            border: 1px solid #e0e0e0;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            transition: all 0.3s;
+            background: #fafafa;
+        }
+        
+        .main-search-page .user-item:hover {
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            transform: translateY(-1px);
+        }
+        
+        .main-search-page .user-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            margin-right: 15px;
+            object-fit: cover;
+        }
+        
+        .main-search-page .user-info {
+            flex: 1;
+        }
+        
+        .main-search-page .user-name {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 4px;
+        }
+        
+        .main-search-page .user-name a {
+            color: inherit;
+            text-decoration: none;
+        }
+        
+        .main-search-page .user-name a:hover {
+            color: #667eea;
+        }
+        
+        .main-search-page .user-email {
+            font-size: 14px;
+            color: #999;
+        }
+        
+        .main-search-page .no-results {
+            text-align: center;
+            padding: 60px 20px;
+            color: #999;
+        }
+        
+        .main-search-page .no-results i {
+            font-size: 64px;
+            margin-bottom: 20px;
+            color: #ddd;
+        }
+        
+        .main-search-page .sidebar-section {
+            margin-bottom: 25px;
+        }
+        
+        .main-search-page .sidebar-title {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 15px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+        
+        .main-search-page .search-tips {
+            background: #f8f9ff;
+            border: 1px solid #e0e7ff;
+            border-radius: 8px;
+            padding: 15px;
+            font-size: 14px;
+            color: #666;
+            line-height: 1.5;
+        }
+        
+        .main-search-page .search-tips h4 {
+            color: #333;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+        
+        .main-search-page .search-tips ul {
+            margin: 0;
+            padding-left: 16px;
+        }
+        
+        .main-search-page .search-tips li {
+            margin-bottom: 4px;
+        }
+        
+        /* 主搜索页面的搜索历史样式 */
+        .main-search-page .main-search-history-dropdown {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+            z-index: 1000;
+            display: none;
+            margin-top: 8px;
+            max-height: 350px;
+            overflow-y: auto;
+        }
+        
+        .main-search-page .main-search-history-dropdown .search-history-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 20px;
+            border-bottom: 1px solid #f0f0f0;
+            font-size: 15px;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .main-search-page .main-search-history-dropdown .clear-all-btn {
+            background: none;
+            border: none;
+            color: #666;
+            font-size: 13px;
+            cursor: pointer;
+            padding: 6px 12px;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+        }
+        
+        .main-search-page .main-search-history-dropdown .clear-all-btn:hover {
+            background: #f5f5f5;
+            color: #333;
+        }
+        
+        .main-search-page .main-search-history-dropdown .search-history-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 20px;
+            border-bottom: 1px solid #f8f8f8;
+            transition: background-color 0.3s ease;
+        }
+        
+        .main-search-page .main-search-history-dropdown .search-history-item:last-child {
+            border-bottom: none;
+        }
+        
+        .main-search-page .main-search-history-dropdown .search-history-item:hover {
+            background: #f8f9fa;
+        }
+        
+        .main-search-page .main-search-history-dropdown .history-text {
+            flex: 1;
+            cursor: pointer;
+            font-size: 15px;
+            color: #333;
+            padding: 6px 0;
+        }
+        
+        .main-search-page .main-search-history-dropdown .delete-history-btn {
+            background: none;
+            border: none;
+            color: #999;
+            cursor: pointer;
+            padding: 6px;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+            margin-left: 12px;
+        }
+        
+        .main-search-page .main-search-history-dropdown .delete-history-btn:hover {
+            background: #f0f0f0;
+            color: #666;
+        }
+        
+        .main-search-page .main-search-history-dropdown .search-history-empty {
+            text-align: center;
+            padding: 32px 20px;
+            color: #999;
+            font-size: 15px;
+        }
+        
+        .main-search-page .main-search-history-dropdown .search-history-empty i {
+            font-size: 28px;
+            margin-bottom: 12px;
+            display: block;
+            opacity: 0.5;
+        }
+        
+        @media (max-width: 768px) {
+            .main-search-page .search-results {
+                grid-template-columns: 1fr;
+            }
+            
+            .main-search-page .results-sidebar {
+                order: -1;
+            }
+            
+            .main-search-page .filter-tabs {
+                flex-wrap: wrap;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div th:replace="fragments/header :: siteHeader('search')"></div>
+    <div class="search-container main-search-page">
+        <!-- 搜索头部 -->
+        <div class="search-header">
+            <h1><i class="fas fa-search"></i> 搜索</h1>
+            <p>在数码社区中发现更多精彩内容</p>
+            
+            <form class="search-box" th:action="@{/search}" method="get">
+                <div class="search-input-container">
+                    <input type="text" name="q" class="search-input" 
+                           th:value="${query}" placeholder="搜索帖子、用户..." 
+                           onfocus="showMainSearchHistory()" onblur="hideMainSearchHistory()">
+                    <button type="submit" class="search-btn">
+                        <i class="fas fa-search"></i>
+                    </button>
+                    
+                    <!-- 搜索历史下拉框 -->
+                    <div class="main-search-history-dropdown" id="mainSearchHistoryDropdown">
+                        <div class="search-history-header">
+                            <span>搜索历史</span>
+                            <button type="button" class="clear-all-btn" onclick="clearAllMainHistory()">清空</button>
+                        </div>
+                        <div class="search-history-list" id="mainSearchHistoryList">
+                            <!-- 搜索历史项将通过JavaScript动态添加 -->
+                        </div>
+                        <div class="search-history-empty" id="mainSearchHistoryEmpty" style="display: none;">
+                            <i class="fas fa-history"></i>
+                            <span>暂无搜索历史</span>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+        
+        <!-- 搜索结果 -->
+        <div class="search-results" th:if="${query != null and !query.isEmpty()}">
+            <div class="results-main">
+                <div class="results-header">
+                    <h2>搜索结果</h2>
+                    <span class="results-count" th:text="'共找到 ' + ${totalResults} + ' 个结果'">共找到 0 个结果</span>
+                </div>
+                
+                <div class="filter-tabs">
+                    <a href="#" class="filter-tab active" onclick="showTab('all')">全部</a>
+                    <a href="#" class="filter-tab" onclick="showTab('posts')">帖子</a>
+                    <a href="#" class="filter-tab" onclick="showTab('users')">用户</a>
+                    <a href="#" class="filter-tab" onclick="showTab('news')">新闻</a>
+                </div>
+                
+                <!-- 帖子结果 -->
+                <div id="posts-section">
+                    <div th:if="${posts.size() > 0}">
+                        <h3 style="margin-bottom: 15px; color: #333;"><i class="fas fa-file-alt"></i> 帖子</h3>
+                        <div th:each="post : ${posts}" class="post-item">
+                            <div class="post-header">
+                                <img th:src="${post.authorAvatarUrl != null && !post.authorAvatarUrl.isEmpty() ? post.authorAvatarUrl : '/img/default-avatar.svg'}" 
+                                     class="post-avatar" th:alt="${post.authorUsername}">
+                                <div class="post-meta">
+                                    <div class="post-author" th:text="${post.authorUsername}">用户名</div>
+                                    <div class="post-time" th:text="${#temporals.format(post.createdAt, 'yyyy-MM-dd HH:mm')}">发布时间</div>
+                                </div>
+                            </div>
+                            <h4 class="post-title">
+                                <a th:href="@{'/community/' + ${post.id}}" th:text="${post.title}">帖子标题</a>
+                            </h4>
+                            <div class="post-content" th:text="${post.content}">帖子内容预览...</div>
+                            <div class="post-stats">
+                                <span class="stat-item">
+                                    <i class="fas fa-heart"></i>
+                                    <span th:text="${post.likeCount}">0</span>
+                                </span>
+                                <span class="stat-item">
+                                    <i class="fas fa-comment"></i>
+                                    <span th:text="${post.commentCount}">0</span>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 用户结果 -->
+                <div id="users-section">
+                    <div th:if="${users.size() > 0}">
+                        <h3 style="margin-bottom: 15px; color: #333; margin-top: 30px;"><i class="fas fa-users"></i> 用户</h3>
+                        <div th:each="user : ${users}" class="user-item">
+                            <img th:src="${user.avatarUrl != null && !user.avatarUrl.isEmpty() ? user.avatarUrl : '/img/default-avatar.svg'}" 
+                                 class="user-avatar" th:alt="${user.username}">
+                            <div class="user-info">
+                                <div class="user-name">
+                                    <a th:href="@{/user/profile/{username}(username=${user.username})}" th:text="${user.username}">用户名</a>
+                                </div>
+                                <div class="user-email" th:text="${user.email}">用户邮箱</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 新闻结果 -->
+                <div id="news-section">
+                    <div th:if="${news.size() > 0}">
+                        <h3 style="margin-bottom: 15px; color: #333; margin-top: 30px;"><i class="fas fa-newspaper"></i> 新闻</h3>
+                        <div th:each="newsItem : ${news}" class="post-item">
+                            <div class="post-header">
+                                <div class="post-meta">
+                                    <div class="post-author" th:text="${newsItem.author}">作者</div>
+                                    <div class="post-time" th:text="${#temporals.format(newsItem.publishTime, 'yyyy-MM-dd HH:mm')}">发布时间</div>
+                                </div>
+                            </div>
+                            <h4 class="post-title">
+                                <a th:href="@{'/news/' + ${newsItem.id}}" th:text="${newsItem.title}">新闻标题</a>
+                            </h4>
+                            <div class="post-content" th:text="${newsItem.summary}">新闻摘要...</div>
+                            <div class="post-stats">
+                                <span class="stat-item">
+                                    <i class="fas fa-eye"></i>
+                                    <span th:text="${newsItem.viewCount}">0</span>
+                                </span>
+                                <span class="stat-item">
+                                    <i class="fas fa-tag"></i>
+                                    <span th:text="${newsItem.category}">分类</span>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 无结果 -->
+                <div th:if="${totalResults == 0}" class="no-results">
+                    <i class="fas fa-search"></i>
+                    <h3>未找到相关结果</h3>
+                    <p>尝试使用不同的关键词或检查拼写</p>
+                </div>
+            </div>
+            
+            <!-- 侧边栏 -->
+            <div class="results-sidebar">
+                <div class="sidebar-section">
+                    <h3 class="sidebar-title">搜索统计</h3>
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                        <span>帖子:</span>
+                        <span th:text="${posts.size()}">0</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                        <span>用户:</span>
+                        <span th:text="${users.size()}">0</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between;">
+                        <span>新闻:</span>
+                        <span th:text="${news.size()}">0</span>
+                    </div>
+                </div>
+                
+                <div class="sidebar-section">
+                    <h3 class="sidebar-title">搜索技巧</h3>
+                    <div class="search-tips">
+                        <h4>如何更好地搜索：</h4>
+                        <ul>
+                            <li>使用具体的关键词</li>
+                            <li>尝试不同的词汇组合</li>
+                            <li>检查拼写是否正确</li>
+                            <li>使用用户名搜索特定用户</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 初始状态 -->
+        <div th:if="${query == null or query.isEmpty()}" class="no-results">
+            <i class="fas fa-search"></i>
+            <h3>开始搜索</h3>
+            <p>在上方输入关键词来搜索帖子和用户</p>
+        </div>
+    </div>
+    
+    <script>
+        function showTab(tab) {
+            // 移除所有活动状态
+            document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+            
+            // 添加活动状态
+            event.target.classList.add('active');
+            
+            // 显示/隐藏内容
+            const postsSection = document.getElementById('posts-section');
+            const usersSection = document.getElementById('users-section');
+            const newsSection = document.getElementById('news-section');
+            
+            switch(tab) {
+                case 'all':
+                    postsSection.style.display = 'block';
+                    usersSection.style.display = 'block';
+                    newsSection.style.display = 'block';
+                    break;
+                case 'posts':
+                    postsSection.style.display = 'block';
+                    usersSection.style.display = 'none';
+                    newsSection.style.display = 'none';
+                    break;
+                case 'users':
+                    postsSection.style.display = 'none';
+                    usersSection.style.display = 'block';
+                    newsSection.style.display = 'none';
+                    break;
+                case 'news':
+                    postsSection.style.display = 'none';
+                    usersSection.style.display = 'none';
+                    newsSection.style.display = 'block';
+                    break;
+            }
+        }
+        
+        // 高亮搜索关键词
+        function highlightSearchTerms() {
+            const query = '[[${query}]]';
+            if (!query) return;
+            
+            const elements = document.querySelectorAll('.post-title, .post-content, .user-name');
+            elements.forEach(el => {
+                const regex = new RegExp(`(${query})`, 'gi');
+                el.innerHTML = el.innerHTML.replace(regex, '<mark style="background: #fff3cd; padding: 2px 4px; border-radius: 3px;">$1</mark>');
+            });
+        }
+        
+        // 搜索历史功能
+        function showMainSearchHistory() {
+            const dropdown = document.getElementById('mainSearchHistoryDropdown');
+            loadMainSearchHistory();
+            dropdown.style.display = 'block';
+        }
+        
+        function hideMainSearchHistory() {
+            setTimeout(() => {
+                const dropdown = document.getElementById('mainSearchHistoryDropdown');
+                dropdown.style.display = 'none';
+            }, 200);
+        }
+        
+        function loadMainSearchHistory() {
+            const history = JSON.parse(localStorage.getItem('searchHistory') || '[]');
+            const historyList = document.getElementById('mainSearchHistoryList');
+            const emptyState = document.getElementById('mainSearchHistoryEmpty');
+            
+            historyList.innerHTML = '';
+            
+            if (history.length === 0) {
+                emptyState.style.display = 'block';
+                return;
+            }
+            
+            emptyState.style.display = 'none';
+            
+            history.slice(0, 8).forEach((item, index) => {
+                const historyItem = document.createElement('div');
+                historyItem.className = 'search-history-item';
+                historyItem.innerHTML = `
+                    <span class="history-text" onclick="selectMainSearchHistory('${item.replace(/'/g, "\\'")}')"> ${item}</span>
+                    <button class="delete-history-btn" onclick="deleteMainSearchHistory(${index})">
+                        <i class="fas fa-times"></i>
+                    </button>
+                `;
+                historyList.appendChild(historyItem);
+            });
+        }
+        
+        function selectMainSearchHistory(query) {
+            document.querySelector('.search-input').value = query;
+            hideMainSearchHistory();
+        }
+        
+        function deleteMainSearchHistory(index) {
+            const history = JSON.parse(localStorage.getItem('searchHistory') || '[]');
+            history.splice(index, 1);
+            localStorage.setItem('searchHistory', JSON.stringify(history));
+            loadMainSearchHistory();
+        }
+        
+        function clearAllMainHistory() {
+            localStorage.removeItem('searchHistory');
+            loadMainSearchHistory();
+        }
+        
+        // 保存搜索历史
+        function saveSearchHistory(query) {
+            if (!query || query.trim() === '') return;
+            
+            let history = JSON.parse(localStorage.getItem('searchHistory') || '[]');
+            
+            // 移除重复项
+            history = history.filter(item => item !== query);
+            
+            // 添加到开头
+            history.unshift(query);
+            
+            // 限制历史记录数量
+            if (history.length > 20) {
+                history = history.slice(0, 20);
+            }
+            
+            localStorage.setItem('searchHistory', JSON.stringify(history));
+        }
+        
+        // 页面加载完成后执行
+        document.addEventListener('DOMContentLoaded', function() {
+            highlightSearchTerms();
+            
+            // 保存当前搜索查询到历史记录
+            const currentQuery = '[[${query}]]';
+            if (currentQuery && currentQuery.trim() !== '') {
+                saveSearchHistory(currentQuery);
+            }
+        });
+    </script>
+</body>
+</html>

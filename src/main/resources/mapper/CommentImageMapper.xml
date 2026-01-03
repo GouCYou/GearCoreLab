@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.gcc.gearcorelab.mapper.CommentImageMapper">
+    <select id="findUrlByCommentId" resultType="string">
+        SELECT image_url FROM comment_images
+        WHERE comment_id=#{commentId}
+    </select>
+    <insert id="insert">
+        INSERT INTO comment_images(comment_id,image_url)
+        VALUES(#{commentId},#{imageUrl})
+    </insert>
+    <delete id="deleteByCommentId">
+        DELETE FROM comment_images WHERE comment_id=#{commentId}
+    </delete>
+</mapper>

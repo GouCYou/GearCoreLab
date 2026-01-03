@@ -1,0 +1,1053 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>帖子管理 | GearCoreLab Admin</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #ffffff;
+            min-height: 100vh;
+        }
+
+        .admin-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* 侧边栏样式 */
+        .sidebar {
+            width: 280px;
+            background: #ffffff;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+            padding: 0;
+            overflow-y: auto;
+        }
+
+        .sidebar-header {
+            padding: 30px 25px;
+            border-bottom: 1px solid #e9ecef;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .logo {
+            width: 60px;
+            height: 60px;
+            margin-bottom: 15px;
+            border-radius: 12px;
+        }
+
+        .sidebar-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 8px;
+        }
+
+        .sidebar-subtitle {
+            color: #6c757d;
+            font-size: 14px;
+        }
+
+        .sidebar-nav {
+            padding: 20px 0;
+        }
+
+        .nav-item {
+            margin: 0;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 15px 25px;
+            color: #495057;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border-left: 4px solid transparent;
+        }
+
+        .nav-link:hover {
+            background: #f8f9fa;
+            color: #1890ff;
+            border-left-color: #1890ff;
+        }
+
+        .nav-link.active {
+            background: rgba(24, 144, 255, 0.1);
+            color: #1890ff;
+            border-left-color: #1890ff;
+            font-weight: 600;
+        }
+
+        .nav-icon {
+            width: 20px;
+            margin-right: 12px;
+            text-align: center;
+        }
+
+        /* 主内容区 */
+        .main-content {
+            flex: 1;
+            padding: 30px;
+            overflow-y: auto;
+        }
+
+        .content-header {
+            background: #ffffff;
+            border-radius: 8px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .page-title {
+            font-size: 32px;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 8px;
+        }
+
+        .page-subtitle {
+            color: #6c757d;
+            font-size: 16px;
+        }
+
+        .posts-management {
+            background: #ffffff;
+            border-radius: 8px;
+            padding: 30px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .management-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .management-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            background: #1890ff;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #40a9ff;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #c82333;
+        }
+
+        .btn-sm {
+            padding: 6px 12px;
+            font-size: 12px;
+        }
+
+        .posts-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        .posts-table th,
+        .posts-table td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .posts-table th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #495057;
+            position: sticky;
+            top: 0;
+        }
+
+        .posts-table tr:hover {
+            background: #f8f9fa;
+        }
+
+        .status-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .status-active {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-deleted {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #6c757d;
+        }
+
+        .empty-icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+            color: #dee2e6;
+        }
+
+        .empty-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .empty-text {
+            font-size: 14px;
+            margin-bottom: 20px;
+        }
+
+        /* 响应式设计 */
+        .back-btn {
+            position: fixed;
+            top: 30px;
+            right: 30px;
+            background: #1890ff;
+            border: none;
+            border-radius: 4px;
+            padding: 12px 20px;
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+        }
+
+        .back-btn:hover {
+            background: #40a9ff;
+            color: white;
+            text-decoration: none;
+        }
+
+        /* 搜索筛选栏样式 */
+        .search-filter-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding: 20px;
+            background: white;
+            border-radius: 4px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .search-box {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .search-box input {
+            width: 300px;
+            padding: 8px 12px;
+            border: 1px solid #d9d9d9;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .filter-options {
+            display: flex;
+            gap: 15px;
+        }
+
+        .filter-options select {
+            padding: 8px 12px;
+            border: 1px solid #d9d9d9;
+            border-radius: 4px;
+            font-size: 14px;
+            background: white;
+        }
+
+        /* 帖子表格样式 */
+        .posts-table {
+            width: 100%;
+            background: white;
+            border-radius: 4px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .posts-table th,
+        .posts-table td {
+            padding: 12px 16px;
+            text-align: left;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .posts-table th {
+            background: #fafafa;
+            font-weight: 600;
+            color: #262626;
+        }
+
+        .posts-table tbody tr:hover {
+            background: #f5f5f5;
+        }
+
+        .status-badge {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .status-published {
+            background: #f6ffed;
+            color: #52c41a;
+            border: 1px solid #b7eb8f;
+        }
+
+        .status-draft {
+            background: #fff7e6;
+            color: #fa8c16;
+            border: 1px solid #ffd591;
+        }
+
+        .status-pending {
+            background: #fff1f0;
+            color: #ff4d4f;
+            border: 1px solid #ffccc7;
+        }
+
+        .category-badge {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .category-tech {
+            background: #e6f7ff;
+            color: #1890ff;
+            border: 1px solid #91d5ff;
+        }
+
+        .category-hardware {
+            background: #fff2e8;
+            color: #fa541c;
+            border: 1px solid #ffbb96;
+        }
+
+        .category-tutorial {
+            background: #f9f0ff;
+            color: #722ed1;
+            border: 1px solid #d3adf7;
+        }
+
+        .category-general {
+            background: #f6ffed;
+            color: #52c41a;
+            border: 1px solid #b7eb8f;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn-sm {
+            padding: 4px 8px;
+            font-size: 12px;
+            border-radius: 4px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-edit {
+            background: #1890ff;
+            color: white;
+        }
+
+        .btn-edit:hover {
+            background: #40a9ff;
+        }
+
+        .btn-delete {
+            background: #ff4d4f;
+            color: white;
+        }
+
+        .btn-delete:hover {
+            background: #ff7875;
+        }
+
+        .btn-view {
+            background: #52c41a;
+            color: white;
+        }
+
+        .btn-view:hover {
+            background: #73d13d;
+        }
+
+        /* 分页样式 */
+        .pagination-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 20px;
+            padding: 20px;
+            background: white;
+            border-radius: 4px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .pagination {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .pagination button {
+            padding: 8px 12px;
+            border: 1px solid #d9d9d9;
+            background: white;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .pagination button:hover:not(:disabled) {
+            border-color: #1890ff;
+            color: #1890ff;
+        }
+
+        .pagination button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .page-number {
+            padding: 8px 12px;
+            border: 1px solid #d9d9d9;
+            background: white;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .page-number.active {
+            background: #1890ff;
+            color: white;
+            border-color: #1890ff;
+        }
+
+        .page-number:hover:not(.active) {
+            border-color: #1890ff;
+            color: #1890ff;
+        }
+
+        @media (max-width: 768px) {
+            .admin-container {
+                flex-direction: column;
+            }
+            
+            .sidebar {
+                width: 100%;
+                height: auto;
+            }
+            
+            .main-content {
+                padding: 20px;
+            }
+            
+            .management-header {
+                flex-direction: column;
+                gap: 15px;
+                align-items: stretch;
+            }
+            
+            .posts-table {
+                font-size: 12px;
+            }
+            
+            .posts-table th,
+            .posts-table td {
+                padding: 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-container">
+        <!-- 侧边栏 -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <img src="/img/logo.png" alt="GearCoreLab" class="logo">
+                <h1 class="sidebar-title">管理后台</h1>
+                <p class="sidebar-subtitle">GearCoreLab Admin</p>
+            </div>
+            <nav class="sidebar-nav">
+                <div class="nav-item">
+                    <a href="/admin" class="nav-link">
+                        <i class="fas fa-tachometer-alt nav-icon"></i>
+                        仪表盘
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="/admin/users" class="nav-link">
+                        <i class="fas fa-users nav-icon"></i>
+                        用户管理
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="/admin/posts" class="nav-link active">
+                        <i class="fas fa-comments nav-icon"></i>
+                        帖子管理
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="/admin/news" class="nav-link">
+                        <i class="fas fa-newspaper nav-icon"></i>
+                        新闻管理
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="/admin/hardware" class="nav-link">
+                        <i class="fas fa-microchip nav-icon"></i>
+                        配件管理
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="/admin/notifications" class="nav-link">
+                        <i class="fas fa-bell nav-icon"></i>
+                        通知管理
+                    </a>
+                </div>
+
+            </nav>
+        </div>
+
+        <!-- 主内容区 -->
+        <div class="main-content">
+            <!-- 页面标题 -->
+            <div class="content-header">
+                <h1 class="page-title">帖子管理</h1>
+                <p class="page-subtitle">管理社区帖子内容，包括审核、删除和置顶等操作</p>
+            </div>
+
+            <!-- 帖子管理区域 -->
+            <div class="posts-management">
+                <div class="management-header">
+                    <h2 class="management-title">帖子列表</h2>
+                </div>
+
+                <!-- 帖子表格 -->
+                <div id="postsTableContainer">
+                    <!-- 搜索筛选栏 -->
+                <div class="search-filter-bar">
+                    <div class="search-box">
+                        <input type="text" id="searchInput" placeholder="搜索帖子标题或内容...">
+                        <button id="searchBtn" class="btn btn-primary">
+                            <i class="fas fa-search"></i> 搜索
+                        </button>
+                    </div>
+                    <div class="filter-options">
+                        <select id="statusFilter">
+                            <option value="">全部状态</option>
+                            <option value="published">已发布</option>
+                            <option value="draft">草稿</option>
+                            <option value="pending">待审核</option>
+                        </select>
+                        <select id="categoryFilter">
+                            <option value="">全部分类</option>
+                            <option value="tech">技术讨论</option>
+                            <option value="hardware">硬件评测</option>
+                            <option value="tutorial">教程分享</option>
+                            <option value="general">综合讨论</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- 帖子表格 -->
+                <table class="posts-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>标题</th>
+                            <th>作者</th>
+                            <th>分类</th>
+                            <th>状态</th>
+                            <th>发布时间</th>
+                            <th>浏览量</th>
+                            <th>回复数</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="postsTableBody">
+                        <!-- 动态加载的帖子数据 -->
+                    </tbody>
+                </table>
+
+                <!-- 空状态 -->
+                <div id="emptyState" class="empty-state" style="display: none;">
+                    <i class="fas fa-clipboard-list" style="font-size: 48px; color: #d9d9d9; margin-bottom: 16px;"></i>
+                    <h3 style="color: #8c8c8c; margin-bottom: 8px;">暂无帖子数据</h3>
+                    <p style="color: #bfbfbf;">还没有任何帖子，快去发布第一篇帖子吧！</p>
+                </div>
+
+                <!-- 分页 -->
+                <div class="pagination-container">
+                    <div class="pagination-info">
+                        <span id="paginationInfo">显示 1-10 条，共 0 条记录</span>
+                    </div>
+                    <div class="pagination">
+                        <button id="prevPage">上一页</button>
+                        <div id="pageNumbers"></div>
+                        <button id="nextPage">下一页</button>
+                    </div>
+                </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 返回主站按钮 -->
+    <a href="/" class="back-btn">
+        <i class="fas fa-home"></i> 返回主站
+    </a>
+
+    <script>
+        // 帖子管理JavaScript代码
+        let currentPage = 1;
+        let pageSize = 10;
+        let totalPosts = 0;
+        let allPosts = [];
+        let filteredPosts = [];
+
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            loadPosts();
+            bindEvents();
+        });
+
+        // 绑定事件
+        function bindEvents() {
+            // 搜索按钮
+            document.getElementById('searchBtn').addEventListener('click', performSearch);
+            document.getElementById('searchInput').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    performSearch();
+                }
+            });
+
+            // 筛选器
+            document.getElementById('statusFilter').addEventListener('change', performSearch);
+            document.getElementById('categoryFilter').addEventListener('change', performSearch);
+
+            // 分页按钮
+            document.getElementById('prevPage').addEventListener('click', function() {
+                if (currentPage > 1) {
+                    currentPage--;
+                    renderPostsTable();
+                }
+            });
+
+            document.getElementById('nextPage').addEventListener('click', function() {
+                const totalPages = Math.ceil(filteredPosts.length / pageSize);
+                if (currentPage < totalPages) {
+                    currentPage++;
+                    renderPostsTable();
+                }
+            });
+        }
+
+        // 加载帖子数据
+        async function loadPosts() {
+            try {
+                const response = await fetch('/admin/api/posts');
+                const posts = await response.json();
+                allPosts = (posts || []).map(post => ({
+                    id: post.id,
+                    title: post.title || post.postTitle || '',
+                    author: post.author || post.authorUsername || '',
+                    category: post.category || '',
+                    status: post.status || '',
+                    publishTime: post.publishTime || post.createdAt || '',
+                    views: post.views || post.viewCount || 0,
+                    replies: post.replies || post.commentCount || 0
+                }));
+                    filteredPosts = [...allPosts];
+                    totalPosts = allPosts.length;
+                    renderPostsTable();
+            } catch (error) {
+                console.error('加载帖子出错:', error);
+                showSampleData();
+            }
+        }
+
+        // 显示示例数据
+        function showSampleData() {
+            allPosts = [
+                {
+                    id: 1,
+                    title: 'RTX 4090显卡深度评测',
+                    author: '硬件达人',
+                    category: 'hardware',
+                    status: 'published',
+                    publishTime: '2024-01-15 14:30:00',
+                    views: 1250,
+                    replies: 23
+                },
+                {
+                    id: 2,
+                    title: 'Python机器学习入门教程',
+                    author: '编程小白',
+                    category: 'tutorial',
+                    status: 'draft',
+                    publishTime: '2024-01-14 09:15:00',
+                    views: 856,
+                    replies: 12
+                },
+                {
+                    id: 3,
+                    title: '新一代CPU架构讨论',
+                    author: '技术专家',
+                    category: 'tech',
+                    status: 'pending',
+                    publishTime: '2024-01-13 16:45:00',
+                    views: 432,
+                    replies: 8
+                }
+            ];
+            filteredPosts = [...allPosts];
+            totalPosts = allPosts.length;
+            renderPostsTable();
+        }
+
+        // 执行搜索和筛选
+        function performSearch() {
+            const searchKeyword = document.getElementById('searchInput').value.toLowerCase();
+            const statusFilter = document.getElementById('statusFilter').value;
+            const categoryFilter = document.getElementById('categoryFilter').value;
+
+            filteredPosts = allPosts.filter(post => {
+                const matchesSearch = !searchKeyword || 
+                    post.title.toLowerCase().includes(searchKeyword) ||
+                    (post.content && post.content.toLowerCase().includes(searchKeyword));
+                
+                const matchesStatus = !statusFilter || post.status === statusFilter;
+                const matchesCategory = !categoryFilter || post.category === categoryFilter;
+
+                return matchesSearch && matchesStatus && matchesCategory;
+            });
+
+            currentPage = 1;
+            renderPostsTable();
+        }
+
+        // 渲染帖子表格
+        function renderPostsTable() {
+            const tableBody = document.getElementById('postsTableBody');
+            const emptyState = document.getElementById('emptyState');
+            const postsTable = document.querySelector('.posts-table');
+
+            if (filteredPosts.length === 0) {
+                showEmptyState();
+                return;
+            }
+
+            // 显示表格，隐藏空状态
+            postsTable.style.display = 'table';
+            emptyState.style.display = 'none';
+
+            // 计算分页
+            const startIndex = (currentPage - 1) * pageSize;
+            const endIndex = Math.min(startIndex + pageSize, filteredPosts.length);
+            const pagePosts = filteredPosts.slice(startIndex, endIndex);
+
+            // 渲染表格行
+            tableBody.innerHTML = pagePosts.map(post => `
+                <tr>
+                    <td>${post.id}</td>
+                    <td>${post.title}</td>
+                    <td>${post.author}</td>
+                    <td><span class="category-badge category-${post.category}">${getCategoryName(post.category)}</span></td>
+                    <td><span class="status-badge status-${post.status}">${getStatusName(post.status)}</span></td>
+                    <td>${post.publishTime}</td>
+                    <td>${post.views}</td>
+                    <td>${post.replies}</td>
+                    <td>
+                        <div class="action-buttons">
+                            <button class="btn-sm btn-view" onclick="viewPost(${post.id})">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                            <button class="btn-sm btn-delete" onclick="deletePost(${post.id})">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+
+            // 更新分页信息
+            updatePagination();
+        }
+
+        // 显示空状态
+        function showEmptyState() {
+            const tableBody = document.getElementById('postsTableBody');
+            const emptyState = document.getElementById('emptyState');
+            const postsTable = document.querySelector('.posts-table');
+
+            postsTable.style.display = 'none';
+            emptyState.style.display = 'block';
+            
+            // 清空分页信息
+            document.getElementById('paginationInfo').textContent = '显示 0-0 条，共 0 条记录';
+            document.getElementById('pageNumbers').innerHTML = '';
+            document.getElementById('prevPage').disabled = true;
+            document.getElementById('nextPage').disabled = true;
+        }
+
+        // 更新分页
+        function updatePagination() {
+            const totalPages = Math.ceil(filteredPosts.length / pageSize);
+            const startIndex = (currentPage - 1) * pageSize + 1;
+            const endIndex = Math.min(currentPage * pageSize, filteredPosts.length);
+
+            // 更新分页信息
+            document.getElementById('paginationInfo').textContent = 
+                `显示 ${startIndex}-${endIndex} 条，共 ${filteredPosts.length} 条记录`;
+
+            // 更新分页按钮状态
+            document.getElementById('prevPage').disabled = currentPage <= 1;
+            document.getElementById('nextPage').disabled = currentPage >= totalPages;
+
+            // 生成页码
+            const pageNumbers = document.getElementById('pageNumbers');
+            pageNumbers.innerHTML = '';
+
+            for (let i = 1; i <= totalPages; i++) {
+                if (i === 1 || i === totalPages || (i >= currentPage - 2 && i <= currentPage + 2)) {
+                    const pageBtn = document.createElement('span');
+                    pageBtn.className = `page-number ${i === currentPage ? 'active' : ''}`;
+                    pageBtn.textContent = i;
+                    pageBtn.onclick = () => {
+                        currentPage = i;
+                        renderPostsTable();
+                    };
+                    pageNumbers.appendChild(pageBtn);
+                } else if (i === currentPage - 3 || i === currentPage + 3) {
+                    const ellipsis = document.createElement('span');
+                    ellipsis.textContent = '...';
+                    ellipsis.style.padding = '8px 4px';
+                    pageNumbers.appendChild(ellipsis);
+                }
+            }
+        }
+
+        // 获取分类名称
+        function getCategoryName(category) {
+            const categories = {
+                'tech': '技术讨论',
+                'hardware': '硬件评测',
+                'tutorial': '教程分享',
+                'general': '综合讨论'
+            };
+            return categories[category] || category;
+        }
+
+        // 获取状态名称
+        function getStatusName(status) {
+            const statuses = {
+                'published': '已发布',
+                'draft': '草稿',
+                'pending': '待审核'
+            };
+            return statuses[status] || status;
+        }
+
+        // 查看帖子
+        function viewPost(id) {
+            window.open(`/community/${id}`, '_blank');
+        }
+
+
+
+        // 自定义弹窗函数
+        function showCustomAlert(message, type = 'info', title = '', showCancel = false) {
+            return new Promise((resolve) => {
+                // 创建遮罩层
+                const overlay = document.createElement('div');
+                overlay.className = 'custom-alert-overlay';
+                overlay.style.cssText = `
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    right: 0;
+                    bottom: 0;
+                    background: rgba(0, 0, 0, 0.5);
+                    z-index: 10000;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    opacity: 0;
+                    transition: opacity 0.3s ease;
+                `;
+                
+                // 创建弹窗
+                const alert = document.createElement('div');
+                alert.className = 'custom-alert';
+                alert.style.cssText = `
+                    background: white;
+                    border-radius: 12px;
+                    padding: 0;
+                    max-width: 400px;
+                    width: 90%;
+                    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+                    transform: scale(0.8);
+                    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                    overflow: hidden;
+                `;
+                
+                // 设置图标
+                const icons = {
+                    success: 'fas fa-check',
+                    error: 'fas fa-times',
+                    warning: 'fas fa-exclamation-triangle',
+                    info: 'fas fa-info'
+                };
+                
+                const iconColors = {
+                    success: '#4CAF50',
+                    error: '#f44336',
+                    warning: '#ff9800',
+                    info: '#2196F3'
+                };
+                
+                // 设置标题
+                const titles = {
+                    success: title || '成功',
+                    error: title || '错误',
+                    warning: title || '警告',
+                    info: title || '提示'
+                };
+                
+                alert.innerHTML = `
+                    <div style="padding: 24px; display: flex; align-items: flex-start; gap: 16px;">
+                        <div style="width: 40px; height: 40px; border-radius: 50%; background: ${iconColors[type]}; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                            <i class="${icons[type]}" style="color: white; font-size: 18px;"></i>
+                        </div>
+                        <div style="flex: 1;">
+                            <div style="font-size: 18px; font-weight: 600; color: #333; margin-bottom: 8px;">${titles[type]}</div>
+                            <div style="color: #666; line-height: 1.5;">${message}</div>
+                        </div>
+                    </div>
+                    <div style="padding: 16px 24px; background: #f8f9fa; display: flex; gap: 12px; justify-content: flex-end;">
+                        ${showCancel ? '<button class="custom-alert-btn secondary" style="padding: 8px 16px; border: 1px solid #ddd; background: white; color: #666; border-radius: 6px; cursor: pointer; font-size: 14px;" onclick="closeCustomAlert(false)">取消</button>' : ''}
+                        <button class="custom-alert-btn primary" style="padding: 8px 16px; border: none; background: #007bff; color: white; border-radius: 6px; cursor: pointer; font-size: 14px;" onclick="closeCustomAlert(true)">确定</button>
+                    </div>
+                `;
+                
+                // 添加到页面
+                overlay.appendChild(alert);
+                document.body.appendChild(overlay);
+                
+                // 显示动画
+                setTimeout(() => {
+                    overlay.style.opacity = '1';
+                    alert.style.transform = 'scale(1)';
+                }, 10);
+                
+                // 关闭函数
+                window.closeCustomAlert = function(result) {
+                    overlay.style.opacity = '0';
+                    alert.style.transform = 'scale(0.8)';
+                    
+                    setTimeout(() => {
+                        document.body.removeChild(overlay);
+                        delete window.closeCustomAlert;
+                        resolve(result);
+                    }, 300);
+                };
+                
+                // 点击遮罩层关闭
+                overlay.addEventListener('click', () => window.closeCustomAlert(false));
+            });
+        }
+
+        // 删除帖子
+        async function deletePost(id) {
+            const confirmed = await showCustomAlert('确定要删除这篇帖子吗？此操作不可恢复。', 'warning', '确认删除', true);
+            if (!confirmed) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`/admin/api/posts/${id}`, {
+                    method: 'DELETE'
+                });
+                const data = await response.json();
+                
+                if (data.success) {
+                    await showCustomAlert('删除成功', 'success');
+                    loadPosts(); // 重新加载数据
+                } else {
+                    await showCustomAlert('删除失败: ' + data.message, 'error');
+                }
+            } catch (error) {
+                console.error('删除帖子出错:', error);
+                await showCustomAlert('删除失败，请稍后重试', 'error');
+            }
+        }
+    </script>
+</body>
+</html>

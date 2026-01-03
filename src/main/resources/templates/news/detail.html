@@ -1,0 +1,605 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${news.title} + ' | GearCoreLab'">新闻详情 | GearCoreLab</title>
+    <link rel="stylesheet" th:href="@{/css/main.css}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --news-primary: #1a73e8;
+            --news-secondary: #34a853;
+            --news-accent: #ea4335;
+            --news-dark: #202124;
+            --news-gray: #5f6368;
+            --news-light-gray: #f8f9fa;
+            --news-border: #dadce0;
+            --news-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        body {
+            background: var(--news-light-gray);
+            font-family: 'Google Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+        }
+        
+        /* 确保导航栏GearCoreLab字体不被覆盖 */
+        .gcl-navbar-container .gcl-site-name {
+            font-family: "Helvetica Neue", Arial, sans-serif !important;
+            font-weight: normal !important;
+        }
+
+        .news-detail-container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* 面包屑导航 */
+        .breadcrumb {
+            background: white;
+            padding: 16px 24px;
+            border-radius: 12px;
+            margin-bottom: 24px;
+            box-shadow: var(--news-shadow);
+        }
+
+        .breadcrumb a {
+            color: var(--news-primary);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        .breadcrumb-separator {
+            margin: 0 12px;
+            color: var(--news-gray);
+        }
+
+        /* 新闻头部 */
+        .news-header {
+            background: white;
+            padding: 40px;
+            border-radius: 16px;
+            margin-bottom: 24px;
+            box-shadow: var(--news-shadow);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .news-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--news-primary);
+        }
+
+        .news-category-badge {
+            display: inline-block;
+            background: var(--news-accent);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            margin-bottom: 16px;
+        }
+
+        .news-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--news-dark);
+            line-height: 1.2;
+            margin: 0 0 24px 0;
+            letter-spacing: -0.02em;
+        }
+
+        .news-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+            padding-top: 24px;
+            border-top: 1px solid var(--news-border);
+        }
+
+        .news-meta-info {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+            color: var(--news-gray);
+            font-size: 0.95rem;
+        }
+
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .news-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        .action-btn {
+            padding: 10px 20px;
+            border: 2px solid;
+            border-radius: 25px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .action-btn.edit {
+            color: var(--news-primary);
+            border-color: var(--news-primary);
+            background: transparent;
+        }
+
+        .action-btn.edit:hover {
+            background: var(--news-primary);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(26, 115, 232, 0.3);
+        }
+
+        .action-btn.delete {
+            color: var(--news-accent);
+            border-color: var(--news-accent);
+            background: transparent;
+        }
+
+        .action-btn.delete:hover {
+            background: var(--news-accent);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(234, 67, 53, 0.3);
+        }
+
+        /* 新闻图片 */
+        .news-image-container {
+            margin-bottom: 24px;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: var(--news-shadow);
+        }
+
+        .news-image {
+            width: 100%;
+            height: auto;
+            max-height: 500px;
+            object-fit: cover;
+            display: block;
+        }
+
+        /* 新闻内容 */
+        .news-content {
+            background: white;
+            padding: 40px;
+            border-radius: 16px;
+            box-shadow: var(--news-shadow);
+            margin-bottom: 24px;
+        }
+
+        .news-content-text {
+            font-size: 1.125rem;
+            line-height: 1.8;
+            color: var(--news-dark);
+        }
+
+        .news-content-text h1,
+        .news-content-text h2,
+        .news-content-text h3,
+        .news-content-text h4,
+        .news-content-text h5,
+        .news-content-text h6 {
+            color: var(--news-dark);
+            font-weight: 700;
+            margin: 32px 0 16px 0;
+            line-height: 1.3;
+        }
+
+        .news-content-text h1 {
+            font-size: 2rem;
+            border-bottom: 3px solid var(--news-primary);
+            padding-bottom: 12px;
+        }
+
+        .news-content-text h2 {
+            font-size: 1.75rem;
+            color: var(--news-primary);
+        }
+
+        .news-content-text h3 {
+            font-size: 1.5rem;
+        }
+
+        .news-content-text h4 {
+            font-size: 1.25rem;
+        }
+
+        .news-content-text p {
+            margin-bottom: 20px;
+            text-align: justify;
+        }
+
+        .news-content-text blockquote {
+            border-left: 4px solid var(--news-primary);
+            background: var(--news-light-gray);
+            padding: 20px 24px;
+            margin: 24px 0;
+            border-radius: 0 8px 8px 0;
+            font-style: italic;
+            color: var(--news-gray);
+            position: relative;
+        }
+
+        .news-content-text blockquote::before {
+            content: '"';
+            font-size: 3rem;
+            color: var(--news-primary);
+            position: absolute;
+            top: -10px;
+            left: 20px;
+            font-family: serif;
+        }
+
+        .news-content-text code {
+            background: #f1f3f4;
+            color: #d73a49;
+            padding: 3px 8px;
+            border-radius: 6px;
+            font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', monospace;
+            font-size: 0.9em;
+        }
+
+        .news-content-text pre {
+            background: #f8f9fa;
+            border: 1px solid var(--news-border);
+            border-radius: 8px;
+            padding: 20px;
+            overflow-x: auto;
+            margin: 20px 0;
+            font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', monospace;
+        }
+
+        .news-content-text pre code {
+            background: none;
+            color: inherit;
+            padding: 0;
+            border-radius: 0;
+        }
+
+        .news-content-text ul,
+        .news-content-text ol {
+            padding-left: 32px;
+            margin-bottom: 20px;
+        }
+
+        .news-content-text li {
+            margin-bottom: 8px;
+        }
+
+        .news-content-text strong {
+            color: var(--news-dark);
+            font-weight: 700;
+        }
+
+        .news-content-text em {
+            color: var(--news-gray);
+            font-style: italic;
+        }
+
+        .news-content-text a {
+            color: var(--news-primary);
+            text-decoration: none;
+            border-bottom: 1px solid transparent;
+            transition: border-color 0.3s ease;
+        }
+
+        .news-content-text a:hover {
+            border-bottom-color: var(--news-primary);
+        }
+
+        /* 返回按钮 */
+        .back-to-list {
+            text-align: center;
+            margin-top: 40px;
+        }
+
+        .back-btn {
+            background: white;
+            color: var(--news-gray);
+            border: 2px solid var(--news-border);
+            padding: 12px 24px;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .back-btn:hover {
+            background: var(--news-primary);
+            color: white;
+            border-color: var(--news-primary);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(26, 115, 232, 0.3);
+        }
+
+        /* 分享按钮 */
+        .share-section {
+            background: white;
+            padding: 24px;
+            border-radius: 12px;
+            box-shadow: var(--news-shadow);
+            margin-bottom: 24px;
+            text-align: center;
+        }
+
+        .share-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--news-dark);
+            margin-bottom: 16px;
+        }
+
+        .share-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .copy-link-btn {
+            padding: 12px 24px;
+            border: 2px solid var(--news-primary);
+            border-radius: 25px;
+            background: transparent;
+            color: var(--news-primary);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.95rem;
+        }
+
+        .copy-link-btn:hover {
+            background: var(--news-primary);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(26, 115, 232, 0.3);
+        }
+
+        .copy-link-btn:active {
+            transform: translateY(0);
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .news-detail-container {
+                padding: 16px;
+            }
+
+            .news-header {
+                padding: 24px;
+            }
+
+            .news-title {
+                font-size: 2rem;
+            }
+
+            .news-meta {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .news-content {
+                padding: 24px;
+            }
+
+            .news-content-text {
+                font-size: 1rem;
+            }
+
+            .share-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div th:replace="fragments/header :: siteHeader('news')" />
+    
+    <div class="news-detail-container">
+        <!-- 面包屑导航 -->
+        <nav class="breadcrumb">
+            <a href="/"><i class="fas fa-home"></i> 首页</a>
+            <span class="breadcrumb-separator">></span>
+            <a href="/news">科技新闻</a>
+            <span class="breadcrumb-separator">></span>
+            <span th:text="${news.title}">新闻详情</span>
+        </nav>
+
+        <!-- 新闻头部 -->
+        <article class="news-header">
+            <div class="news-category-badge">
+                <i class="fas fa-microchip"></i> 科技资讯
+            </div>
+            
+            <h1 class="news-title" th:text="${news.title}"></h1>
+            
+            <div class="news-meta">
+                <div class="news-meta-info">
+                    <div class="meta-item">
+                        <i class="fas fa-calendar-alt"></i>
+                        <span th:text="${#temporals.format(news.publishTime, 'yyyy年MM月dd日')}"></span>
+                    </div>
+                    <div class="meta-item">
+                        <i class="fas fa-clock"></i>
+                        <span th:text="${#temporals.format(news.publishTime, 'HH:mm')}"></span>
+                    </div>
+                    <div class="meta-item">
+                        <i class="fas fa-eye"></i>
+                        <span th:text="'阅读量 ' + ${news.viewCount}">阅读量 0</span>
+                    </div>
+                </div>
+                
+                <div class="news-actions" sec:authorize="hasRole('ADMIN')">
+                    <a th:href="@{/news/{id}/edit(id=${news.id})}" class="action-btn edit">
+                        <i class="fas fa-edit"></i> 编辑
+                    </a>
+                    <form th:action="@{/news/{id}/delete(id=${news.id})}" method="post" style="display: inline;" 
+                          onsubmit="return confirm('确定要删除这条新闻吗？')">
+                        <button type="submit" class="action-btn delete">
+                            <i class="fas fa-trash"></i> 删除
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </article>
+
+        <!-- 新闻图片 -->
+        <div th:if="${news.imageUrl != null and !news.imageUrl.isEmpty()}" class="news-image-container">
+            <img th:src="${news.imageUrl}" th:alt="${news.title}" class="news-image">
+        </div>
+
+        <!-- 新闻内容 -->
+        <article class="news-content">
+            <!-- 使用简单的th:text避免解析问题 -->
+            <div class="news-content-text" th:text="${news.content ?: ''}"></div>
+        </article>
+
+        <!-- 分享区域 -->
+        <div class="share-section">
+            <h3 class="share-title">分享这篇文章</h3>
+            <div class="share-buttons">
+                <button class="copy-link-btn" onclick="copyCurrentLink()">
+                    <i class="fas fa-link"></i> 复制链接
+                </button>
+            </div>
+        </div>
+
+        <!-- 返回按钮 -->
+        <div class="back-to-list">
+            <a href="/news" class="back-btn">
+                <i class="fas fa-arrow-left"></i> 返回新闻列表
+            </a>
+        </div>
+    </div>
+
+    
+    
+    <script th:inline="none">
+        // 简单的 Markdown 渲染
+        document.addEventListener('DOMContentLoaded', function() {
+            const content = document.querySelector('.news-content-text');
+            if (content) {
+                let html = content.innerHTML;
+                
+                // 处理标题
+                html = html.replace(/^### (.*$)/gim, '<h3>$1</h3>');
+                html = html.replace(/^## (.*$)/gim, '<h2>$1</h2>');
+                html = html.replace(/^# (.*$)/gim, '<h1>$1</h1>');
+                
+                // 处理粗体和斜体
+                html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+                html = html.replace(/\*(.*?)\*/g, '<em>$1</em>');
+                
+                // 处理代码
+                html = html.replace(/```([\s\S]*?)```/g, '<pre><code>$1</code></pre>');
+                html = html.replace(/`(.*?)`/g, '<code>$1</code>');
+                
+                // 处理链接
+                html = html.replace(/\[([^\]]+)\]\(([^\)]+)\)/g, '<a href="$2" target="_blank">$1</a>');
+                
+                // 处理引用
+                html = html.replace(/^> (.*$)/gim, '<blockquote>$1</blockquote>');
+                
+                // 处理段落
+                html = html.replace(/\n\n/g, '</p><p>');
+                if (!html.startsWith('<')) {
+                    html = '<p>' + html + '</p>';
+                }
+                
+                // 处理换行
+                html = html.replace(/\n/g, '<br>');
+                
+                content.innerHTML = html;
+            }
+        });
+
+        // 复制链接功能
+        function copyCurrentLink() {
+            const url = window.location.href;
+            
+            // 使用现代浏览器的 Clipboard API
+            if (navigator.clipboard && window.isSecureContext) {
+                navigator.clipboard.writeText(url).then(() => {
+                    showCopySuccess();
+                }).catch(err => {
+                    fallbackCopyTextToClipboard(url);
+                });
+            } else {
+                // 降级方案
+                fallbackCopyTextToClipboard(url);
+            }
+        }
+        
+        function fallbackCopyTextToClipboard(text) {
+            const textArea = document.createElement('textarea');
+            textArea.value = text;
+            textArea.style.position = 'fixed';
+            textArea.style.left = '-999999px';
+            textArea.style.top = '-999999px';
+            document.body.appendChild(textArea);
+            textArea.focus();
+            textArea.select();
+            
+            try {
+                document.execCommand('copy');
+                showCopySuccess();
+            } catch (err) {
+                alert('复制失败，请手动复制链接：' + text);
+            }
+            
+            document.body.removeChild(textArea);
+        }
+        
+        function showCopySuccess() {
+            const btn = document.querySelector('.copy-link-btn');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-check"></i> 已复制';
+            btn.style.background = 'var(--news-secondary)';
+            btn.style.borderColor = 'var(--news-secondary)';
+            btn.style.color = 'white';
+            
+            setTimeout(() => {
+                btn.innerHTML = originalText;
+                btn.style.background = 'transparent';
+                btn.style.borderColor = 'var(--news-primary)';
+                btn.style.color = 'var(--news-primary)';
+            }, 2000);
+        }
+    </script>
+</body>
+</html>

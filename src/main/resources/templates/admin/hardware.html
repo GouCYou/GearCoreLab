@@ -1,0 +1,1653 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>硬件配置管理 | GearCoreLab Admin</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #ffffff;
+            min-height: 100vh;
+        }
+
+        .admin-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* 侧边栏样式 */
+        .sidebar {
+            width: 280px;
+            background: #ffffff;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+            padding: 0;
+            overflow-y: auto;
+        }
+
+        .sidebar-header {
+            padding: 30px 25px;
+            border-bottom: 1px solid #e9ecef;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .logo {
+            width: 60px;
+            height: 60px;
+            margin-bottom: 15px;
+            border-radius: 12px;
+        }
+
+        .sidebar-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 8px;
+        }
+
+        .sidebar-subtitle {
+            color: #6c757d;
+            font-size: 14px;
+        }
+
+        .sidebar-nav {
+            padding: 20px 0;
+        }
+
+        .nav-item {
+            margin: 0;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 15px 25px;
+            color: #495057;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border-left: 4px solid transparent;
+        }
+
+        .nav-link:hover {
+            background: #f8f9fa;
+            color: #1890ff;
+            border-left-color: #1890ff;
+        }
+
+        .nav-link.active {
+            background: rgba(24, 144, 255, 0.1);
+            color: #1890ff;
+            border-left-color: #1890ff;
+            font-weight: 600;
+        }
+
+        .nav-icon {
+            width: 20px;
+            margin-right: 12px;
+            text-align: center;
+        }
+
+        /* 主内容区 */
+        .main-content {
+            flex: 1;
+            padding: 30px;
+            overflow-y: auto;
+        }
+
+        .content-header {
+            background: #ffffff;
+            border-radius: 8px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .page-title {
+            font-size: 32px;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 8px;
+        }
+
+        .page-subtitle {
+            color: #6c757d;
+            font-size: 16px;
+        }
+
+        /* 硬件类型选项卡 */
+        .hardware-tabs {
+            background: #ffffff;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .tabs-container {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 4px;
+            background: #f8f9fa;
+            color: #6c757d;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .tab-btn.active {
+            background: #1890ff;
+            color: white;
+        }
+
+        .tab-btn:hover:not(.active) {
+            background: #e9ecef;
+            color: #495057;
+        }
+
+        /* 硬件管理区域 */
+        .hardware-management {
+            background: #ffffff;
+            border-radius: 8px;
+            padding: 30px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .management-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .management-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            background: #1890ff;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #40a9ff;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #218838;
+        }
+
+        /* 搜索和筛选 */
+        .search-filter {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .search-input {
+            padding: 10px 15px;
+            border: 2px solid #e9ecef;
+            border-radius: 4px;
+            font-size: 14px;
+            width: 250px;
+            transition: border-color 0.3s ease;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #1890ff;
+        }
+
+        .filter-select {
+            padding: 10px 15px;
+            border: 2px solid #e9ecef;
+            border-radius: 4px;
+            font-size: 14px;
+            background: white;
+            cursor: pointer;
+        }
+
+        /* 硬件表格 */
+        .hardware-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        .hardware-table th,
+        .hardware-table td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .hardware-table th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #495057;
+            position: sticky;
+            top: 0;
+        }
+
+        .hardware-table tr:hover {
+            background: #f8f9fa;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn-sm {
+            padding: 6px 12px;
+            font-size: 12px;
+        }
+
+        .btn-edit {
+            background: #ffc107;
+            color: #212529;
+        }
+
+        .btn-edit:hover {
+            background: #e0a800;
+        }
+
+        .btn-delete {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-delete:hover {
+            background: #c82333;
+        }
+
+        /* 模态框 */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(5px);
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 0;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 600px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            animation: modalSlideIn 0.3s ease;
+        }
+
+        @keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .modal-header {
+            padding: 25px 30px;
+            border-bottom: 1px solid #e9ecef;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #2c3e50;
+            margin: 0;
+        }
+
+        .close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #6c757d;
+            padding: 0;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+
+        .close:hover {
+            background: #f8f9fa;
+            color: #495057;
+        }
+
+        .modal-body {
+            padding: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #495057;
+        }
+
+        .form-input,
+        .form-select,
+        .form-textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e9ecef;
+            border-radius: 4px;
+            font-size: 14px;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-input:focus,
+        .form-select:focus,
+        .form-textarea:focus {
+            outline: none;
+            border-color: #1890ff;
+        }
+
+        .form-textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .modal-footer {
+            padding: 20px 30px;
+            border-top: 1px solid #e9ecef;
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        /* 空状态 */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #6c757d;
+        }
+
+        .empty-icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+            color: #dee2e6;
+        }
+
+        .empty-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .empty-text {
+            font-size: 14px;
+            margin-bottom: 20px;
+        }
+
+        /* 加载状态 */
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #6c757d;
+        }
+
+        .loading-spinner {
+            font-size: 32px;
+            animation: spin 1s linear infinite;
+            margin-bottom: 15px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .back-btn {
+            position: fixed;
+            top: 30px;
+            right: 30px;
+            background: #1890ff;
+            border: none;
+            border-radius: 4px;
+            padding: 12px 20px;
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+        }
+
+        .back-btn:hover {
+            background: #40a9ff;
+            color: white;
+            text-decoration: none;
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .admin-container {
+                flex-direction: column;
+            }
+            
+            .sidebar {
+                width: 100%;
+                height: auto;
+            }
+            
+            .main-content {
+                padding: 20px;
+            }
+            
+            .tabs-container {
+                justify-content: center;
+            }
+            
+            .management-header {
+                flex-direction: column;
+                gap: 15px;
+                align-items: stretch;
+            }
+            
+            .header-actions {
+                justify-content: center;
+            }
+            
+            .search-filter {
+                flex-direction: column;
+            }
+            
+            .search-input {
+                width: 100%;
+            }
+            
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .hardware-table {
+                font-size: 12px;
+            }
+            
+            .hardware-table th,
+            .hardware-table td {
+                padding: 8px;
+            }
+        }
+        
+        /* 分页样式 */
+        .pagination-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 20px;
+            padding: 20px 0;
+            border-top: 1px solid #e9ecef;
+        }
+        
+        .pagination {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .pagination button {
+            padding: 8px 16px;
+            border: 1px solid #ddd;
+            background: white;
+            color: #333;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .pagination button:hover:not(:disabled) {
+            background: #1890ff;
+            color: white;
+        }
+        
+        .pagination button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .page-number {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            background: white;
+            color: #333;
+            text-decoration: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 0 2px;
+        }
+        
+        .page-number.active {
+            background: #1890ff;
+            color: white;
+            border-color: #1890ff;
+        }
+        
+        .page-number:hover:not(.active) {
+            background: #f0f0f0;
+        }
+        
+        .pagination-info {
+            color: #666;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-container">
+        <!-- 侧边栏 -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <img src="/img/logo.png" alt="GearCoreLab" class="logo">
+                <h1 class="sidebar-title">管理后台</h1>
+                <p class="sidebar-subtitle">GearCoreLab Admin</p>
+            </div>
+            <nav class="sidebar-nav">
+                <div class="nav-item">
+                    <a href="/admin" class="nav-link">
+                        <i class="fas fa-tachometer-alt nav-icon"></i>
+                        仪表盘
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="/admin/users" class="nav-link">
+                        <i class="fas fa-users nav-icon"></i>
+                        用户管理
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="/admin/posts" class="nav-link">
+                        <i class="fas fa-comments nav-icon"></i>
+                        帖子管理
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="/admin/news" class="nav-link">
+                        <i class="fas fa-newspaper nav-icon"></i>
+                        新闻管理
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="/admin/hardware" class="nav-link active">
+                        <i class="fas fa-microchip nav-icon"></i>
+                        配件管理
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="/admin/notifications" class="nav-link">
+                        <i class="fas fa-bell nav-icon"></i>
+                        通知管理
+                    </a>
+                </div>
+
+            </nav>
+        </div>
+
+        <!-- 主内容区 -->
+        <div class="main-content">
+            <!-- 页面标题 -->
+            <div class="content-header">
+                <h1 class="page-title">硬件配置管理</h1>
+                <p class="page-subtitle">管理系统中的硬件组件信息，包括CPU、主板、内存、显卡等各类配件</p>
+            </div>
+
+            <!-- 硬件类型选项卡 -->
+            <div class="hardware-tabs">
+                <div class="tabs-container">
+                    <button class="tab-btn active" data-type="cpu">
+                        <i class="fas fa-microchip"></i>
+                        处理器 (CPU)
+                    </button>
+                    <button class="tab-btn" data-type="motherboard">
+                        <i class="fas fa-memory"></i>
+                        主板
+                    </button>
+                    <button class="tab-btn" data-type="ram">
+                        <i class="fas fa-memory"></i>
+                        内存 (RAM)
+                    </button>
+                    <button class="tab-btn" data-type="gpu">
+                        <i class="fas fa-tv"></i>
+                        显卡 (GPU)
+                    </button>
+                    <button class="tab-btn" data-type="storage">
+                        <i class="fas fa-hdd"></i>
+                        存储设备
+                    </button>
+                    <button class="tab-btn" data-type="psu">
+                        <i class="fas fa-plug"></i>
+                        电源 (PSU)
+                    </button>
+                    <button class="tab-btn" data-type="case">
+                        <i class="fas fa-cube"></i>
+                        机箱
+                    </button>
+                </div>
+            </div>
+
+            <!-- 硬件管理区域 -->
+            <div class="hardware-management">
+                <div class="management-header">
+                    <h2 class="management-title" id="currentTypeTitle">处理器 (CPU) 管理</h2>
+                    <div class="header-actions">
+                        <button class="btn btn-success" onclick="exportData()">
+                            <i class="fas fa-download"></i>
+                            导出数据
+                        </button>
+                        <button class="btn btn-primary" onclick="openAddModal()">
+                            <i class="fas fa-plus"></i>
+                            添加配件
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 搜索和筛选 -->
+                <div class="search-filter">
+                    <input type="text" class="search-input" id="searchInput" placeholder="搜索配件名称、品牌...">
+                    <select class="filter-select" id="brandFilter">
+                        <option value="">所有品牌</option>
+                    </select>
+                    <select class="filter-select" id="priceFilter">
+                        <option value="">价格范围</option>
+                        <option value="0-500">¥0 - ¥500</option>
+                        <option value="500-1000">¥500 - ¥1000</option>
+                        <option value="1000-2000">¥1000 - ¥2000</option>
+                        <option value="2000-5000">¥2000 - ¥5000</option>
+                        <option value="5000+">¥5000+</option>
+                    </select>
+                </div>
+
+                <!-- 硬件列表 -->
+                <div id="hardwareTableContainer">
+                    <div class="loading">
+                        <div class="loading-spinner">
+                            <i class="fas fa-spinner"></i>
+                        </div>
+                        <p>加载中...</p>
+                    </div>
+                </div>
+                
+                <!-- 分页 -->
+                <div class="pagination-container">
+                    <div class="pagination-info">
+                        <span id="paginationInfo">显示 1-10 条，共 0 条记录</span>
+                    </div>
+                    <div class="pagination">
+                        <button id="prevBtn" onclick="changePage(currentPage - 1)" disabled>上一页</button>
+                        <button id="nextBtn" onclick="changePage(currentPage + 1)" disabled>下一页</button>
+                        <span id="pageNumbers"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 添加/编辑硬件模态框 -->
+    <div id="hardwareModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" id="modalTitle">添加硬件配件</h3>
+                <button class="close" onclick="closeModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form id="hardwareForm">
+                <div class="modal-body">
+                    <div id="formFields">
+                        <!-- 动态生成的表单字段 -->
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal()">取消</button>
+                    <button type="submit" class="btn btn-primary">保存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // 当前选中的硬件类型
+        let currentHardwareType = 'cpu';
+        let editingHardwareId = null;
+        let allHardwareData = [];
+        let filteredData = [];
+        
+        // 分页相关变量
+        let currentPage = 1;
+        let pageSize = 10;
+
+        // 硬件类型配置
+        const hardwareConfigs = {
+            cpu: {
+                title: '处理器 (CPU)',
+                fields: [
+                    { name: 'name', label: '产品名称', type: 'text', required: true },
+                    { name: 'brand', label: '品牌', type: 'select', required: true, options: ['Intel', 'AMD'] },
+                    { name: 'generation', label: '代数', type: 'text', required: true },
+                    { name: 'socket', label: '接口类型', type: 'select', required: true, options: ['LGA1700', 'LGA1200', 'AM4', 'AM5'] },
+                    { name: 'cores', label: '核心数', type: 'number', required: true },
+                    { name: 'threads', label: '线程数', type: 'number', required: true },
+                    { name: 'baseFreq', label: '基础频率(GHz)', type: 'number', step: '0.1' },
+                    { name: 'boostFreq', label: '加速频率(GHz)', type: 'number', step: '0.1' },
+                    { name: 'price', label: '价格(元)', type: 'number', required: true },
+                    { name: 'imageUrl', label: '图片链接', type: 'url' }
+                ],
+                columns: ['名称', '品牌', '代数', '接口', '核心/线程', '频率', '价格', '操作']
+            },
+            motherboard: {
+                title: '主板',
+                fields: [
+                    { name: 'name', label: '产品名称', type: 'text', required: true },
+                    { name: 'brand', label: '品牌', type: 'select', required: true, options: ['华硕', '微星', '技嘉', '华擎'] },
+                    { name: 'chipset', label: '芯片组', type: 'select', required: true, options: ['Z790', 'B760', 'H610', 'X670E', 'B650'] },
+                    { name: 'socket', label: '接口类型', type: 'select', required: true, options: ['LGA1700', 'LGA1200', 'AM4', 'AM5'] },
+                    { name: 'formFactor', label: '板型', type: 'select', required: true, options: ['ATX', 'Micro-ATX', 'Mini-ITX'] },
+                    { name: 'memoryType', label: '内存类型', type: 'select', required: true, options: ['DDR4', 'DDR5'] },
+                    { name: 'memorySlots', label: '内存插槽数', type: 'number', required: true },
+                    { name: 'maxMemory', label: '最大内存(GB)', type: 'number' },
+                    { name: 'price', label: '价格(元)', type: 'number', required: true },
+                    { name: 'imageUrl', label: '图片链接', type: 'url' }
+                ],
+                columns: ['名称', '品牌', '芯片组', '接口', '板型', '内存类型', '价格', '操作']
+            },
+            ram: {
+                title: '内存 (RAM)',
+                fields: [
+                    { name: 'name', label: '产品名称', type: 'text', required: true },
+                    { name: 'brand', label: '品牌', type: 'select', required: true, options: ['金士顿', '海盗船', '芝奇', '十铨', '威刚'] },
+                    { name: 'type', label: '内存类型', type: 'select', required: true, options: ['DDR4', 'DDR5'] },
+                    { name: 'capacity', label: '容量(GB)', type: 'number', required: true },
+                    { name: 'speed', label: '频率(MHz)', type: 'number', required: true },
+                    { name: 'timing', label: '时序', type: 'text' },
+                    { name: 'voltage', label: '电压(V)', type: 'number', step: '0.1' },
+                    { name: 'price', label: '价格(元)', type: 'number', required: true },
+                    { name: 'imageUrl', label: '图片链接', type: 'url' }
+                ],
+                columns: ['名称', '品牌', '类型', '容量', '频率', '时序', '价格', '操作']
+            },
+            gpu: {
+                title: '显卡 (GPU)',
+                fields: [
+                    { name: 'name', label: '产品名称', type: 'text', required: true },
+                    { name: 'brand', label: '品牌', type: 'select', required: true, options: ['NVIDIA', 'AMD'] },
+                    { name: 'series', label: '系列', type: 'text', required: true },
+                    { name: 'memory', label: '显存(GB)', type: 'number', required: true },
+                    { name: 'memoryType', label: '显存类型', type: 'select', options: ['GDDR6', 'GDDR6X', 'GDDR5'] },
+                    { name: 'coreClock', label: '核心频率(MHz)', type: 'number' },
+                    { name: 'boostClock', label: '加速频率(MHz)', type: 'number' },
+                    { name: 'powerConsumption', label: '功耗(W)', type: 'number' },
+                    { name: 'price', label: '价格(元)', type: 'number', required: true },
+                    { name: 'imageUrl', label: '图片链接', type: 'url' }
+                ],
+                columns: ['名称', '品牌', '系列', '显存', '频率', '功耗', '价格', '操作']
+            },
+            storage: {
+                title: '存储设备',
+                fields: [
+                    { name: 'name', label: '产品名称', type: 'text', required: true },
+                    { name: 'brand', label: '品牌', type: 'select', required: true, options: ['三星', '西数', '希捷', '金士顿', '英特尔'] },
+                    { name: 'type', label: '存储类型', type: 'select', required: true, options: ['SSD', 'HDD', 'M.2 NVMe'] },
+                    { name: 'capacity', label: '容量(GB)', type: 'number', required: true },
+                    { name: 'interface', label: '接口类型', type: 'select', required: true, options: ['SATA III', 'M.2', 'PCIe 3.0', 'PCIe 4.0'] },
+                    { name: 'readSpeed', label: '读取速度(MB/s)', type: 'number' },
+                    { name: 'writeSpeed', label: '写入速度(MB/s)', type: 'number' },
+                    { name: 'price', label: '价格(元)', type: 'number', required: true },
+                    { name: 'imageUrl', label: '图片链接', type: 'url' }
+                ],
+                columns: ['名称', '品牌', '类型', '容量', '接口', '读写速度', '价格', '操作']
+            },
+            psu: {
+                title: '电源 (PSU)',
+                fields: [
+                    { name: 'name', label: '产品名称', type: 'text', required: true },
+                    { name: 'brand', label: '品牌', type: 'select', required: true, options: ['海盗船', '酷冷至尊', '安钛克', '振华', '全汉'] },
+                    { name: 'wattage', label: '额定功率(W)', type: 'number', required: true },
+                    { name: 'efficiency', label: '80Plus认证', type: 'select', options: ['80Plus', '80Plus Bronze', '80Plus Silver', '80Plus Gold', '80Plus Platinum', '80Plus Titanium'] },
+                    { name: 'modular', label: '模组化', type: 'select', required: true, options: ['全模组', '半模组', '非模组'] },
+                    { name: 'formFactor', label: '规格', type: 'select', required: true, options: ['ATX', 'SFX', 'SFX-L'] },
+                    { name: 'price', label: '价格(元)', type: 'number', required: true },
+                    { name: 'imageUrl', label: '图片链接', type: 'url' }
+                ],
+                columns: ['名称', '品牌', '功率', '认证', '模组化', '规格', '价格', '操作']
+            },
+            case: {
+                title: '机箱',
+                fields: [
+                    { name: 'name', label: '产品名称', type: 'text', required: true },
+                    { name: 'brand', label: '品牌', type: 'select', required: true, options: ['酷冷至尊', '追风者', '海盗船', '联力', '银欣'] },
+                    { name: 'formFactor', label: '板型支持', type: 'select', required: true, options: ['ATX', 'Micro-ATX', 'Mini-ITX', 'E-ATX'] },
+                    { name: 'maxGpuLength', label: '最大显卡长度(mm)', type: 'number' },
+                    { name: 'maxCpuCoolerHeight', label: '最大CPU散热器高度(mm)', type: 'number' },
+                    { name: 'driveBays', label: '硬盘位（如2x 3.5\", 2x 2.5\"）', type: 'text' },
+                    { name: 'fansIncluded', label: '预装风扇（如2x 120mm）', type: 'text' },
+                    { name: 'fanSlots', label: '风扇位数量', type: 'number' },
+                    { name: 'sidePanel', label: '侧板类型', type: 'select', options: ['钢化玻璃', '亚克力', '金属'] },
+                    { name: 'price', label: '价格(元)', type: 'number', required: true },
+                    { name: 'imageUrl', label: '图片链接', type: 'url' }
+                ],
+                columns: ['名称', '品牌', '板型支持', '显卡长度', '散热器高度', '硬盘位', '预装风扇', '侧板', '价格', '操作']
+            }
+        };
+
+        // 页面初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            initializePage();
+            loadHardwareData();
+            setupEventListeners();
+        });
+
+        // 初始化页面
+        function initializePage() {
+            updateCurrentTypeTitle();
+            setupTabSwitching();
+        }
+
+        // 设置事件监听器
+        function setupEventListeners() {
+            // 搜索输入
+            document.getElementById('searchInput').addEventListener('input', filterHardware);
+            
+            // 筛选器
+            document.getElementById('brandFilter').addEventListener('change', filterHardware);
+            document.getElementById('priceFilter').addEventListener('change', filterHardware);
+            
+            // 表单提交
+            document.getElementById('hardwareForm').addEventListener('submit', handleFormSubmit);
+            
+            // 模态框外部点击关闭
+            document.getElementById('hardwareModal').addEventListener('click', function(e) {
+                if (e.target === this) {
+                    closeModal();
+                }
+            });
+        }
+
+        // 设置选项卡切换
+        function setupTabSwitching() {
+            const tabButtons = document.querySelectorAll('.tab-btn');
+            tabButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const type = this.dataset.type;
+                    switchHardwareType(type);
+                });
+            });
+        }
+
+        // 切换硬件类型
+        function switchHardwareType(type) {
+            currentHardwareType = type;
+            
+            // 更新选项卡状态
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.querySelector(`[data-type="${type}"]`).classList.add('active');
+            
+            // 更新标题
+            updateCurrentTypeTitle();
+            
+            // 重新加载数据
+            loadHardwareData();
+        }
+
+        // 更新当前类型标题
+        function updateCurrentTypeTitle() {
+            const config = hardwareConfigs[currentHardwareType];
+            document.getElementById('currentTypeTitle').textContent = config.title + ' 管理';
+        }
+
+        // 加载硬件数据
+        function loadHardwareData() {
+            showLoading();
+            
+            fetch(`/admin/api/hardware?type=${currentHardwareType}`)
+                .then(response => response.json())
+                .then(data => {
+                    allHardwareData = Array.isArray(data) ? data : [];
+                    filteredData = [...allHardwareData];
+                    updateBrandFilter();
+                    renderHardwareTable();
+                })
+                .catch(error => {
+                    console.error('加载硬件数据失败:', error);
+                    showError('网络错误，请检查连接');
+                });
+        }
+
+        // 显示加载状态
+        function showLoading() {
+            document.getElementById('hardwareTableContainer').innerHTML = `
+                <div class="loading">
+                    <div class="loading-spinner">
+                        <i class="fas fa-spinner"></i>
+                    </div>
+                    <p>加载中...</p>
+                </div>
+            `;
+        }
+
+        // 显示错误信息
+        function showError(message) {
+            document.getElementById('hardwareTableContainer').innerHTML = `
+                <div class="empty-state">
+                    <div class="empty-icon">
+                        <i class="fas fa-exclamation-triangle"></i>
+                    </div>
+                    <div class="empty-title">加载失败</div>
+                    <div class="empty-text">${message}</div>
+                    <button class="btn btn-primary" onclick="loadHardwareData()">重试</button>
+                </div>
+            `;
+        }
+
+        // 更新品牌筛选器
+        function updateBrandFilter() {
+            const brands = [...new Set(allHardwareData.map(item => item.brand).filter(Boolean))];
+            const brandFilter = document.getElementById('brandFilter');
+            
+            brandFilter.innerHTML = '<option value="">所有品牌</option>';
+            brands.forEach(brand => {
+                brandFilter.innerHTML += `<option value="${brand}">${brand}</option>`;
+            });
+        }
+
+        // 筛选硬件
+        function filterHardware() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const brandFilter = document.getElementById('brandFilter').value;
+            const priceFilter = document.getElementById('priceFilter').value;
+            
+            filteredData = allHardwareData.filter(item => {
+                // 搜索筛选
+                const matchesSearch = !searchTerm || 
+                    item.name?.toLowerCase().includes(searchTerm) ||
+                    item.brand?.toLowerCase().includes(searchTerm);
+                
+                // 品牌筛选
+                const matchesBrand = !brandFilter || item.brand === brandFilter;
+                
+                // 价格筛选
+                let matchesPrice = true;
+                if (priceFilter) {
+                    const price = item.price || 0;
+                    switch(priceFilter) {
+                        case '0-500':
+                            matchesPrice = price <= 500;
+                            break;
+                        case '500-1000':
+                            matchesPrice = price > 500 && price <= 1000;
+                            break;
+                        case '1000-2000':
+                            matchesPrice = price > 1000 && price <= 2000;
+                            break;
+                        case '2000-5000':
+                            matchesPrice = price > 2000 && price <= 5000;
+                            break;
+                        case '5000+':
+                            matchesPrice = price > 5000;
+                            break;
+                    }
+                }
+                
+                return matchesSearch && matchesBrand && matchesPrice;
+            });
+            
+            renderHardwareTable();
+        }
+
+        // 渲染硬件表格
+        function renderHardwareTable() {
+            const container = document.getElementById('hardwareTableContainer');
+            const config = hardwareConfigs[currentHardwareType];
+            
+            if (filteredData.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">
+                            <i class="fas fa-inbox"></i>
+                        </div>
+                        <div class="empty-title">暂无${config.title}数据</div>
+                        <div class="empty-text">点击"添加配件"开始添加</div>
+                        <button class="btn btn-primary" onclick="openAddModal()">添加配件</button>
+                    </div>
+                `;
+                // 清空分页信息
+                document.getElementById('paginationInfo').textContent = '显示 0-0 条，共 0 条记录';
+                document.getElementById('pageNumbers').innerHTML = '';
+                return;
+            }
+            
+            // 计算分页
+            const startIndex = (currentPage - 1) * pageSize;
+            const endIndex = Math.min(startIndex + pageSize, filteredData.length);
+            const pageData = filteredData.slice(startIndex, endIndex);
+            
+            let tableHTML = `
+                <table class="hardware-table">
+                    <thead>
+                        <tr>
+                            ${config.columns.map(col => `<th>${col}</th>`).join('')}
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+            
+            pageData.forEach(item => {
+                tableHTML += `<tr>${renderTableRow(item, config)}</tr>`;
+            });
+            
+            tableHTML += `
+                    </tbody>
+                </table>
+            `;
+            
+            container.innerHTML = tableHTML;
+            
+            // 更新分页信息
+            updatePagination();
+        }
+
+        // 渲染表格行
+        function renderTableRow(item, config) {
+            let rowHTML = '';
+            
+            switch(currentHardwareType) {
+                case 'cpu':
+                    rowHTML = `
+                        <td>${item.name || ''}</td>
+                        <td>${item.brand || ''}</td>
+                        <td>${item.generation || ''}</td>
+                        <td>${item.socket || ''}</td>
+                        <td>${item.cores || ''}/${item.threads || ''}</td>
+                        <td>${item.baseFreq || ''}${item.boostFreq ? ' - ' + item.boostFreq : ''} GHz</td>
+                        <td>¥${item.price || 0}</td>
+                    `;
+                    break;
+                case 'motherboard':
+                    rowHTML = `
+                        <td>${item.name || ''}</td>
+                        <td>${item.brand || ''}</td>
+                        <td>${item.chipset || ''}</td>
+                        <td>${item.socket || ''}</td>
+                        <td>${item.formFactor || ''}</td>
+                        <td>${item.memoryType || ''}</td>
+                        <td>¥${item.price || 0}</td>
+                    `;
+                    break;
+                case 'ram':
+                    rowHTML = `
+                        <td>${item.name || ''}</td>
+                        <td>${item.brand || ''}</td>
+                        <td>${item.type || ''}</td>
+                        <td>${item.capacity || ''}GB</td>
+                        <td>${item.speed || ''}MHz</td>
+                        <td>${item.timing || ''}</td>
+                        <td>¥${item.price || 0}</td>
+                    `;
+                    break;
+                case 'gpu':
+                    rowHTML = `
+                        <td>${item.name || ''}</td>
+                        <td>${item.brand || ''}</td>
+                        <td>${item.series || ''}</td>
+                        <td>${item.memory || ''}GB</td>
+                        <td>${item.coreClock || ''}${item.boostClock ? ' / ' + item.boostClock : ''} MHz</td>
+                        <td>${item.powerConsumption || ''}W</td>
+                        <td>¥${item.price || 0}</td>
+                    `;
+                    break;
+                case 'storage':
+                    rowHTML = `
+                        <td>${item.name || ''}</td>
+                        <td>${item.brand || ''}</td>
+                        <td>${item.type || ''}</td>
+                        <td>${item.capacity || ''}GB</td>
+                        <td>${item.interface || ''}</td>
+                        <td>${item.readSpeed || ''}${item.writeSpeed ? ' / ' + item.writeSpeed : ''} MB/s</td>
+                        <td>¥${item.price || 0}</td>
+                    `;
+                    break;
+                case 'psu':
+                    rowHTML = `
+                        <td>${item.name || ''}</td>
+                        <td>${item.brand || ''}</td>
+                        <td>${item.wattage || ''}W</td>
+                        <td>${item.efficiency || ''}</td>
+                        <td>${item.modular || ''}</td>
+                        <td>${item.formFactor || ''}</td>
+                        <td>¥${item.price || 0}</td>
+                    `;
+                    break;
+                case 'case':
+                    rowHTML = `
+                        <td>${item.name || ''}</td>
+                        <td>${item.brand || ''}</td>
+                        <td>${item.formFactor || ''}</td>
+                        <td>${item.maxGpuLength || ''}mm</td>
+                        <td>${item.maxCpuCoolerHeight || ''}mm</td>
+                        <td>${item.driveBays || ''}</td>
+                        <td>${item.fansIncluded || ''}</td>
+                        <td>${item.fanSlots || ''}</td>
+                        <td>${item.sidePanel || ''}</td>
+                        <td>¥${item.price || 0}</td>
+                    `;
+                    break;
+            }
+            
+            rowHTML += `
+                <td>
+                    <div class="action-buttons">
+                        <button class="btn btn-edit btn-sm" onclick="editHardware(${item.id})">
+                            <i class="fas fa-edit"></i> 编辑
+                        </button>
+                        <button class="btn btn-delete btn-sm" onclick="deleteHardware(${item.id})">
+                            <i class="fas fa-trash"></i> 删除
+                        </button>
+                    </div>
+                </td>
+            `;
+            
+            return rowHTML;
+        }
+
+        // 打开添加模态框
+        function openAddModal() {
+            editingHardwareId = null;
+            const config = hardwareConfigs[currentHardwareType];
+            document.getElementById('modalTitle').textContent = '添加' + config.title;
+            generateFormFields();
+            const modal = document.getElementById('hardwareModal');
+            modal.style.display = 'flex';
+            modal.style.justifyContent = 'center';
+            modal.style.alignItems = 'center';
+        }
+
+        // 自定义弹窗函数
+        function showCustomAlert(message, type = 'info', title = '', showCancel = false) {
+            return new Promise((resolve) => {
+                // 创建遮罩层
+                const overlay = document.createElement('div');
+                overlay.className = 'custom-alert-overlay';
+                overlay.style.cssText = `
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    right: 0;
+                    bottom: 0;
+                    background: rgba(0, 0, 0, 0.5);
+                    z-index: 10000;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    opacity: 0;
+                    transition: opacity 0.3s ease;
+                `;
+                
+                // 创建弹窗
+                const alert = document.createElement('div');
+                alert.className = 'custom-alert';
+                alert.style.cssText = `
+                    background: white;
+                    border-radius: 12px;
+                    padding: 0;
+                    max-width: 400px;
+                    width: 90%;
+                    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+                    transform: scale(0.8);
+                    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                    overflow: hidden;
+                `;
+                
+                // 设置图标
+                const icons = {
+                    success: 'fas fa-check',
+                    error: 'fas fa-times',
+                    warning: 'fas fa-exclamation-triangle',
+                    info: 'fas fa-info'
+                };
+                
+                const iconColors = {
+                    success: '#4CAF50',
+                    error: '#f44336',
+                    warning: '#ff9800',
+                    info: '#2196F3'
+                };
+                
+                // 设置标题
+                const titles = {
+                    success: title || '成功',
+                    error: title || '错误',
+                    warning: title || '警告',
+                    info: title || '提示'
+                };
+                
+                alert.innerHTML = `
+                    <div style="padding: 24px; display: flex; align-items: flex-start; gap: 16px;">
+                        <div style="width: 40px; height: 40px; border-radius: 50%; background: ${iconColors[type]}; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                            <i class="${icons[type]}" style="color: white; font-size: 18px;"></i>
+                        </div>
+                        <div style="flex: 1;">
+                            <div style="font-size: 18px; font-weight: 600; color: #333; margin-bottom: 8px;">${titles[type]}</div>
+                            <div style="color: #666; line-height: 1.5; white-space: pre-line;">${message}</div>
+                        </div>
+                    </div>
+                    <div style="padding: 16px 24px; background: #f8f9fa; display: flex; gap: 12px; justify-content: flex-end;">
+                        ${showCancel ? '<button class="custom-alert-btn secondary" style="padding: 8px 16px; border: 1px solid #ddd; background: white; color: #666; border-radius: 6px; cursor: pointer; font-size: 14px;" onclick="closeCustomAlert(false)">取消</button>' : ''}
+                        <button class="custom-alert-btn primary" style="padding: 8px 16px; border: none; background: #007bff; color: white; border-radius: 6px; cursor: pointer; font-size: 14px;" onclick="closeCustomAlert(true)">确定</button>
+                    </div>
+                `;
+                
+                // 添加到页面
+                overlay.appendChild(alert);
+                document.body.appendChild(overlay);
+                
+                // 显示动画
+                setTimeout(() => {
+                    overlay.style.opacity = '1';
+                    alert.style.transform = 'scale(1)';
+                }, 10);
+                
+                // 关闭函数
+                window.closeCustomAlert = function(result) {
+                    overlay.style.opacity = '0';
+                    alert.style.transform = 'scale(0.8)';
+                    
+                    setTimeout(() => {
+                        document.body.removeChild(overlay);
+                        delete window.closeCustomAlert;
+                        resolve(result);
+                    }, 300);
+                };
+                
+                // 点击遮罩层关闭
+                overlay.addEventListener('click', () => window.closeCustomAlert(false));
+            });
+        }
+
+        // 编辑硬件
+        async function editHardware(id) {
+            fetch(`/api/hardware/components/detail/${id}`)
+                .then(response => response.json())
+                .then(async data => {
+                    if (data.success) {
+                        editingHardwareId = id;
+                        const config = hardwareConfigs[currentHardwareType];
+                        document.getElementById('modalTitle').textContent = '编辑' + config.title;
+                        generateFormFields(data.data);
+                        const modal = document.getElementById('hardwareModal');
+                        modal.style.display = 'flex';
+                        modal.style.justifyContent = 'center';
+                        modal.style.alignItems = 'center';
+                    } else {
+                        await showCustomAlert('获取硬件信息失败: ' + data.message, 'error');
+                    }
+                })
+                .catch(async error => {
+                    console.error('获取硬件信息失败:', error);
+                    await showCustomAlert('网络错误，请重试', 'error');
+                });
+        }
+
+        // 删除硬件
+        async function deleteHardware(id) {
+            const confirmed = await showCustomAlert('确定要删除这个配件吗？', 'warning', '确认删除', true);
+            if (!confirmed) return;
+            
+            fetch(`/api/hardware/components/${id}`, {
+                method: 'DELETE'
+            })
+            .then(response => response.json())
+            .then(async data => {
+                if (data.success) {
+                    loadHardwareData();
+                    await showCustomAlert('删除成功', 'success');
+                } else {
+                    await showCustomAlert('删除失败: ' + data.message, 'error');
+                }
+            })
+            .catch(async error => {
+                console.error('删除硬件失败:', error);
+                await showCustomAlert('网络错误，请重试', 'error');
+            });
+        }
+
+        // 生成表单字段
+        function generateFormFields(data = null) {
+            const config = hardwareConfigs[currentHardwareType];
+            const formFields = document.getElementById('formFields');
+            
+            let fieldsHTML = '';
+            
+            config.fields.forEach((field, index) => {
+                const value = data ? (data[field.name] || '') : '';
+                let inputHTML = '';
+                
+                if (field.type === 'select') {
+                    inputHTML = `
+                        <select class="form-select" name="${field.name}" ${field.required ? 'required' : ''}>
+                            <option value="">请选择${field.label}</option>
+                            ${field.options.map(option => 
+                                `<option value="${option}" ${value == option ? 'selected' : ''}>${option}</option>`
+                            ).join('')}
+                        </select>
+                    `;
+                } else if (field.type === 'textarea') {
+                    inputHTML = `
+                        <textarea class="form-textarea" name="${field.name}" 
+                                  placeholder="请输入${field.label}" ${field.required ? 'required' : ''}>${value}</textarea>
+                    `;
+                } else {
+                    inputHTML = `
+                        <input type="${field.type}" class="form-input" name="${field.name}" 
+                               placeholder="请输入${field.label}" value="${value}" 
+                               ${field.required ? 'required' : ''}
+                               ${field.step ? 'step="' + field.step + '"' : ''}>
+                    `;
+                }
+                
+                const isEvenRow = Math.floor(index / 2) % 2 === 0;
+                const isFirstInRow = index % 2 === 0;
+                
+                if (isFirstInRow) {
+                    fieldsHTML += '<div class="form-row">';
+                }
+                
+                fieldsHTML += `
+                    <div class="form-group">
+                        <label class="form-label">${field.label}</label>
+                        ${inputHTML}
+                    </div>
+                `;
+                
+                if (!isFirstInRow || index === config.fields.length - 1) {
+                    fieldsHTML += '</div>';
+                }
+            });
+            
+            formFields.innerHTML = fieldsHTML;
+        }
+
+        // 处理表单提交
+        function handleFormSubmit(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(e.target);
+            const hardwareData = {};
+            
+            for (let [key, value] of formData.entries()) {
+                if (value.trim() === '') continue;
+                
+                // 转换数据类型
+                if (['cores', 'threads', 'price', 'speed', 'capacity', 'memory', 'powerConsumption', 'wattage', 
+                     'memorySlots', 'maxMemory', 'readSpeed', 'writeSpeed', 'maxGpuLength', 'maxCpuCoolerHeight', 
+                     'fanSlots', 'coreClock', 'boostClock'].includes(key)) {
+                    hardwareData[key] = parseInt(value);
+                } else if (['baseFreq', 'boostFreq', 'voltage'].includes(key)) {
+                    hardwareData[key] = parseFloat(value);
+                } else {
+                    hardwareData[key] = value;
+                }
+            }
+            
+            // 设置硬件类型和分类
+            hardwareData.type = currentHardwareType;
+            hardwareData.category = currentHardwareType;
+            
+            // 生成规格描述
+            hardwareData.specifications = generateSpecifications(hardwareData);
+            
+            // 提交到后端API
+            const url = editingHardwareId ? 
+                `/api/hardware/components/${editingHardwareId}` : 
+                '/api/hardware/components';
+            const method = editingHardwareId ? 'PUT' : 'POST';
+            
+            fetch(url, {
+                method: method,
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(hardwareData)
+            })
+            .then(response => response.json())
+            .then(async data => {
+                if (data.success) {
+                    closeModal();
+                    loadHardwareData();
+                    await showCustomAlert(editingHardwareId ? '更新成功' : '添加成功', 'success');
+                } else {
+                    await showCustomAlert('保存失败: ' + data.message, 'error');
+                }
+            })
+            .catch(async error => {
+                console.error('保存硬件失败:', error);
+                await showCustomAlert('网络错误，请重试', 'error');
+            });
+        }
+
+        // 生成规格描述
+        function generateSpecifications(data) {
+            switch(currentHardwareType) {
+                case 'cpu':
+                    return `${data.cores}核${data.threads}线程 ${data.baseFreq}GHz`;
+                case 'motherboard':
+                    return `${data.chipset} ${data.formFactor} ${data.memoryType}`;
+                case 'ram':
+                    return `${data.capacity}GB ${data.type}-${data.speed}`;
+                case 'gpu':
+                    return `${data.memory}GB ${data.memoryType || 'GDDR6'}`;
+                case 'storage':
+                    return `${data.capacity}GB ${data.type} ${data.interface}`;
+                case 'psu':
+                    return `${data.wattage}W ${data.efficiency || ''} ${data.modular || ''}`;
+                case 'case':
+                    // 机箱生成JSON字符串
+                    return JSON.stringify({
+                        form_factor: data.formFactor || '',
+                        max_gpu_length: data.maxGpuLength ? `${data.maxGpuLength}mm` : '',
+                        max_cpu_cooler: data.maxCpuCoolerHeight ? `${data.maxCpuCoolerHeight}mm` : '',
+                        drive_bays: data.driveBays || '',
+                        fans_included: data.fansIncluded || '',
+                        side_panel: data.sidePanel || ''
+                    });
+                default:
+                    return '';
+            }
+        }
+
+        // 关闭模态框
+        function closeModal() {
+            document.getElementById('hardwareModal').style.display = 'none';
+            document.getElementById('hardwareForm').reset();
+        }
+
+        // 初始化默认数据
+        async function initializeDefaultData() {
+            const confirmed = await showCustomAlert('确定要初始化默认数据吗？这将添加一些示例配件数据。', 'warning', '确认初始化', true);
+            if (!confirmed) return;
+            
+            fetch('/api/hardware/initialize', {
+                method: 'POST'
+            })
+            .then(response => response.json())
+            .then(async data => {
+                if (data.success) {
+                    await showCustomAlert('初始化成功！已添加默认配件数据。', 'success');
+                    loadHardwareData();
+                } else {
+                    await showCustomAlert('初始化失败: ' + data.message, 'error');
+                }
+            })
+            .catch(async error => {
+                console.error('初始化失败:', error);
+                await showCustomAlert('网络错误，请重试', 'error');
+            });
+        }
+
+        // 导出数据
+        function exportData() {
+            fetch(`/api/hardware/components/${currentHardwareType}`)
+                .then(response => response.json())
+                .then(async data => {
+                    if (data.success) {
+                        const jsonData = JSON.stringify(data.data, null, 2);
+                        const blob = new Blob([jsonData], { type: 'application/json' });
+                        const url = URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = `${currentHardwareType}_data.json`;
+                        document.body.appendChild(a);
+                        a.click();
+                        document.body.removeChild(a);
+                        URL.revokeObjectURL(url);
+                    } else {
+                        await showCustomAlert('导出失败: ' + data.message, 'error');
+                    }
+                })
+                .catch(async error => {
+                    console.error('导出失败:', error);
+                    await showCustomAlert('网络错误，请重试', 'error');
+                });
+        }
+        
+        // 更新分页
+        function updatePagination() {
+            const totalPages = Math.ceil(filteredData.length / pageSize);
+            const startIndex = (currentPage - 1) * pageSize + 1;
+            const endIndex = Math.min(currentPage * pageSize, filteredData.length);
+            
+            // 更新分页信息
+            document.getElementById('paginationInfo').textContent = 
+                `显示 ${startIndex}-${endIndex} 条，共 ${filteredData.length} 条记录`;
+            
+            // 更新分页按钮状态
+            document.getElementById('prevBtn').disabled = currentPage === 1;
+            document.getElementById('nextBtn').disabled = currentPage === totalPages || totalPages === 0;
+            
+            // 生成页码按钮
+            const pageNumbers = document.getElementById('pageNumbers');
+            pageNumbers.innerHTML = '';
+            
+            for (let i = 1; i <= totalPages; i++) {
+                if (i === 1 || i === totalPages || (i >= currentPage - 2 && i <= currentPage + 2)) {
+                    const pageBtn = document.createElement('span');
+                    pageBtn.className = `page-number ${i === currentPage ? 'active' : ''}`;
+                    pageBtn.textContent = i;
+                    pageBtn.onclick = () => changePage(i);
+                    pageNumbers.appendChild(pageBtn);
+                } else if (i === currentPage - 3 || i === currentPage + 3) {
+                    const ellipsis = document.createElement('span');
+                    ellipsis.textContent = '...';
+                    ellipsis.style.padding = '8px 4px';
+                    pageNumbers.appendChild(ellipsis);
+                }
+            }
+        }
+        
+        // 切换页面
+        function changePage(page) {
+            const totalPages = Math.ceil(filteredData.length / pageSize);
+            if (page < 1 || page > totalPages) return;
+            
+            currentPage = page;
+            renderHardwareTable();
+        }
+        
+        // 修改筛选函数，重置页面
+        const originalFilterHardware = filterHardware;
+        filterHardware = function() {
+            currentPage = 1; // 重置到第一页
+            originalFilterHardware();
+        };
+    </script>
+
+    <!-- 返回主站按钮 -->
+    <a href="/" class="back-btn">
+        <i class="fas fa-home"></i> 返回主站
+    </a>
+</body>
+</html>

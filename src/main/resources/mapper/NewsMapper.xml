@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.gcc.gearcorelab.mapper.NewsMapper">
+    
+    <!-- 结果映射 -->
+    <resultMap id="NewsResultMap" type="cn.gcc.gearcorelab.model.News">
+        <id property="id" column="id"/>
+        <result property="title" column="title"/>
+        <result property="content" column="content"/>
+        <result property="summary" column="summary"/>
+        <result property="category" column="category"/>
+        <result property="author" column="author"/>
+        <result property="imageUrl" column="image_url"/>
+        <result property="viewCount" column="view_count"/>
+        <result property="publishTime" column="publish_time"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="updatedAt" column="updated_at"/>
+        <result property="status" column="status"/>
+    </resultMap>
+    
+    <!-- 查询所有新闻，按发布时间倒序 -->
+    <select id="findAllOrderByPublishTime" resultMap="NewsResultMap">
+        SELECT id, title, content, summary, category, author, image_url, view_count, publish_time, created_at, updated_at, status
+        FROM news
+        WHERE status = 'published'
+        ORDER BY publish_time DESC
+    </select>
+    
+    <!-- 分页查询新闻，按发布时间倒序 -->
+    <select id="findAllOrderByPublishTimeWithPagination" resultMap="NewsResultMap">
+        SELECT id, title, content, summary, category, author, image_url, view_count, publish_time, created_at, updated_at, status
+        FROM news
+        WHERE status = 'published'
+        ORDER BY publish_time DESC
+        LIMIT #{offset}, #{limit}
+    </select>
+    
+    <!-- 统计新闻总数 -->
+    <select id="countAllNews" resultType="int">
+        SELECT COUNT(*) FROM news WHERE status = 'published'
+    </select>
+    
+    <!-- 插入新闻 -->
+    <insert id="insert" parameterType="cn.gcc.gearcorelab.model.News" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO news (title, content, summary, category, author, image_url, view_count, publish_time, created_at, updated_at, status)
+        VALUES (#{title}, #{content}, #{summary}, #{category}, #{author}, #{imageUrl}, #{viewCount}, #{publishTime}, #{createdAt}, #{updatedAt}, #{status})
+    </insert>
+    
+    <!-- 根据ID查询新闻 -->
+    <select id="findById" resultMap="NewsResultMap">
+        SELECT id, title, content, summary, category, author, image_url, view_count, publish_time, created_at, updated_at, status
+        FROM news
+        WHERE id = #{id}
+    </select>
+    
+    <!-- 更新新闻 -->
+    <update id="update" parameterType="cn.gcc.gearcorelab.model.News">
+        UPDATE news
+        SET title = #{title},
+            content = #{content},
+            summary = #{summary},
+            category = #{category},
+            author = #{author},
+            <if test="imageUrl != null">
+                image_url = #{imageUrl},
+            </if>
+            <if test="viewCount != null">
+                view_count = #{viewCount},
+            </if>
+            <if test="status != null">
+                status = #{status},
+            </if>
+            publish_time = #{publishTime},
+            updated_at = #{updatedAt}
+        WHERE id = #{id}
+    </update>
+    
+    <!-- 删除新闻 -->
+    <delete id="delete">
+        DELETE FROM news WHERE id = #{id}
+    </delete>
+    
+    <!-- 增加浏览次数 -->
+    <update id="incrementViewCount">
+        UPDATE news SET view_count = COALESCE(view_count, 0) + 1 WHERE id = #{id}
+    </update>
+
+    <!-- 搜索新闻 -->
+    <select id="searchNews" resultMap="NewsResultMap">
+        SELECT id, title, content, summary, category, author, image_url, view_count, publish_time, created_at, updated_at, status
+        FROM news
+        WHERE status = 'published'
+        AND (title LIKE CONCAT('%', #{query}, '%') OR content LIKE CONCAT('%', #{query}, '%') OR summary LIKE CONCAT('%', #{query}, '%'))
+        ORDER BY publish_time DESC
+    </select>
+
+</mapper>

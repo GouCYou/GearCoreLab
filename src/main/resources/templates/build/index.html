@@ -1,0 +1,1615 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>我的配置 | CCTStudio - GearCoreLab</title>
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="stylesheet" th:href="@{/css/main.css}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .main-build-page {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            /* 使用全站默认颜色，由全局 body 决定 */
+            /* 不在此处设定 color，避免覆盖 */
+            /* (删除 color 属性) */
+            min-height: 100vh;
+            overflow: hidden;
+            height: 100vh;
+        }
+        
+        .main-build-page * {
+            box-sizing: border-box;
+        }
+        
+        /* 导航栏样式隔离 */
+        /* 不对 .navbar 做任何覆盖，保持全局一致 */
+        
+        .build-container {
+            display: flex;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 15px;
+            gap: 15px;
+            height: calc(100vh - 130px); /* 调整固定高度 */
+            align-items: stretch; /* 确保子元素高度一致 */
+            align-content: stretch; /* 确保内容对齐 */
+        }
+        
+        .config-sidebar {
+            width: 300px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            height: calc(100vh - 130px); /* 强制固定高度 */
+            min-height: calc(100vh - 130px); /* 最小高度也设为固定值 */
+            max-height: calc(100vh - 130px); /* 最大高度也设为固定值 */
+            border: 1px solid rgba(0,0,0,0.05); /* 添加细边框确保对齐 */
+            box-sizing: border-box; /* 确保padding包含在高度内 */
+        }
+        
+        .sidebar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            flex-shrink: 0;
+        }
+        
+        .sidebar-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #2c3e50;
+        }
+        
+        .new-config-btn {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.85rem;
+            transition: all 0.3s ease;
+        }
+        
+        .new-config-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 3px 10px rgba(0, 123, 255, 0.4);
+        }
+        
+        .config-list {
+            flex: 1;
+            overflow-y: auto;
+            overflow-x: hidden;
+            margin-bottom: 15px;
+            scrollbar-width: thin;
+            scrollbar-color: rgba(102, 126, 234, 0.5) rgba(0, 0, 0, 0.05);
+        }
+        
+        .config-list::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        .config-list::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.05);
+            border-radius: 10px;
+        }
+        
+        .config-list::-webkit-scrollbar-thumb {
+            background-color: rgba(102, 126, 234, 0.5);
+            border-radius: 10px;
+        }
+        
+        .config-item {
+            background: linear-gradient(135deg, #ffffff 0%, #f8f9ff 100%);
+            border-radius: 12px;
+            padding: 14px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid rgba(102, 126, 234, 0.1);
+            position: relative;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.08);
+            overflow: hidden;
+        }
+        
+        .config-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+        
+        .config-item:hover {
+            transform: translateY(-4px) scale(1.02);
+            box-shadow: 0 12px 40px rgba(102, 126, 234, 0.15);
+            border-color: rgba(102, 126, 234, 0.3);
+        }
+        
+        .config-item:hover::before {
+            transform: scaleX(1);
+        }
+        
+        .config-item.active {
+            background: #007bff;
+            color: white;
+            border-color: #007bff;
+            box-shadow: 0 8px 30px rgba(0, 123, 255, 0.3);
+        }
+        
+        .config-item.active::before {
+            background: rgba(255, 255, 255, 0.3);
+            transform: scaleX(1);
+        }
+        
+        .config-content {
+            position: relative;
+            z-index: 2;
+        }
+        
+        .config-title {
+            font-weight: 700;
+            font-size: 1rem;
+            margin-bottom: 6px;
+            line-height: 1.2;
+            color: inherit;
+        }
+        
+        .config-meta {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 8px;
+            font-size: 0.8rem;
+            opacity: 0.8;
+        }
+        
+        .config-meta span {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .config-meta i {
+            font-size: 0.8rem;
+        }
+        
+        .config-description {
+            font-size: 0.8rem;
+            opacity: 0.7;
+            line-height: 1.3;
+            margin-bottom: 8px;
+        }
+        
+        .config-actions {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            display: flex;
+            gap: 6px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            z-index: 10;
+        }
+        
+        .config-item:hover .config-actions {
+            opacity: 1;
+        }
+        
+        .btn-icon {
+            background: rgba(255, 255, 255, 0.95);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            border-radius: 6px;
+            width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        }
+        
+        .btn-icon:hover {
+            transform: scale(1.1);
+            background: rgba(255, 255, 255, 1);
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .edit-btn {
+            color: #667eea;
+        }
+        
+        .btn-danger {
+            color: #e74c3c;
+        }
+        
+        .config-item.active .btn-icon {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+        }
+        
+        .config-item.active .btn-icon:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+        
+        .performance-score {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 12px;
+            flex-shrink: 0;
+        }
+        
+        .score-title {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 8px;
+            text-align: center;
+        }
+        
+        .score-display {
+            text-align: center;
+            margin-bottom: 12px;
+        }
+        
+        .score-number {
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: #667eea;
+        }
+        
+        .score-label {
+            font-size: 0.8rem;
+            color: #666;
+            margin-top: 3px;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: #e9ecef;
+            border-radius: 3px;
+            overflow: hidden;
+            margin-bottom: 8px;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: all 0.5s ease;
+            background: #ffc107;
+        }
+        
+        .config-stats {
+            display: flex;
+            gap: 12px;
+            margin-top: 15px;
+        }
+        
+        .stat-item {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 10px;
+            transition: all 0.3s ease;
+        }
+        
+        .stat-item:hover {
+            background: #e9ecef;
+            transform: translateY(-1px);
+        }
+        
+        .stat-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 8px;
+            font-size: 14px;
+        }
+        
+        .stat-item:first-child .stat-icon {
+            background: #ffc107;
+            color: white;
+        }
+        
+        .stat-item:last-child .stat-icon {
+            background: #28a745;
+            color: white;
+        }
+        
+        .stat-content {
+            flex: 1;
+        }
+        
+        .stat-value {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #2c3e50;
+            line-height: 1.2;
+        }
+        
+        .stat-label {
+            font-size: 0.75rem;
+            color: #666;
+            margin-top: 2px;
+        }
+        
+        .compatibility-status {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 12px;
+            flex-shrink: 0;
+            border-left: 3px solid #28a745;
+        }
+        
+        .compatibility-status.incompatible {
+            border-left-color: #dc3545;
+            background: #fff5f5;
+        }
+        
+        .compatibility-status.compatible {
+            border-left-color: #28a745;
+            background: #f0fff4;
+        }
+        
+        .compatibility-message {
+            font-size: 0.85rem;
+            line-height: 1.3;
+        }
+        
+        .compatibility-status.compatible .compatibility-message {
+            color: #155724;
+        }
+        
+        .compatibility-status.incompatible .compatibility-message {
+            color: #721c24;
+        }
+        
+        .main-content {
+            flex: 1;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            height: calc(100vh - 130px); /* 强制固定高度 */
+            min-height: calc(100vh - 130px); /* 最小高度也设为固定值 */
+            max-height: calc(100vh - 130px); /* 最大高度也设为固定值 */
+            border: 1px solid rgba(0,0,0,0.05); /* 添加细边框确保对齐 */
+            box-sizing: border-box; /* 确保padding包含在高度内 */
+        }
+        
+        .main-content-header {
+            padding: 0.75rem 1.25rem 0.5rem 1.25rem; /* 缩小顶部留白 */
+            border-bottom: 1px solid #f0f0f0;
+            flex-shrink: 0;
+        }
+        
+        .main-content-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1rem 1.5rem;
+            scrollbar-width: thin;
+            scrollbar-color: rgba(102, 126, 234, 0.5) rgba(0, 0, 0, 0.05);
+        }
+        
+        .main-content-body.no-scroll {
+            overflow-y: hidden;
+        }
+        
+        .main-content-footer {
+            padding: 1rem 1.5rem 1.5rem 1.5rem;
+            border-top: 1px solid #f0f0f0;
+            flex-shrink: 0;
+            background: #fafafa;
+        }
+        
+        .main-content-body::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        .main-content-body::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.05);
+            border-radius: 10px;
+        }
+        
+        .main-content-body::-webkit-scrollbar-thumb {
+            background-color: rgba(102, 126, 234, 0.5);
+            border-radius: 10px;
+        }
+        
+        .main-content-body::-webkit-scrollbar-thumb:hover {
+            background-color: rgba(102, 126, 234, 0.7);
+        }
+        
+        .content-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.75rem;
+            padding-bottom: 0;
+            border-bottom: none;
+            min-height: 48px; /* 确保有足够高度进行垂直居中 */
+        }
+        
+        .content-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .save-config-btn {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 0.6rem 1.2rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .save-config-btn:hover {
+            background: #45a049;
+            transform: translateY(-1px);
+            box-shadow: 0 3px 10px rgba(76, 175, 80, 0.3);
+        }
+        
+        .save-config-btn i {
+            font-size: 0.8rem;
+        }
+        
+
+        
+        .component-section {
+            background: #fafafa;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+            transition: all 0.3s ease;
+            border: 1px solid #e9ecef;
+        }
+        
+        .component-section:hover {
+            box-shadow: 0 3px 12px rgba(0,0,0,0.08);
+            transform: translateY(-1px);
+        }
+        
+        .component-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 0.75rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid #e9ecef;
+        }
+        
+        .component-header-left {
+            display: flex;
+            align-items: center;
+        }
+        
+        .component-icon {
+            font-size: 1.2rem;
+            margin-right: 0.5rem;
+            color: #667eea;
+        }
+        
+        .component-name {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .add-storage-btn {
+            background: #28a745;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 32px;
+            height: 32px;
+            cursor: pointer;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+        
+        .add-storage-btn:hover {
+            background: #218838;
+            transform: scale(1.1);
+        }
+        
+        .component-search {
+            position: relative;
+            margin-bottom: 0.75rem;
+        }
+        
+        .component-search .search-input {
+            width: 100%;
+            padding: 0.6rem 0.8rem;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+        
+        .component-search .search-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.1);
+        }
+        
+        .component-search .search-results {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 1px solid #ddd;
+            border-top: none;
+            border-radius: 0 0 6px 6px;
+            max-height: 180px;
+            overflow-y: auto;
+            z-index: 10002; /* 设置更高的z-index，确保在所有元素之上 */
+            display: none;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        
+        .component-search .search-result-item {
+            padding: 0.8rem;
+            cursor: pointer;
+            border-bottom: 1px solid #f0f0f0;
+            transition: background 0.2s ease;
+            font-size: 0.9rem;
+        }
+        
+        .component-search .search-result-item:hover {
+            background: #f8f9ff;
+        }
+        
+        .component-search .search-result-item:last-child {
+            border-bottom: none;
+        }
+        
+        .search-item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.3rem;
+        }
+        
+        .search-item-price {
+            color: #667eea;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+        
+        .search-item-specs {
+            color: #666;
+            font-size: 0.8rem;
+            line-height: 1.3;
+        }
+        
+        .selected-component {
+            background: white;
+            border: 1px solid #667eea;
+            border-radius: 6px;
+            padding: 0.8rem;
+            display: none;
+        }
+        
+        .selected-component.active {
+            display: block;
+        }
+        
+        .component-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+        
+        .component-details {
+            flex: 1;
+            text-align: left;
+        }
+        
+        .component-header {
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            text-align: left;
+        }
+        
+        .component-header-left {
+            display: flex;
+            align-items: center;
+            text-align: left;
+        }
+        
+        .component-name {
+            text-align: left;
+            display: block;
+        }
+        
+        .component-icon {
+            text-align: left;
+        }
+        
+        .component-details h4 {
+            margin: 0 0 0.3rem 0;
+            color: #333;
+            font-size: 1rem;
+            font-weight: 600;
+        }
+        
+        .component-details p {
+            margin: 0;
+            color: #666;
+            font-size: 0.85rem;
+            line-height: 1.4;
+        }
+        
+        .component-price {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #4CAF50;
+            margin-left: 1rem;
+            white-space: nowrap;
+        }
+        
+        .remove-component {
+            background: #ff4757;
+            color: white;
+            border: none;
+            padding: 0.4rem;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-left: 0.8rem;
+            font-size: 0.8rem;
+            transition: all 0.3s ease;
+        }
+        
+        .remove-component:hover {
+            background: #ff3742;
+            transform: scale(1.05);
+        }
+        
+        .compatibility-status {
+            margin-top: 2rem;
+            padding: 1rem;
+            border-radius: 8px;
+            font-weight: 500;
+        }
+        
+        .compatibility-status.compatible {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .compatibility-status.incompatible {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        /* 固定按钮组样式 */
+        .fixed-buttons {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            z-index: 1000;
+        }
+        
+        .fixed-save-btn {
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 25px;
+            padding: 12px 20px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0, 123, 255, 0.3);
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            min-width: 120px;
+            justify-content: center;
+        }
+        
+        .fixed-save-btn:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 6px 20px rgba(0, 123, 255, 0.4);
+            background: #0056b3;
+        }
+        
+        .fixed-save-btn i {
+            font-size: 1.1rem;
+        }
+        
+        .admin-btn {
+            background: #ff6b6b;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            font-size: 1.5rem;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
+            transition: all 0.3s ease;
+        }
+        
+        .admin-btn:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 6px 20px rgba(255, 107, 107, 0.4);
+        }
+        
+        /* 自定义保存弹窗样式 */
+        .custom-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 2000;
+            animation: fadeIn 0.3s ease;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal-content {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            min-width: 400px;
+            max-width: 90vw;
+            max-height: 90vh;
+            overflow-y: auto;
+            animation: slideIn 0.3s ease;
+        }
+        
+        .modal-header {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+        
+        .modal-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        
+        .modal-subtitle {
+            color: #666;
+            font-size: 0.9rem;
+        }
+        
+        .modal-input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 1rem;
+            margin-bottom: 20px;
+            transition: border-color 0.3s ease;
+        }
+        
+        .modal-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        .modal-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: flex-end;
+        }
+        
+        .modal-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .modal-btn-primary {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+        }
+        
+        .modal-btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        .modal-btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+        
+        .modal-btn-secondary:hover {
+            background: #5a6268;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        @keyframes slideIn {
+            from { 
+                opacity: 0;
+                transform: translate(-50%, -60%);
+            }
+            to { 
+                opacity: 1;
+                transform: translate(-50%, -50%);
+            }
+        }
+        
+        @keyframes slideInRight {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        
+        @keyframes slideOutRight {
+            from { transform: translateX(0); opacity: 1; }
+            to { transform: translateX(100%); opacity: 0; }
+        }
+        
+        /* 配置预览悬浮窗样式 */
+        .config-preview-tooltip {
+            position: fixed;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            color: #333;
+            padding: 24px;
+            border-radius: 16px;
+            font-size: 14px;
+            max-width: 380px;
+            min-width: 320px;
+            z-index: 10003;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(255, 255, 255, 0.1);
+            pointer-events: none;
+            opacity: 0;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            transform: translateY(15px) scale(0.95);
+            border: 1px solid rgba(102, 126, 234, 0.1);
+        }
+        
+        .config-preview-tooltip.show {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+        
+        .config-preview-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+        
+        .config-preview-title {
+            font-weight: 700;
+            font-size: 16px;
+            color: #2c3e50;
+            margin: 0;
+            line-height: 1.3;
+            flex: 1;
+        }
+        
+        .config-preview-power {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            white-space: nowrap;
+            margin-left: 12px;
+        }
+        
+        .config-preview-components {
+            display: grid;
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+        
+        .config-preview-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px 12px;
+            background: #f8f9ff;
+            border-radius: 10px;
+            border-left: 3px solid #667eea;
+        }
+        
+        .config-preview-component {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .config-preview-icon {
+            color: #667eea;
+            font-size: 14px;
+            width: 16px;
+            text-align: center;
+        }
+        
+        .config-preview-name {
+            font-weight: 600;
+            font-size: 12px;
+            color: #666;
+            min-width: 40px;
+        }
+        
+        .config-preview-value {
+            font-size: 13px;
+            color: #2c3e50;
+            font-weight: 500;
+            text-align: right;
+            flex: 1;
+            margin-left: 8px;
+        }
+        
+        .config-preview-total {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 16px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 12px;
+            margin-top: 16px;
+        }
+        
+        .config-preview-total-label {
+            color: white;
+            font-weight: 600;
+            font-size: 14px;
+        }
+        
+        .config-preview-total-price {
+            color: white;
+            font-weight: 700;
+            font-size: 16px;
+        }
+        
+        .config-preview-item-old {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid #f8f9fa;
+        }
+        
+        .config-preview-item:last-child {
+            border-bottom: none;
+        }
+        
+        .config-preview-component {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex: 1;
+        }
+        
+        .config-preview-icon {
+            width: 16px;
+            height: 16px;
+            color: #667eea;
+            flex-shrink: 0;
+        }
+        
+        .config-preview-name {
+            font-size: 13px;
+            color: #666;
+            font-weight: 500;
+            min-width: 60px;
+        }
+        
+        .config-preview-value {
+            font-size: 13px;
+            color: #333;
+            text-align: right;
+            flex: 1;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        
+        .config-preview-total {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 2px solid #f0f0f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .config-preview-total-label {
+            font-size: 14px;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .config-preview-total-price {
+            font-size: 16px;
+            font-weight: 700;
+            color: #667eea;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: #666;
+        }
+        
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            color: #ddd;
+        }
+        
+        /* 删除确认弹窗样式 */
+        .delete-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+            animation: fadeIn 0.3s ease;
+            backdrop-filter: blur(2px);
+        }
+        
+        .delete-modal.show {
+            display: flex;
+        }
+        
+        .delete-modal-content {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            max-width: 400px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            transform: scale(0.9);
+            opacity: 0;
+            transition: transform 0.3s ease, opacity 0.3s ease;
+        }
+        
+        .delete-modal.show .delete-modal-content {
+            transform: scale(1);
+            opacity: 1;
+        }
+        
+        .delete-modal-icon {
+            font-size: 3rem;
+            color: #e74c3c;
+            margin-bottom: 1rem;
+        }
+        
+        .delete-modal-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 0.5rem;
+        }
+        
+        .delete-modal-message {
+            color: #666;
+            margin-bottom: 2rem;
+            line-height: 1.5;
+        }
+        
+        .delete-modal-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+        }
+        
+        .delete-modal-btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            min-width: 100px;
+        }
+        
+        .delete-modal-btn-cancel {
+            background: #f8f9fa;
+            color: #333;
+            border: 1px solid #ddd;
+        }
+        
+        .delete-modal-btn-cancel:hover {
+            background: #e9ecef;
+        }
+        
+        .delete-modal-btn-confirm {
+            background: #e74c3c;
+            color: white;
+        }
+        
+        .delete-modal-btn-confirm:hover {
+            background: #c0392b;
+            transform: translateY(-1px);
+        }
+        
+        /* 修复导航栏搜索框在配置页面的样式污染 */
+        /* 导航栏样式已统一使用标准样式 */
+        
+        /* 移除 Logo 文本颜色覆盖，使用全局统一样式 */
+        /* .navbar .site-name 样式已移除，使用全局CSS设置 */
+        
+        /* 性能评分脉冲动画 */
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+                opacity: 1;
+            }
+            50% {
+                transform: scale(1.02);
+                opacity: 0.9;
+            }
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+        
+        /* 性能评分进度条增强样式 */
+        .performance-progress {
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        
+        .performance-progress .progress-fill {
+            border-radius: 10px;
+            transition: all 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+    </style>
+</head>
+<body class="main-build-page">
+    <!-- 引入头部导航 -->
+    <div th:replace="fragments/header :: siteHeader('build')"></div>
+    
+    <div class="build-container">
+        <!-- 左侧配置单列表 -->
+        <div class="config-sidebar">
+            <div class="sidebar-header">
+                <h2 class="sidebar-title">我的配置单</h2>
+                <button class="new-config-btn" onclick="createNewConfig()">
+                    <i class="fas fa-plus"></i> 新建
+                </button>
+            </div>
+            
+            <div class="config-list" id="configList">
+                <div class="empty-state">
+                    <i class="fas fa-desktop"></i>
+                    <p>暂无配置单</p>
+                    <p>点击"新建"开始创建您的第一个配置</p>
+                </div>
+            </div>
+            
+            <!-- 性能评分区域 -->
+            <div class="performance-score" id="performanceScore">
+                <div class="score-title">性能评分</div>
+                <div class="score-display">
+                    <div class="score-number" id="scoreNumber">0.0</div>
+                    <div class="score-label">综合性能分数</div>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill" style="width: 0%;"></div>
+                </div>
+                
+                <!-- 实时瓦数和价格显示 -->
+                <div class="config-stats">
+                    <div class="stat-item">
+                        <div class="stat-icon">
+                            <i class="fas fa-bolt"></i>
+                        </div>
+                        <div class="stat-content">
+                            <div class="stat-value" id="totalWattage">0W</div>
+                            <div class="stat-label">总功耗</div>
+                        </div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-icon">
+                            <i class="fas fa-yen-sign"></i>
+                        </div>
+                        <div class="stat-content">
+                            <div class="stat-value" id="totalPrice">¥0</div>
+                            <div class="stat-label">总价格</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 兼容性状态区域 -->
+            <div class="compatibility-status" id="compatibilityStatus" style="display: none;">
+                <div class="compatibility-message" id="compatibilityMessage">
+                    <i class="fas fa-check-circle"></i> 配件兼容性检查中...
+                </div>
+            </div>
+        </div>
+        
+        <!-- 右侧主内容区 -->
+        <div class="main-content">
+            <div class="main-content-header">
+                <div class="content-header">
+                    <h1 class="content-title" id="contentTitle">选择配件开始装机</h1>
+                    <button class="save-config-btn" onclick="showSaveModal()" title="保存配置">
+                        <i class="fas fa-save"></i>
+                        保存配置
+                    </button>
+                </div>
+            </div>
+            
+            <div class="main-content-body">
+                <div id="buildContent">
+                <!-- CPU -->
+                <div class="component-section">
+                    <div class="component-header">
+                        <div class="component-header-left">
+                            <i class="fas fa-microchip component-icon"></i>
+                            <span class="component-name">处理器 (CPU)</span>
+                        </div>
+                    </div>
+                    <div class="component-search">
+                        <input type="text" class="search-input" placeholder="搜索CPU..." 
+                               onkeyup="searchComponent('cpu', this.value)" onfocus="showSearchResults('cpu')">
+                        <div class="search-results" id="cpu-results"></div>
+                    </div>
+                    <div class="selected-component" id="cpu-selected">
+                        <div class="component-info">
+                            <div class="component-details">
+                                <h4 id="cpu-name"></h4>
+                                <p id="cpu-specs"></p>
+                            </div>
+                            <div>
+                                <span class="component-price" id="cpu-price"></span>
+                                <button class="remove-component" onclick="removeComponent('cpu')">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 主板 -->
+                <div class="component-section">
+                    <div class="component-header">
+                        <div class="component-header-left">
+                            <i class="fas fa-memory component-icon"></i>
+                            <span class="component-name">主板 (Motherboard)</span>
+                        </div>
+                    </div>
+                    <div class="component-search">
+                        <input type="text" class="search-input" placeholder="搜索主板..." 
+                               onkeyup="searchComponent('motherboard', this.value)" onfocus="showSearchResults('motherboard')">
+                        <div class="search-results" id="motherboard-results"></div>
+                    </div>
+                    <div class="selected-component" id="motherboard-selected">
+                        <div class="component-info">
+                            <div class="component-details">
+                                <h4 id="motherboard-name"></h4>
+                                <p id="motherboard-specs"></p>
+                            </div>
+                            <div>
+                                <span class="component-price" id="motherboard-price"></span>
+                                <button class="remove-component" onclick="removeComponent('motherboard')">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 内存 -->
+                <div class="component-section">
+                    <div class="component-header">
+                        <div class="component-header-left">
+                            <i class="fas fa-hdd component-icon"></i>
+                            <span class="component-name">内存 (RAM)</span>
+                        </div>
+                    </div>
+                    <div class="component-search">
+                        <input type="text" class="search-input" placeholder="搜索内存..." 
+                               onkeyup="searchComponent('ram', this.value)" onfocus="showSearchResults('ram')">
+                        <div class="search-results" id="ram-results"></div>
+                    </div>
+                    <div class="selected-component" id="ram-selected">
+                        <div class="component-info">
+                            <div class="component-details">
+                                <h4 id="ram-name"></h4>
+                                <p id="ram-specs"></p>
+                            </div>
+                            <div>
+                                <span class="component-price" id="ram-price"></span>
+                                <button class="remove-component" onclick="removeComponent('ram')">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 显卡 -->
+                <div class="component-section">
+                    <div class="component-header">
+                        <div class="component-header-left">
+                            <i class="fas fa-tv component-icon"></i>
+                            <span class="component-name">显卡 (GPU)</span>
+                        </div>
+                    </div>
+                    <div class="component-search">
+                        <input type="text" class="search-input" placeholder="搜索显卡..." 
+                               onkeyup="searchComponent('gpu', this.value)" onfocus="showSearchResults('gpu')">
+                        <div class="search-results" id="gpu-results"></div>
+                    </div>
+                    <div class="selected-component" id="gpu-selected">
+                        <div class="component-info">
+                            <div class="component-details">
+                                <h4 id="gpu-name"></h4>
+                                <p id="gpu-specs"></p>
+                            </div>
+                            <div>
+                                <span class="component-price" id="gpu-price"></span>
+                                <button class="remove-component" onclick="removeComponent('gpu')">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 存储 -->
+                <div class="component-section">
+                    <div class="component-header">
+                        <div class="component-header-left">
+                            <i class="fas fa-save component-icon"></i>
+                            <span class="component-name">存储 (Storage)</span>
+                        </div>
+                    </div>
+                    <div class="component-search">
+                        <input type="text" class="search-input" placeholder="搜索存储设备..." 
+                               onkeyup="searchComponent('storage', this.value)" onfocus="showSearchResults('storage')">
+                        <div class="search-results" id="storage-results"></div>
+                    </div>
+                    <div class="selected-component" id="storage-selected">
+                        <div class="component-info">
+                            <div class="component-details">
+                                <h4 id="storage-name"></h4>
+                                <p id="storage-specs"></p>
+                            </div>
+                            <div>
+                                <span class="component-price" id="storage-price"></span>
+                                <button class="remove-component" onclick="removeComponent('storage')">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="additionalStorageSlots"></div>
+                </div>
+                
+                <!-- 电源 -->
+                <div class="component-section">
+                    <div class="component-header">
+                        <div class="component-header-left">
+                            <i class="fas fa-plug component-icon"></i>
+                            <span class="component-name">电源 (PSU)</span>
+                        </div>
+                    </div>
+                    <div class="component-search">
+                        <input type="text" class="search-input" placeholder="搜索电源..." 
+                               onkeyup="searchComponent('psu', this.value)" onfocus="showSearchResults('psu')">
+                        <div class="search-results" id="psu-results"></div>
+                    </div>
+                    <div class="selected-component" id="psu-selected">
+                        <div class="component-info">
+                            <div class="component-details">
+                                <h4 id="psu-name"></h4>
+                                <p id="psu-specs"></p>
+                            </div>
+                            <div>
+                                <span class="component-price" id="psu-price"></span>
+                                <button class="remove-component" onclick="removeComponent('psu')">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 机箱 -->
+                <div class="component-section">
+                    <div class="component-header">
+                        <div class="component-header-left">
+                            <i class="fas fa-cube component-icon"></i>
+                            <span class="component-name">机箱 (Case)</span>
+                        </div>
+                    </div>
+                    <div class="component-search">
+                        <input type="text" class="search-input" placeholder="搜索机箱..." 
+                               onkeyup="searchComponent('case', this.value)" onfocus="showSearchResults('case')">
+                        <div class="search-results" id="case-results"></div>
+                    </div>
+                    <div class="selected-component" id="case-selected">
+                        <div class="component-info">
+                            <div class="component-details">
+                                <h4 id="case-name"></h4>
+                                <p id="case-specs"></p>
+                            </div>
+                            <div>
+                                <span class="component-price" id="case-price"></span>
+                                <button class="remove-component" onclick="removeComponent('case')">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                </div>
+            </div>
+            
+            <!-- main-content-footer 已移除，保存按钮移至标题右侧 -->
+        </div>
+    </div>
+    
+    <!-- 自定义保存弹窗 -->
+    <div class="custom-modal" id="saveModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">保存配置单</div>
+                <div class="modal-subtitle">为您的装机配置起个名字吧</div>
+            </div>
+            <input type="text" class="modal-input" id="configTitle" placeholder="请输入配置单名称" maxlength="50">
+            <textarea class="modal-input" id="configDescription" placeholder="请输入配置单描述（可选）" rows="3" style="resize: vertical; margin-top: 10px;"></textarea>
+            <div class="modal-buttons">
+                <button class="modal-btn modal-btn-secondary" onclick="closeSaveModal()">取消</button>
+                <button class="modal-btn modal-btn-primary" onclick="confirmSaveConfig()">保存</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 固定在右下角的按钮组 -->
+    <div class="fixed-buttons">
+        <!-- 返回顶部按钮 -->
+        <button class="back-to-top" onclick="scrollToTop()" style="display: none;" id="backToTopBtn" title="返回顶部">
+            <i class="fas fa-arrow-up"></i>
+        </button>
+        
+        <!-- 管理员按钮 (仅管理员可见) -->
+        <button class="admin-btn" onclick="window.location.href='/build/admin'" 
+                th:if="${user.username == 'admin'}" title="管理配件">
+            <i class="fas fa-cog"></i>
+        </button>
+    </div>
+    
+    <!-- 配置预览悬浮窗 -->
+    <div class="config-preview-tooltip" id="configPreviewTooltip">
+        <div class="config-preview-header">
+            <h3 class="config-preview-title" id="previewTitle">配置单名称</h3>
+            <span class="config-preview-power" id="previewPower">0W</span>
+        </div>
+        <div class="config-preview-components" id="previewComponents">
+            <!-- 动态生成的配置项 -->
+        </div>
+        <div class="config-preview-total">
+            <span class="config-preview-total-label">总价</span>
+            <span class="config-preview-total-price" id="previewTotalPrice">¥0</span>
+        </div>
+    </div>
+    
+    <!-- 删除确认弹窗 -->
+    <div class="delete-modal" id="deleteModal">
+        <div class="delete-modal-content">
+            <div class="delete-modal-icon">
+                <i class="fas fa-exclamation-triangle"></i>
+            </div>
+            <div class="delete-modal-title">确认删除</div>
+            <div class="delete-modal-message">您确定要删除这个配置单吗？此操作无法撤销。</div>
+            <div class="delete-modal-buttons">
+                <button class="delete-modal-btn delete-modal-btn-cancel" onclick="hideDeleteModal()">取消</button>
+                <button class="delete-modal-btn delete-modal-btn-confirm" onclick="confirmDelete()">删除</button>
+            </div>
+        </div>
+    </div>
+    
+    <script th:src="@{/js/build.js}"></script>
+    <script>
+        /* 根据导航栏高度动态调整布局，确保页面无滚动且间距合适 */
+        document.addEventListener('DOMContentLoaded', () => {
+            const nav = document.querySelector('.navbar');
+            const container = document.querySelector('.build-container');
+            const sidebar = document.querySelector('.config-sidebar');
+            if (nav && container) {
+                const navHeight = nav.offsetHeight;
+                const gap = -60;
+                container.style.marginTop = (navHeight + gap) + 'px';
+                container.style.height = `calc(100vh - ${navHeight + gap}px)`;
+                if (sidebar) {
+                    const extra = 50; // 与原设计保持一致的余量
+                    sidebar.style.height = `calc(100vh - ${navHeight + extra}px)`;
+                }
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // 确保配置列表加载完成后绑定悬浮事件
+            if (typeof loadConfigList === 'function') {
+                loadConfigList().then(() => {
+                    // 配置加载完成后再次确保事件绑定
+                    if (typeof addPreviewEvents === 'function') {
+                        addPreviewEvents();
+                    }
+                }).catch(() => {
+                    // 如果loadConfigList不返回Promise，直接调用
+                    setTimeout(() => {
+                        if (typeof addPreviewEvents === 'function') {
+                            addPreviewEvents();
+                        }
+                    }, 1000);
+                });
+            }
+        });
+    </script>
+</body>
+</html>

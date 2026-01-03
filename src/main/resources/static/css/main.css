@@ -1,0 +1,2279 @@
+/* ===============  GearCoreLab 统一简约主题  =============== */
+
+/* 全局样式 */
+:root {
+    --primary: #1890ff;
+    --primary-light: #40a9ff;
+    --success: #52c41a;
+    --warning: #faad14;
+    --error: #f5222d;
+    --gray-100: #f5f5f5;
+    --gray-200: #e8e8e8;
+    --gray-300: #d9d9d9;
+    --gray-400: #bfbfbf;
+    --gray-500: #8c8c8c;
+    --gray-600: #595959;
+    --gray-700: #434343;
+    --gray-800: #262626;
+    --gray-900: #1f1f1f;
+    --radius: 4px;
+}
+
+body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    line-height: 1.5;
+    color: var(--gray-800);
+    background: var(--gray-100);
+}
+
+.container {
+    max-width: 800px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+}
+
+/* 帖子详情 */
+.post-detail {
+    background: #fff;
+    border-radius: var(--radius);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    padding: 2rem;
+}
+
+.post {
+    margin-bottom: 2rem;
+}
+
+.post-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1.5rem;
+}
+
+.post-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.delete-btn-small {
+    background: #ff4757;
+    color: white;
+    border: none;
+    border-radius: var(--radius);
+    padding: 0.25rem 0.5rem;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-weight: 500;
+}
+
+.delete-btn-small:hover {
+    background: #ff3838;
+    transform: translateY(-1px);
+}
+
+.author {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+/* 头像上传容器 */
+.avatar-upload-container {
+    position: relative;
+    display: inline-block;
+    cursor: pointer;
+}
+
+.avatar-large {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    object-fit: cover;
+    transition: all 0.3s ease;
+}
+
+.avatar-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    color: white;
+    font-size: 12px;
+    text-align: center;
+}
+
+.avatar-upload-container:hover .avatar-overlay {
+    opacity: 1;
+}
+
+.avatar-upload-container:hover .avatar-large {
+    transform: scale(1.05);
+}
+
+.username {
+    color: var(--gray-700);
+    text-decoration: none;
+    font-weight: 500;
+    position: relative;
+    cursor: pointer;
+    transition: color 0.3s ease;
+}
+
+.username:hover {
+    color: var(--primary);
+    text-decoration: none;
+}
+
+
+
+
+
+
+
+
+
+.time {
+    color: var(--gray-500);
+    font-size: 0.9rem;
+}
+
+.post-content {
+    margin-bottom: 1.5rem;
+}
+
+.content-text {
+    margin: 0 0 1rem;
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+
+.thumbnails {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 0.5rem;
+    margin-top: 1rem;
+}
+
+.thumbnail {
+    width: 100%;
+    aspect-ratio: 1;
+    object-fit: cover;
+    border-radius: var(--radius);
+    cursor: pointer;
+}
+
+/* 评论区 */
+.comments {
+    margin-top: 2rem;
+    padding-left: 2rem !important; /* 增加更大的左内边距，让整体向右移动 */
+}
+
+.comments h3 {
+    font-size: 1.25rem;
+    font-weight: 500;
+    margin: 0 0 1.5rem;
+    color: var(--gray-700);
+}
+
+.comments .comment {
+    display: block;
+    gap: 0;
+}
+
+.comment-header {
+    margin-bottom: 0.5rem;
+}
+
+.comment .author {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+}
+
+.comment .avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+    flex-shrink: 0;
+}
+
+.comment .author-info {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    height: 40px;
+    margin-left: 12px;
+    flex: 1;
+}
+
+.comment .author-info .username {
+    font-size: 1.05em;
+}
+
+.comment .author-info .time {
+    margin-left: 0;
+    color: #888;
+    font-size: 0.95em;
+}
+
+.comment-content {
+    margin-left: calc(40px + 0.75rem);
+    padding-right: 6rem !important;
+}
+
+.comment-text {
+    color: var(--gray-600);
+    line-height: 1.6;
+    margin: .25rem 0 1rem;
+    word-break: break-word;
+}
+
+.comment .thumbnails {
+    margin-bottom: 1rem;
+}
+
+.comment-actions {
+    position: absolute;
+    top: 50%;
+    right: 0;
+    transform: translateY(-50%);
+    margin-top: 0;
+}
+
+/* 评论表单 */
+.post-form-container {
+    background: #fff;
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius);
+    padding: 1.5rem;
+    box-shadow: var(--shadow);
+}
+
+.form-main {
+    position: relative;
+    border: none;
+    padding: 0.5rem 0.5rem 3rem !important; /* 进一步减小内边距，让输入框变小 */
+}
+
+.post-form textarea {
+    border: 1px solid var(--gray-300);
+    border-radius: var(--radius);
+    transition: border-color 0.15s;
+    min-height: 45px !important; /* 调整到与按钮高度匹配 */
+    height: 45px !important; /* 固定高度，与按钮对齐 */
+}
+
+.post-form textarea:focus {
+    border-color: var(--primary);
+}
+
+.image-upload-btn {
+    background: var(--primary-light);
+    color: #fff;
+    border: none;
+}
+
+.image-upload-btn:hover {
+    background: var(--primary);
+}
+
+.submit-btn {
+    background: var(--primary);
+    color: #fff;
+    border: none;
+}
+
+.submit-btn:hover {
+    background: var(--primary-dark);
+}
+
+.image-preview {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    gap: 0.5rem;
+    margin: 1rem 0;
+}
+
+.preview-item {
+    position: relative;
+    aspect-ratio: 1;
+}
+
+.preview-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: var(--radius);
+}
+
+.preview-item .remove {
+    position: absolute;
+    top: -0.5rem;
+    right: -0.5rem;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: var(--error);
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    line-height: 1;
+}
+
+.login-tip {
+    text-align: center;
+    padding: 2rem;
+    color: var(--gray-500);
+    background: var(--gray-100);
+    border-radius: var(--radius);
+    margin-top: 1.5rem;
+}
+
+.login-tip a {
+    color: var(--primary);
+    text-decoration: none;
+}
+
+.login-tip a:hover {
+    text-decoration: underline;
+}
+
+/* 帖子点赞按钮和评论点赞按钮统一红色风格 */
+.like-btn.post-like,
+.like-btn.comment-like {
+    background: #fff !important;
+    border: 1.5px solid #e74c3c !important;
+    color: #e74c3c !important;
+}
+.like-btn.post-like:hover,
+.like-btn.comment-like:hover {
+    background: #ffebee !important;
+    color: #c62828 !important;
+    border-color: #c62828 !important;
+}
+.like-btn.post-like.liked,
+.like-btn.comment-like.liked {
+    background: #e74c3c !important;
+    color: #fff !important;
+    border-color: #e74c3c !important;
+}
+.like-btn.post-like.liked .like-icon,
+.like-btn.comment-like.liked .like-icon {
+    color: #fff !important;
+}
+
+/* 删除按钮 */
+.delete-btn {
+    padding: 0.45rem 0.9rem;
+    background: var(--error);
+    color: #fff;
+    border: none;
+    border-radius: var(--radius);
+    text-decoration: none;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: all 0.15s;
+}
+
+.delete-btn:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.delete-btn-small {
+    padding: 0.35rem 0.7rem;
+    background: var(--error);
+    color: #fff;
+    border: none;
+    border-radius: var(--radius);
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.15s;
+}
+
+.delete-btn-small:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.comment-delete-btn {
+    padding: 0.25rem 0.5rem;
+    background: var(--error);
+    color: #fff;
+    border: none;
+    border-radius: var(--radius);
+    font-size: 0.75rem;
+    cursor: pointer;
+    transition: all 0.15s;
+}
+
+.comment-delete-btn:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+/* 1. CSS 变量 */
+:root {
+    --primary: #2563eb;          /* 品牌主色 */
+    --primary-light: #3b82f6;
+    --primary-dark: #1d4ed8;
+    --danger: #dc2626;
+    --gray-100: #f3f4f6;
+    --gray-200: #e5e7eb;
+    --gray-300: #d1d5db;
+    --gray-400: #9ca3af;
+    --gray-500: #6b7280;
+    --gray-600: #4b5563;
+    --radius: 6px;
+    --shadow: 0 2px 4px rgba(0,0,0,0.06);
+}
+
+/* 2. 通用重置 */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+    font-family: "Helvetica Neue", Arial, sans-serif;
+    background: var(--gray-100);
+    color: var(--gray-600);
+    line-height: 1.6;
+    margin: 0;
+}
+ul { list-style: none; }
+a { text-decoration: none; color: inherit; }
+img { display: block; max-width: 100%; }
+button { font: inherit; cursor: pointer; }
+
+/* 3. 导航栏 */
+.navbar {
+    background: #fff;
+    box-shadow: var(--shadow);
+    padding: 0.75rem 1.25rem;
+    position: sticky;
+    top: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    z-index: 999;
+    transition: all 0.3s ease;
+}
+
+.navbar .logo-link { 
+    display: flex; 
+    align-items: center; 
+    gap: 0.5rem; 
+    font-weight: 600;
+    transition: transform 0.2s ease;
+}
+.navbar .logo-link:hover {
+    transform: scale(1.05);
+}
+.navbar .site-name { font-size: 1.125rem; color: var(--gray-700); font-weight: bold; }
+
+/* 导航栏中心区域 */
+.navbar-center {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+    flex: 1;
+    justify-content: space-between;
+}
+
+/* 导航链接 */
+.nav-links {
+    display: flex;
+    gap: 1.5rem;
+    align-items: center;
+    margin-left: 2rem; /* 增加与左侧logo的距离 */
+}
+
+.nav-links a {
+    position: relative;
+    padding: 0.5rem 1rem;
+    border-radius: var(--radius);
+    transition: all 0.3s ease;
+    font-weight: 500;
+    text-decoration: none;
+    color: var(--gray-700);
+}
+
+.nav-links a:hover {
+    background: var(--gray-100);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.nav-links a.active {
+    background: var(--primary);
+    color: white;
+    font-weight: bold;
+}
+
+.nav-links a.active:hover {
+    background: var(--primary-light);
+}
+
+/* 动态搜索栏 - 重新设计 */
+.search-container {
+    position: relative;
+    margin-left: auto;
+}
+
+.search-form {
+    display: flex;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 25px;
+    padding: 0.25rem;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    width: 250px;
+    overflow: hidden;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    position: relative;
+    backdrop-filter: blur(10px);
+}
+
+.search-form:hover,
+.search-form:focus-within {
+    width: 320px;
+    background: white;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+    border-color: rgba(0, 0, 0, 0.2);
+}
+
+.search-input {
+    border: none;
+    background: transparent;
+    outline: none;
+    flex: 1;
+    padding: 0.6rem 0.5rem 0.6rem 1rem;
+    font-size: 14px;
+    color: var(--gray-700);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    min-width: 0;
+}
+
+.search-input::placeholder {
+    color: rgba(0, 0, 0, 0.5);
+}
+
+.search-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    color: rgba(0, 0, 0, 0.6);
+    border: none;
+    border-radius: 50%;
+    width: 36px;
+    height: 36px;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    flex-shrink: 0;
+    position: relative;
+}
+
+.search-btn:hover {
+    background: rgba(0, 0, 0, 0.05);
+    color: rgba(0, 0, 0, 0.8);
+    transform: scale(1.05);
+}
+
+.search-btn:active {
+    transform: scale(0.95);
+}
+
+.search-icon {
+    width: 18px;
+    height: 18px;
+    transition: transform 0.3s ease;
+}
+
+.search-form:hover .search-icon {
+    transform: scale(1.1);
+}
+
+/* 导航栏右侧 */
+.navbar-right { 
+    display: flex; 
+    gap: 1rem; 
+    align-items: center;
+    margin-left: 1rem;
+}
+
+.avatar-small { width: 36px; height: 36px; border-radius: 50%; }
+.avatar { width: 48px; height: 48px; border-radius: 50%; object-fit: cover; }
+.logo-img { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; }
+
+/* 用户菜单修复 */
+.user-menu { 
+    position: relative; 
+    display: flex; 
+    align-items: center; 
+    gap: .5rem; 
+    cursor: pointer;
+    padding: 0.5rem;
+    border-radius: var(--radius);
+    transition: background 0.2s ease;
+}
+
+.user-menu:hover {
+    background: var(--gray-100);
+}
+
+.user-menu .nickname {
+    font-weight: bold;
+}
+
+.user-menu .dropdown { 
+    display: none; 
+    position: absolute; 
+    right: 0; 
+    top: calc(100% + 0.25rem); 
+    background: #fff; 
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15); 
+    border-radius: 12px;
+    min-width: 180px;
+    z-index: 9999;
+    padding: 0.75rem 0;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    opacity: 0;
+    transform: translateY(-10px);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes dropdownSlideDown {
+    0% {
+        opacity: 0;
+        transform: translateY(-10px) scale(0.95);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+/* 创建一个不可见的桥接区域 */
+.user-menu::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    right: 0;
+    width: 100%;
+    height: 0.75rem;
+    background: transparent;
+    z-index: 999;
+}
+
+.user-menu:hover .dropdown { 
+    display: block; 
+    opacity: 1;
+    transform: translateY(0);
+    animation: dropdownSlideDown 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.dropdown:hover {
+    display: block !important;
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.logout-link, .dropdown a { 
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 1rem; 
+    white-space: nowrap;
+    transition: all 0.2s ease;
+    color: #333;
+    text-decoration: none;
+    font-size: 14px;
+    border-radius: 8px;
+    margin: 0 0.5rem;
+}
+
+.logout-link:hover, .dropdown a:hover { 
+    background: #f8f9ff;
+    color: #667eea;
+    transform: translateX(4px);
+}
+
+/* 菜单项图标 */
+.dropdown a[href*="profile"]::before {
+    content: "\f007";
+    font-family: "Font Awesome 6 Free";
+    font-weight: 900;
+    color: #667eea;
+}
+
+.dropdown a[href*="notifications"]::before {
+    content: "\f0f3";
+    font-family: "Font Awesome 6 Free";
+    font-weight: 900;
+    color: #ff9800;
+}
+
+.logout-link::before {
+    content: "\f2f5";
+    font-family: "Font Awesome 6 Free";
+    font-weight: 900;
+    color: #e74c3c;
+}
+
+/* 4. 容器 */
+.container { max-width: 900px; margin: 4rem auto 2rem; padding: 0 1rem; }
+
+/* 主内容包装器 */
+.main-content-wrapper {
+    width: 100%;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    position: relative;
+    transition: all 0.3s ease;
+}
+
+.main-content-wrapper.has-sidebar {
+    transform: translateX(-50%);
+    width: 50%;
+}
+
+/* 内容容器 - 统一宽度 */
+.content-container {
+    width: 100%;
+    max-width: 700px;
+    margin: 0 auto 2rem;
+    transition: all 0.3s ease;
+}
+
+/* 帖子列表容器 */
+.post-list-container {
+    width: 100%;
+    max-width: 700px;
+    margin: 0 auto;
+    transition: all 0.3s ease;
+}
+
+/* 空列表状态 */
+.empty-post-list {
+    padding: 3rem 1rem;
+    text-align: center;
+}
+
+.empty-state {
+    background-color: var(--bg-light);
+    border-radius: var(--radius);
+    padding: 2.5rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    max-width: 500px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.empty-icon {
+    font-size: 3.5rem;
+    margin-bottom: 1rem;
+    background: var(--gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    display: inline-block;
+}
+
+.empty-state h3 {
+    font-size: 1.5rem;
+    margin-bottom: 0.75rem;
+    color: var(--text-dark);
+}
+
+.empty-state p {
+    color: var(--text-muted);
+    margin-bottom: 1.5rem;
+    line-height: 1.5;
+}
+
+.primary-btn {
+    background: var(--primary);
+    color: white;
+    border: none;
+    border-radius: var(--radius);
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.primary-btn:hover {
+    background: var(--primary-dark);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* 社区页面特殊容器布局 */
+.community-container {
+    display: block;
+    max-width: 1400px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    position: relative;
+}
+
+.community-container.has-sidebar {
+    display: flex;
+    gap: 2rem;
+}
+
+/* 5. 社区列表 */
+.post-card { 
+    background: #fff; 
+    border-radius: var(--radius); 
+    padding: 1.25rem; 
+    margin-bottom: 1rem; 
+    box-shadow: var(--shadow);
+    position: relative;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+.post-card:hover { 
+    box-shadow: 0 4px 8px rgba(0,0,0,0.08); 
+    transform: translateY(-2px);
+}
+.post-card .title { 
+    font-size: 1.25rem; 
+    font-weight: 600; 
+    color: #333; 
+    margin-bottom: 0.5rem; 
+    text-decoration: none;
+}
+.post-card .meta { font-size: 0.875rem; color: #6b7280; margin-top: 1rem; padding-top: 0.5rem; border-top: 1px solid var(--gray-200); display: flex; align-items: center; gap: .5rem; }
+.post-card .preview { color: var(--gray-600); margin-bottom: 0.75rem; }
+.post-card .actions { 
+    display: flex; 
+    gap: 1rem; 
+    font-size: .875rem; 
+    color: #6b7280;
+    justify-content: flex-end;
+    margin-top: 1rem;
+}
+
+/* 6. 发帖表单 */
+.post-form-container {
+    background: #fff;
+    border-radius: var(--radius);
+    padding: 2rem;
+    box-shadow: var(--shadow);
+}
+
+.post-form-container h2 {
+    font-size: 1.75rem;
+    margin-bottom: 2rem;
+    color: var(--gray-600);
+}
+
+.post-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem; /* 减小标题和内容输入框之间的间距 */
+    position: relative;
+    padding-bottom: 4.5rem;
+}
+
+.post-form input[type="text"], .post-form textarea {
+    width: 100%; 
+    padding: 0.75rem 1rem;
+    border: 2px solid var(--primary);
+    border-radius: var(--radius);
+}
+.post-form input[type="text"]:focus, .post-form textarea:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(37,99,235,0.25);
+}
+.post-form textarea { resize: vertical; min-height: 140px; }
+
+.form-actions {
+    position: absolute;
+    right: 1rem;
+    bottom: 1rem;
+    display: flex;
+    gap: 1rem;
+}
+
+.image-upload { 
+    border: 2px dashed var(--primary); 
+    border-radius: var(--radius); 
+    padding: 1rem; 
+    text-align: center; 
+    color: var(--primary); 
+    cursor: pointer; 
+    transition: background .15s; 
+}
+.image-upload:hover { background: var(--primary-light); color:#fff; }
+.image-preview { 
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 0.75rem;
+    margin-top: 1rem;
+}
+.preview-item { 
+    position: relative; 
+    width: 120px; 
+    height: 120px;
+}
+.preview-item img { 
+    width: 100%; 
+    height: 100%; 
+    object-fit: cover; 
+    border-radius: var(--radius);
+}
+.preview-item .remove { 
+    position: absolute; 
+    top: -6px; 
+    right: -6px; 
+    background: var(--danger); 
+    color: #fff; 
+    border: none; 
+    width: 18px; 
+    height: 18px; 
+    border-radius: 50%; 
+    line-height: 18px; 
+    text-align: center; 
+    font-size: 12px;
+    cursor: pointer;
+}
+
+.submit-btn, .new-post-btn { 
+    background: var(--primary); 
+    color: #fff; 
+    border: 2px solid var(--primary); 
+    padding: 0.45rem 1.25rem; 
+    border-radius: var(--radius); 
+    transition: all 0.15s;
+    cursor: pointer;
+}
+.submit-btn:hover, .new-post-btn:hover { opacity:0.9; }
+
+/* 7. 登录/注册卡片 */
+.auth-card { background: #fff; padding: 2rem; max-width: 400px; margin: 5rem auto; border-radius: var(--radius); box-shadow: var(--shadow); text-align: center; }
+.auth-card input { width: 100%; padding: 0.75rem 1rem; margin: 0.5rem 0; border: 1px solid var(--gray-200); border-radius: var(--radius); }
+.auth-card .submit-btn { width: 100%; margin-top: 1rem; }
+.auth-card .tips { font-size: .875rem; margin-top: 0.75rem; }
+.auth-card .tips a { color: var(--primary); text-decoration: none; cursor: pointer; }
+.auth-card .tips a:hover { text-decoration: underline; color: var(--primary-dark); }
+.forgot-password-link { display: inline-block; padding: 4px 8px; border-radius: 4px; transition: all 0.2s ease; }
+.forgot-password-link:hover { background-color: rgba(102, 126, 234, 0.1); }
+
+/* 8. 评论区 */
+.comments {
+    margin-top: 2rem;
+    background: #fff;
+    border-radius: var(--radius);
+    padding: 1.5rem;
+    box-shadow: var(--shadow);
+}
+
+.comments h3 {
+    font-size: 1.25rem;
+    color: var(--gray-600);
+    margin-bottom: 1.5rem;
+    border-bottom: 2px solid var(--gray-200);
+    padding-bottom: 0.5rem;
+}
+
+.comment {
+    border-bottom: 1px solid var(--gray-200);
+    padding: 1.5rem 0;
+    position: relative;
+    background: #fafafa;
+    margin-bottom: 1rem;
+    border-radius: var(--radius);
+    padding: 1rem;
+    transition: all 0.2s ease;
+}
+
+.comment:hover {
+    background: #f5f5f5;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.comment:first-child {
+    padding-top: 1rem;
+}
+
+.comment:last-child {
+    border-bottom: none;
+    padding-bottom: 1rem;
+    margin-bottom: 0;
+}
+
+.comment-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+    position: relative; /* 为删除按钮绝对定位提供参考 */
+}
+
+.comment-left {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    flex: 1;
+}
+
+.comment-avatar-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    min-width: 60px;
+}
+
+.comment-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    padding-top: 0.25rem;
+}
+
+.comment-actions-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    padding-top: 0.1rem; /* 调整删除按钮位置到右上角 */
+    margin-right: 0.5rem;
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+}
+
+.comment .avatar {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid var(--gray-200);
+    flex-shrink: 0;
+}
+
+.comment .username {
+    font-weight: 600;
+    color: var(--primary);
+    text-decoration: none;
+    font-size: 1rem;
+}
+
+.comment .username:hover {
+    text-decoration: underline;
+    color: var(--primary-light);
+}
+
+.comment .time {
+    font-size: 0.875rem;
+    color: var(--gray-500);
+    margin-top: 0.05rem; /* 减少时间与用户名的间距 */
+}
+
+.comment-content {
+    margin-left: calc(60px + 1rem);
+    padding-right: 1rem;
+}
+
+.comment-text {
+    color: var(--gray-700);
+    line-height: 1.6;
+    margin: 0.15rem 0 0.5rem; /* 减少评论内容与时间的间距 */
+    word-break: break-word;
+    font-size: 0.95rem;
+}
+
+.comment .thumbnails {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    gap: 0.75rem;
+    margin-top: 1rem;
+    max-width: 400px;
+}
+
+.comment .thumbnail {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+    border-radius: var(--radius);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: 1px solid var(--gray-200);
+}
+
+.comment .thumbnail:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+/* 评论楼层号样式 */
+.comment .floor {
+    font-size: 0.8rem;
+    color: var(--gray-400);
+    background: var(--gray-100);
+    padding: 0.2rem 0.4rem;
+    border-radius: 10px;
+    margin-top: 0.25rem;
+    font-weight: 500;
+    text-align: center;
+    min-width: 24px;
+}
+
+/* 评论点赞按钮样式 - 与帖子点赞按钮统一为红色胶囊形状 */
+.comment .like-btn {
+    background: #fff;
+    border: 1.5px solid #e74c3c;
+    color: #e74c3c;
+    border-radius: 20px;
+    padding: 0.4rem 0.8rem;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    margin-top: 0.5rem;
+    margin-right: 0.75rem;
+}
+
+.comment .like-btn:hover {
+    background: #ffebee;
+    color: #c62828;
+    border-color: #c62828;
+    transform: translateY(-1px) scale(1.05);
+}
+
+.comment .like-btn.liked {
+    background: #e74c3c;
+    border-color: #e74c3c;
+    color: white;
+}
+
+.comment .like-btn.liked:hover {
+    background: #c62828;
+    border-color: #c62828;
+}
+
+.comment .like-btn .like-icon {
+    font-size: 0.9rem;
+    color: inherit;
+}
+
+/* 评论操作区域 */
+.comment-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-top: 0.5rem;
+}
+
+/* 点赞动画 */
+@keyframes likeAnimation {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.2); }
+    100% { transform: scale(1); }
+}
+
+.thumbnail:hover {
+    transform: scale(1.05);
+}
+
+/* 图片预览模态框 */
+.image-modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.8);
+    cursor: pointer;
+}
+
+.image-modal img {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    max-width: 90%;
+    max-height: 90%;
+    object-fit: contain;
+    border-radius: var(--radius);
+}
+
+.image-modal .close {
+    position: absolute;
+    top: 20px;
+    right: 30px;
+    color: #fff;
+    font-size: 40px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.image-modal .close:hover {
+    opacity: 0.7;
+}
+
+/* 评论表单 */
+.comments .post-form-container {
+    max-width: 800px !important;
+    margin: 0 1rem 2rem 1rem; /* 左右外边距一致 */
+    padding: 0.75rem !important; /* 缩小内边距，减少表单容器高度 */
+}
+
+.comments .post-form {
+    margin: 0;
+    padding-bottom: 2rem; /* 缩小下内边距，使发表评论按钮的上下外边距一致 */
+}
+
+.post-list-container {
+    flex: 1;
+    transition: transform 0.3s ease, width 0.3s ease;
+}
+
+.post-list-container.sidebar-open {
+    transform: translateX(-20%);
+    width: 60%;
+}
+
+/* 帖子详情侧边栏 */
+.sidebar {
+    position: fixed;
+    top: 0;
+    right: -50%;
+    width: 50%;
+    height: 100vh;
+    background: #fff;
+    box-shadow: -2px 0 10px rgba(0,0,0,0.1);
+    transition: right 0.3s ease;
+    z-index: 1000;
+    overflow-y: auto;
+    display: block;
+}
+
+.sidebar.active {
+    right: 0;
+}
+
+/* 侧边栏头部 */
+.sidebar-header {
+    padding: 1rem;
+    border-bottom: 1px solid var(--gray-200);
+    position: relative;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+}
+
+.close-btn {
+    background: var(--error);
+    border: 1px solid var(--error);
+    border-radius: var(--radius);
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+    cursor: pointer;
+    color: white;
+    transition: all 0.2s ease;
+    font-weight: 500;
+}
+
+.close-btn:hover {
+    background: #d32f2f;
+    border-color: #d32f2f;
+    color: white;
+    transform: translateY(-1px);
+}
+
+.sidebar-content {
+    padding: 1rem;
+    padding-top: 20px; /* 减少顶部空间 */
+}
+
+.sidebar-close-section {
+    margin-bottom: 15px;
+    margin-top: 0;
+    padding-top: 0;
+}
+
+.sidebar-close-section hr {
+    border: none;
+    border-top: 1px solid var(--border-color);
+    margin: 5px 0;
+}
+
+.sidebar-close-section .close-btn {
+    width: 100%;
+    margin-top: 5px;
+}
+
+.loading, .error {
+    text-align: center;
+    padding: 2rem;
+    color: var(--gray-500);
+}
+
+.error {
+    color: var(--error);
+}
+
+/* 错误消息样式 */
+.error-message {
+    background: #fff2f0;
+    border: 1px solid #ffccc7;
+    border-radius: var(--radius);
+    padding: 12px 16px;
+    margin-bottom: 16px;
+    color: var(--error);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    line-height: 1.4;
+    transition: opacity 0.3s ease;
+    opacity: 1;
+}
+
+.error-message i {
+    font-size: 16px;
+    flex-shrink: 0;
+}
+
+/* 图片预览模态框样式 */
+.image-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 2000;
+}
+
+.image-modal-content {
+    position: relative;
+    max-width: 90%;
+    max-height: 90%;
+}
+
+.image-modal-content img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    border-radius: var(--radius);
+}
+
+.image-modal-close {
+    position: absolute;
+    top: -40px;
+    right: 0;
+    color: white;
+    font-size: 30px;
+    font-weight: bold;
+    cursor: pointer;
+    background: rgba(0, 0, 0, 0.5);
+    border-radius: 50%;
+    width: 35px;
+    height: 35px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s ease;
+}
+
+.image-modal-close:hover {
+    background: rgba(0, 0, 0, 0.8);
+}
+
+/* 删除确认弹窗样式 */
+.delete-confirm-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.delete-confirm-modal {
+    background: white;
+    padding: 2rem;
+    border-radius: 12px;
+    max-width: 400px;
+    width: 90%;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    text-align: center;
+    animation: modalSlideIn 0.3s ease-out;
+    position: relative;
+    transform: translate(0, 0);
+}
+
+@keyframes modalSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px) scale(0.9);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.delete-confirm-modal h3 {
+    margin-bottom: 15px;
+    color: #333;
+    font-size: 20px;
+}
+
+.delete-confirm-modal p {
+    margin-bottom: 25px;
+    color: #666;
+    line-height: 1.5;
+}
+
+.modal-actions {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+}
+
+.cancel-btn, .confirm-btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    min-width: 80px;
+}
+
+.cancel-btn {
+    background: #f8f9fa;
+    color: #666;
+    border: 1px solid #ddd;
+}
+
+.cancel-btn:hover {
+    background: #e9ecef;
+    color: #333;
+}
+
+.confirm-btn {
+    background: #ff4757;
+    color: white;
+}
+
+.confirm-btn:hover {
+    background: #ff3838;
+    transform: translateY(-1px);
+}
+
+.login-tip {
+    text-align: center;
+    padding: 2rem;
+    color: var(--gray-500);
+    background: var(--gray-100);
+    border-radius: var(--radius);
+    margin-top: 1.5rem;
+}
+
+.login-tip a {
+    color: var(--primary);
+    text-decoration: none;
+}
+
+.login-tip a:hover {
+    text-decoration: underline;
+}
+
+/* 10. 工具类 */
+.fade-in { animation: fadeIn 0.3s ease-in; }
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+.text-center { text-align: center; }
+.mt-2 { margin-top: 2rem; }
+
+/* 11. 空状态 */
+.empty-state { text-align: center; padding: 2rem; color: var(--gray-600); background: var(--gray-100); border-radius: var(--radius); margin: 1rem 0; }
+
+/* 12. 响应式 */
+@media (max-width: 600px) {
+    .navbar-right { gap: 0.75rem; }
+    .container { margin-top: 3.5rem; }
+}
+
+.thumbnail { aspect-ratio: 1; object-fit: cover; border-radius: calc(var(--radius) / 2); cursor: pointer; }
+
+/* 统一帖子与评论区大图缩略展示大小 */
+.post-image img, .comment-image img { width: 200px; height: 200px; object-fit: cover; border-radius: var(--radius); }
+
+/* 帖子头部排版 */
+.post-header { display:flex; align-items:center; justify-content:space-between; }
+.post-header .delete-btn { margin-left:auto; }
+
+/* 评论头部排版 */
+.comment-header { display:flex; align-items:center; justify-content:space-between; }
+
+/* 未登录右上角按钮 */
+.guest-menu a { padding: 0.3rem 0.75rem; border-radius: var(--radius); }
+.guest-menu a:hover { background: var(--gray-200); }
+
+.delete-btn { padding: 0.5rem 1rem; border: none; background: var(--danger); color: white; border-radius: var(--radius); cursor: pointer; transition: opacity 0.2s; }
+.delete-btn:hover { opacity: 0.9; }
+
+/* guest menu */
+.guest-menu { display:flex; align-items:center; gap:0.5rem; }
+.guest-menu a { padding: 0.35rem 0.9rem; border: 1px solid var(--primary); color: var(--primary); }
+.guest-menu a:hover { background: var(--primary-light); color:#fff; }
+
+/* 评论区样式 */
+.comments {
+    margin-top: 2rem;
+    background: #fff;
+    border-radius: var(--radius);
+    padding: 1.5rem;
+    box-shadow: var(--shadow);
+}
+
+.comments h2 {
+    color: var(--primary-dark);
+    font-size: 1.5rem;
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 2px solid var(--primary-light);
+}
+
+.comment {
+    display: flex;
+    gap: 1rem;
+    padding: 1rem 0;
+    border-bottom: 1px solid var(--gray-200);
+}
+
+.comment:last-child {
+    border-bottom: none;
+}
+
+.comment-meta {
+    display: flex;
+    align-items: baseline;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.comment-time {
+    font-size: 0.875rem;
+    color: var(--gray-500);
+}
+
+.comment-text {
+    color: var(--gray-600);
+}
+
+.comment-actions {
+    margin-top: 1rem;
+    display: flex;
+    gap: 1rem;
+}
+
+.comment-form {
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 2px solid var(--gray-200);
+    position: relative;
+}
+
+.comment-form textarea {
+    min-height: 100px;
+    margin-bottom: 2.5rem;
+    resize: none;
+}
+
+.form-actions {
+    position: absolute;
+    right: 1rem;
+    bottom: 1rem;
+    display: flex;
+    gap: 1rem;
+}
+
+.image-upload-btn {
+    background: transparent;
+    border: 1px solid var(--primary);
+    color: var(--primary);
+    padding: 0.5rem 1rem;
+    border-radius: var(--radius);
+    cursor: pointer;
+    font-size: 0.9rem;
+}
+
+.image-upload-btn:hover {
+    background: var(--primary-light);
+    color: #fff;
+}
+
+.image-preview {
+    margin-top: 0.5rem;
+    display: flex;
+    gap: 0.5rem;
+}
+
+.preview-item {
+    position: relative;
+    width: 60px;
+    height: 60px;
+}
+
+.preview-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: var(--radius);
+}
+
+.preview-item .remove {
+    position: absolute;
+    top: -6px;
+    right: -6px;
+    background: var(--danger);
+    color: #fff;
+    border: none;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    line-height: 18px;
+    text-align: center;
+    font-size: 12px;
+    cursor: pointer;
+}
+
+/* 帖子作者信息布局 */
+.post-author {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.post-author .meta {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.post-author .username {
+    color: var(--primary);
+    font-weight: 600;
+}
+
+.post-content {
+    position: relative;
+    padding: 1rem 0;
+}
+
+.post-content p {
+    margin-bottom: 2rem;
+}
+
+.post-actions {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.post-actions .time {
+    margin-right: auto;
+    font-size: 0.875rem;
+    color: var(--gray-500);
+}
+
+/* 帖子列表样式 */
+.post-card {
+    background: #fff;
+    border-radius: var(--radius);
+    padding: 1.25rem;
+    margin-bottom: 1rem;
+    box-shadow: var(--shadow);
+    position: relative;
+}
+
+.post-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+}
+
+.author {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.username {
+    font-weight: 600;
+    color: var(--primary);
+    text-decoration: none;
+}
+
+.username:hover {
+    text-decoration: underline;
+}
+
+.time {
+    font-size: 0.875rem;
+    color: var(--gray-500);
+}
+
+.post-content {
+    margin: 1rem 0;
+}
+
+.title {
+    display: block;
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: inherit;
+    text-decoration: none;
+    margin-bottom: 0.75rem;
+}
+
+.preview {
+    color: var(--gray-600);
+    margin-bottom: 1rem;
+    line-height: 1.6;
+}
+
+.post-meta {
+    margin-top: 1rem;
+    padding-top: 0.5rem;
+    border-top: 1px solid var(--gray-200);
+}
+
+.post-meta .date {
+    font-size: 0.875rem;
+    color: var(--gray-500);
+}
+
+.post-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: flex-end;
+    margin-top: 1rem;
+    align-items: center;
+}
+
+/* 按钮样式 */
+.action-btn {
+    background: none;
+    border: 1px solid var(--border-color);
+    color: var(--text-secondary);
+    padding: 8px 12px;
+    border-radius: var(--radius);
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.action-btn:hover {
+    background: var(--hover-bg);
+    color: var(--text-primary);
+}
+
+.like-btn {
+    background: none;
+    border: 1px solid var(--border-color);
+    color: var(--text-secondary);
+    padding: 8px 12px;
+    border-radius: var(--radius);
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.like-btn:hover {
+    background: var(--hover-bg);
+    color: var(--text-primary);
+}
+
+.like-btn.liked {
+    background: #e3f2fd;
+    border-color: #2196f3;
+    color: #2196f3;
+}
+
+.like-btn.liked .like-icon {
+    color: #2196f3;
+}
+
+.comment-btn {
+    background: #2196f3;
+    border: 1px solid #2196f3;
+    color: white;
+    padding: 8px 12px;
+    border-radius: var(--radius);
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.comment-btn:hover {
+    background: #1976d2;
+    border-color: #1976d2;
+}
+
+.like-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.45rem 0.9rem;
+    border: 1.5px solid #e74c3c; /* 统一为红色胶囊形状 */
+    background: #fff;
+    color: #e74c3c;
+    border-radius: 20px; /* 胶囊形状 */
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 0.95rem;
+}
+
+.like-btn:hover {
+    background: #ffebee;
+    color: #c62828;
+    border-color: #c62828;
+    transform: translateY(-1px) scale(1.05);
+    animation: likeAnimation 0.3s ease;
+}
+
+.like-btn.liked {
+    background: #e74c3c;
+    color: #fff;
+    border-color: #e74c3c;
+}
+
+.like-btn.liked:hover {
+    background: #c62828;
+    border-color: #c62828;
+    animation: likeAnimation 0.3s ease;
+}
+
+.like-icon {
+    font-style: normal;
+    font-size: 0.9em;
+}
+
+/* 帖子图片样式 */
+.post-images {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
+    gap: 0.5rem;
+    margin: 1rem 0;
+    max-width: 300px;
+}
+
+.post-image {
+    width: 60px;
+    height: 60px;
+    object-fit: cover;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+}
+
+.post-image:hover {
+    transform: scale(1.05);
+}
+
+/* 缩略图样式 */
+.thumbnails {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+    gap: 0.5rem;
+    margin: 0.75rem 0;
+}
+
+.thumbnail {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+    border-radius: var(--radius);
+    cursor: pointer;
+}
+
+/* 图片预览 */
+.image-preview {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 0.75rem;
+    margin-top: 1rem;
+}
+
+.preview-item {
+    position: relative;
+    width: 120px;
+    height: 120px;
+}
+
+.preview-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: var(--radius);
+}
+
+.preview-item .remove {
+    position: absolute;
+    top: -6px;
+    right: -6px;
+    background: var(--danger);
+    color: #fff;
+    border: none;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    line-height: 18px;
+    text-align: center;
+    font-size: 12px;
+    cursor: pointer;
+}
+
+.preview-item .remove:hover {
+    background: rgba(220,38,38,0.8);
+}
+
+/* ---------------- 用户界面微调 ---------------- */
+/* 1. 让评论点赞按钮垂直居中、靠右显示，同时避免覆盖正文 */
+.comment-content {
+    position: relative;          /* 作为绝对定位参照 */
+    padding-right: 6rem !important;      /* 给右侧按钮留空间，确保优先级 */
+}
+
+.comment-actions {
+    position: absolute;          /* 依附 comment-content */
+    top: 50%;
+    right: 0;
+    transform: translateY(-50%); /* 垂直居中 */
+    margin-top: 0;               /* 覆盖早前的 margin */
+}
+
+/* 2. 调整发表评论区按钮与容器边缘的距离 */
+.form-actions {
+    right: 1rem;  /* 与输入框右下角对齐，但保留间距 */
+    bottom: 1rem; /* 同上 */
+    display: flex;
+    align-items: center; /* 确保按钮垂直居中 */
+    gap: 0.5rem;
+}
+
+.form-actions button {
+    height: 45px; /* 按钮高度与输入框一致 */
+}
+
+/* 快捷发帖区域样式 */
+.quick-post-container {
+    background: #fff;
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius);
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    box-shadow: var(--shadow);
+}
+
+.quick-post-container h3 {
+    color: var(--primary-dark);
+    font-size: 1.2rem;
+    margin-bottom: 1rem;
+    text-align: center;
+}
+
+.quick-post-container .post-form {
+    margin: 0;
+}
+
+.quick-post-container .post-form input[type="text"],
+.quick-post-container .post-form textarea {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid var(--gray-300);
+    border-radius: var(--radius);
+    font-size: 0.9rem;
+    transition: border-color 0.15s;
+    margin-bottom: 0.75rem;
+}
+
+.quick-post-container .post-form input[type="text"]:focus,
+.quick-post-container .post-form textarea:focus {
+    border-color: var(--primary);
+    outline: none;
+}
+
+.quick-post-container .post-form textarea {
+    min-height: 80px;
+    resize: vertical;
+}
+
+.quick-post-container .form-actions {
+    position: static;
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.5rem;
+    margin-top: 1rem;
+}
+
+.quick-post-container .form-actions button {
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: var(--radius);
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: background-color 0.15s;
+}
+
+/* 帖子列表分隔线 */
+.posts-divider {
+    height: 2px;
+    background: var(--primary);
+    border-radius: 1px;
+    margin-bottom: 1.5rem;
+}
+
+/* 页面过渡动画样式 */
+.community-container {
+    display: flex;
+    gap: 2rem;
+    transition: all 0.3s ease;
+}
+
+.post-sidebar {
+    flex: 1;
+    max-width: 400px;
+    transition: all 0.3s ease;
+}
+
+.post-display {
+    flex: 2;
+    transition: all 0.3s ease;
+}
+
+/* 当选中帖子时的动画效果 */
+.community-container.post-selected .post-sidebar {
+    transform: translateX(-20px);
+}
+
+.community-container.post-selected .post-display {
+    transform: translateX(20px);
+    opacity: 1;
+}
+
+.post-display .placeholder {
+    text-align: center;
+    color: var(--gray-500);
+    padding: 3rem;
+    font-size: 1.1rem;
+}
+
+.post-card {
+    transition: all 0.2s ease;
+    cursor: pointer;
+}
+
+.post-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.post-card.active {
+    border-left: 4px solid var(--primary);
+    background: var(--primary-light);
+    transform: translateX(5px);
+}
+
+/* 搜索页面样式 */
+.search-page {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 2rem 0;
+}
+
+.search-page h1 {
+    text-align: center;
+    margin-bottom: 2rem;
+    color: var(--gray-800);
+}
+
+.search-form-container {
+    margin-bottom: 3rem;
+}
+
+.search-form {
+    display: flex;
+    justify-content: center;
+}
+
+.search-input-group {
+    display: flex;
+    max-width: 600px;
+    width: 100%;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    border-radius: 25px;
+    overflow: hidden;
+}
+
+.search-input-large {
+    flex: 1;
+    padding: 1rem 1.5rem;
+    border: none;
+    outline: none;
+    font-size: 1rem;
+    background: white;
+}
+
+.search-btn-large {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: var(--primary);
+    color: white;
+    border: none;
+    padding: 1rem 2rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-weight: 500;
+}
+
+.search-btn-large:hover {
+    background: var(--primary-dark);
+}
+
+.search-results {
+    min-height: 400px;
+}
+
+.search-info {
+    margin-bottom: 2rem;
+    padding: 1rem;
+    background: var(--gray-50);
+    border-radius: var(--radius);
+}
+
+.result-count {
+    color: var(--gray-600);
+    font-size: 0.9rem;
+    margin-top: 0.5rem;
+}
+
+.no-results {
+    text-align: center;
+    padding: 3rem 1rem;
+}
+
+.no-results-icon {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+    opacity: 0.5;
+}
+
+.no-results h3 {
+    margin-bottom: 1rem;
+    color: var(--gray-700);
+}
+
+.no-results p {
+    color: var(--gray-600);
+    margin-bottom: 2rem;
+}
+
+.back-btn {
+    display: inline-block;
+    padding: 0.75rem 1.5rem;
+    background: var(--primary);
+    color: white;
+    text-decoration: none;
+    border-radius: var(--radius);
+    transition: all 0.3s ease;
+}
+
+.back-btn:hover {
+    background: var(--primary-dark);
+    transform: translateY(-2px);
+}
+
+.comment-header .author-info-row {
+    display: flex;
+    align-items: center;
+    margin-left: 12px;
+    flex: 1;
+    height: 40px;
+}
+.comment-header .author-info-row .username {
+    font-size: 1.05em;
+    font-weight: 500;
+    color: #1976d2;
+    margin-bottom: 4px;
+    line-height: 1;
+}
+.comment-header .author-info-row .time {
+    margin-left: 12px;
+    color: #888;
+    font-size: 0.95em;
+    line-height: 1.2;
+    position: relative;
+    top: 2px;
+}
