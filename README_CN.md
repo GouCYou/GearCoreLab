@@ -1,6 +1,6 @@
 # GearCoreLab
 
-🌎[English](README.md)🇺🇸 - [简体中文](README_CN.md)🇨🇳 - [繁體中文](README_TW.md)🇭🇰
+🌎[English](README.md) - [简体中文](README_CN.md) - [繁體中文](README_TW.md)
 
 *本项目代码包括以下所有信息均由AI生成，真实性和实用性仅供参考*
 
