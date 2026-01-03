@@ -127,7 +127,8 @@ Gear Core Lab is a professional digital DIY computer hardware community platform
   - Spring Boot Test
   - Spring Security Test
 
-### 📁 Project Structure```
+### 📁 Project Structure
+```
 src/main/java/cn/gcc/gearcorelab/
 ├── config/          # 配置类
 ├── controller/      # 控制器层

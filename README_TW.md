@@ -127,7 +127,8 @@
   - Spring Boot Test
   - Spring Security Test
 
-### 📁 專案結構```
+### 📁 專案結構
+```
 src/main/java/cn/gcc/gearcorelab/
 ├── config/          # 配置类
 ├── controller/      # 控制器层
