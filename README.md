@@ -247,6 +247,10 @@ src/main/java/cn/gcc/gearcorelab/
 - Write necessary comments and documentation
 - Maintain clean and readable code
 
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
 **Project Address**: [GouCYou/GearCoreLab: SpringBoot + AI Hardcore Laboratory](https://github.com/GouCYou/GearCoreLab)  
 **Technical Support**: Feel free to submit Issues or Pull Requests
 

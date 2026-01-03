@@ -247,6 +247,10 @@ src/main/java/cn/gcc/gearcorelab/
 - 編寫必要的註釋和文檔
 - 保持代碼整潔和可讀性
 
+## 📄 許可證
+
+本專案採用 MIT 授權 - 查看 [LICENSE](LICENSE) 文件以了解詳情。
+
 **項目地址**：[GouCYou/GearCoreLab: SpringBoot + AI 硬核實驗室](https://github.com/GouCYou/GearCoreLab)  
 **技術支持**：歡迎提交 Issue 或 Pull Request
 
